@@ -1,0 +1,50 @@
+tsconfig.json
+  e0c525bd042b647b 1-19
+src/commands/init.ts
+  e4786284f93edbfa 1-226
+src/ui/tool-picker.ts
+  e0c525bd042b647b 1-89
+src/commands/__tests__/init.test.ts
+  e4786284f93edbfa 1-241
+package.json
+  e0c525bd042b647b 1-40
+src/ui/ascii-logo.ts
+  e0c525bd042b647b 1-16
+src/ui/welcome.ts
+  e0c525bd042b647b 1-51
+vitest.config.ts
+  e0c525bd042b647b 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "5d46b19743051fe00b37ecdb096b244f29cefa6f",
+  "prompts": {
+    "e0c525bd042b647b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019d3832-35be-4334-a3ac-df7f68884c41",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 223,
+      "total_deletions": 0,
+      "accepted_lines": 223,
+      "overriden_lines": 0
+    },
+    "e4786284f93edbfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "774aa754-87e7-477a-bd8c-88a50daab23b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 550,
+      "total_deletions": 0,
+      "accepted_lines": 550,
+      "overriden_lines": 0
+    }
+  }
+}

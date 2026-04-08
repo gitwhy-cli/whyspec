@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+dist/
+.DS_Store
+
+# Internal planning files (not public)
+tasks/
+create-prd.md
+generate-tasks.md
+
+# WhySpec default (gitignored by default, opt-in sharing)
+.gitwhy/

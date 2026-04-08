@@ -1,0 +1,17 @@
+{
+  "name": "@gitwhy-cli/whyspec-adapters",
+  "version": "0.1.0",
+  "description": "Agent skill adapters for WhySpec — generates tool-specific config files for 10+ AI coding agents",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  },
+  "license": "MIT"
+}

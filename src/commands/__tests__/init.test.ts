@@ -157,7 +157,7 @@ describe("installSkillFiles", () => {
       expect(fs.existsSync(skillPath)).toBe(true);
 
       const content = fs.readFileSync(skillPath, "utf-8");
-      expect(content).toContain(`name: whyspec:${cmd}`);
+      expect(content).toContain(`name: whyspec-${cmd}`);
       expect(content).toContain("---");
     }
   });
@@ -180,9 +180,9 @@ describe("generateAgentsMd", () => {
 
     const content = fs.readFileSync(agentsMdPath, "utf-8");
     expect(content).toContain("WhySpec");
-    expect(content).toContain("/whyspec:plan");
-    expect(content).toContain("/whyspec:capture");
-    expect(content).toContain("GitHub Copilot");
+    expect(content).toContain("whyspec plan");
+    expect(content).toContain("whyspec capture");
+    expect(content).toContain("Copilot");
   });
 
   it("does not generate AGENTS.md if no tool needs it", () => {

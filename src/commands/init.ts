@@ -3,7 +3,11 @@ import * as path from "node:path";
 import chalk from "chalk";
 import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
-import { promptToolPicker, needsAgentsMd, getToolMeta } from "../ui/tool-picker.js";
+import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
+import { generateClaudeCodeSkills } from "../adapters/claude-code.js";
+import { generateCursorCommands } from "../adapters/cursor.js";
+import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
+import type { GeneratedFile } from "../adapters/types.js";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -102,56 +106,56 @@ const SKILL_DESCRIPTIONS: Record<string, { name: string; description: string; in
   },
 };
 
-export function installSkillFiles(root: string, tools: string[]): void {
-  // Only install Claude Code skill files if claude-code is selected
-  if (!tools.includes("claude-code")) return;
+/** Write GeneratedFile[] to disk, creating directories as needed. */
+function writeGeneratedFiles(root: string, files: GeneratedFile[]): void {
+  for (const file of files) {
+    const fullPath = path.join(root, file.path);
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.writeFileSync(fullPath, file.content, "utf-8");
+  }
+}
 
+/**
+ * Install authored skill files from skills/ directory if they exist (Agent 5's work).
+ * Falls back to adapter-generated placeholders if authored files aren't available.
+ */
+function installAuthoredSkills(root: string, skillsSourceDir: string): boolean {
+  if (!fs.existsSync(skillsSourceDir)) return false;
+  let installed = false;
   for (const cmd of WHYSPEC_COMMANDS) {
-    const skillDir = path.join(root, ".claude", "skills", `whyspec-${cmd}`);
-    fs.mkdirSync(skillDir, { recursive: true });
+    const src = path.join(skillsSourceDir, `whyspec-${cmd}`, "SKILL.md");
+    if (fs.existsSync(src)) {
+      const dest = path.join(root, ".claude", "skills", `whyspec-${cmd}`);
+      fs.mkdirSync(dest, { recursive: true });
+      fs.copyFileSync(src, path.join(dest, "SKILL.md"));
+      installed = true;
+    }
+  }
+  return installed;
+}
 
-    const meta = SKILL_DESCRIPTIONS[cmd];
-    const content =
-      `---\n` +
-      `name: ${meta.name}\n` +
-      `description: ${meta.description}\n` +
-      `---\n\n` +
-      `# /whyspec:${cmd}\n\n` +
-      `${meta.instruction}\n`;
+export function installSkillFiles(root: string, tools: string[]): void {
+  // Claude Code skills
+  if (tools.includes("claude-code")) {
+    // Try authored skill files first (production-quality from skills/ directory)
+    const skillsDir = path.join(path.dirname(path.dirname(__dirname)), "skills");
+    const authoredInstalled = installAuthoredSkills(root, skillsDir);
+    if (!authoredInstalled) {
+      // Fall back to adapter-generated placeholders
+      writeGeneratedFiles(root, generateClaudeCodeSkills());
+    }
+  }
 
-    fs.writeFileSync(path.join(skillDir, "SKILL.md"), content, "utf-8");
+  // Cursor commands
+  if (tools.includes("cursor")) {
+    writeGeneratedFiles(root, generateCursorCommands());
   }
 }
 
 export function generateAgentsMd(root: string, tools: string[]): void {
   if (!needsAgentsMd(tools)) return;
-
-  const toolNames = tools
-    .map((id) => getToolMeta(id)?.name)
-    .filter(Boolean)
-    .join(", ");
-
-  const content =
-    `# AGENTS.md — WhySpec Instructions\n\n` +
-    `This project uses [WhySpec](https://github.com/gitwhy-cli/whyspec) — the reasoning layer for AI coding.\n\n` +
-    `## Available Commands\n\n` +
-    `| Command | Purpose |\n` +
-    `|---------|--------|\n` +
-    `| \`/whyspec:plan\` | Plan before coding — declare intent and decisions to make |\n` +
-    `| \`/whyspec:execute\` | Implement with context from plan files |\n` +
-    `| \`/whyspec:capture\` | Save reasoning — capture decisions made after coding |\n` +
-    `| \`/whyspec:show\` | View the full story of a change |\n` +
-    `| \`/whyspec:search\` | Search past decisions across all changes |\n` +
-    `| \`/whyspec:debug\` | Debug with structured investigation |\n\n` +
-    `## Workflow\n\n` +
-    `1. **Before coding:** Run \`/whyspec:plan\` to declare intent and identify decisions to make\n` +
-    `2. **During coding:** Run \`/whyspec:execute\` to implement with plan context\n` +
-    `3. **After coding:** Run \`/whyspec:capture\` to record decisions made and reasoning\n\n` +
-    `## Configuration\n\n` +
-    `See \`.gitwhy/config.yaml\` for project settings.\n\n` +
-    `Configured tools: ${toolNames}\n`;
-
-  fs.writeFileSync(path.join(root, "AGENTS.md"), content, "utf-8");
+  const files = generateAgentsMdAdapter();
+  writeGeneratedFiles(root, files);
 }
 
 // ── Project detection ────────────────────────────────────────────────

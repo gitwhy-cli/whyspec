@@ -62,6 +62,8 @@ export async function planCommand(
 
   // Non-JSON mode: create directory and files
   mkdirSync(changePath, { recursive: true });
+  // Write start anchor for commit tracking (used by capture to scope commits)
+  writeFileSync(join(changePath, ".started"), new Date().toISOString());
   writeFileSync(join(changePath, "intent.md"), intentTemplate(slug));
   writeFileSync(join(changePath, "design.md"), designTemplate(slug));
   writeFileSync(join(changePath, "tasks.md"), tasksTemplate(slug));

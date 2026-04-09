@@ -59,7 +59,7 @@ Tests pass.
   });
 
   it("handles uppercase X checkbox", () => {
-    const { progress } = parseTasks("- [X] Done task\n- [ ] Pending task");
+    const { progress } = parseTasks("## Tasks\n\n- [X] Done task\n- [ ] Pending task");
     expect(progress.completed).toBe(1);
     expect(progress.remaining).toBe(1);
   });
@@ -73,7 +73,7 @@ Tests pass.
   });
 
   it("ignores non-checkbox list items", () => {
-    const content = `- Regular list item
+    const content = `## Tasks\n\n- Regular list item
 - Another item
 - [x] Actual task
 - [ ] Pending task`;
@@ -82,7 +82,7 @@ Tests pass.
   });
 
   it("tracks line numbers correctly", () => {
-    const content = `# Tasks
+    const content = `## Tasks
 
 - [x] Done
 - [ ] Pending on line 4
@@ -96,7 +96,7 @@ Tests pass.
   });
 
   it("handles all completed tasks", () => {
-    const content = "- [x] Task 1\n- [x] Task 2\n- [X] Task 3";
+    const content = "## Tasks\n\n- [x] Task 1\n- [x] Task 2\n- [X] Task 3";
     const { progress, pending } = parseTasks(content);
     expect(progress.total).toBe(3);
     expect(progress.completed).toBe(3);
@@ -121,7 +121,7 @@ describe("execute command", () => {
   it("--json returns full execution context", async () => {
     createChangeFolderWithTasks(
       "exec-test",
-      "# Tasks\n\n- [x] Setup\n- [ ] Implement\n- [ ] Test",
+      "# Tasks\n\n## Verification\n\n- [ ] Tests pass\n\n## Tasks\n\n- [x] Setup\n- [ ] Implement\n- [ ] Test",
     );
 
     const output = await captureOutput(() =>
@@ -181,7 +181,7 @@ describe("execute command", () => {
   });
 
   it("auto-detects single change when name not provided", async () => {
-    createChangeFolderWithTasks("only-one", "- [x] Done\n- [ ] Pending");
+    createChangeFolderWithTasks("only-one", "## Tasks\n\n- [x] Done\n- [ ] Pending");
 
     const output = await captureOutput(() =>
       executeCommand(undefined, { json: true }),
@@ -193,7 +193,7 @@ describe("execute command", () => {
   it("non-JSON mode displays progress summary", async () => {
     createChangeFolderWithTasks(
       "display-test",
-      "- [x] Done\n- [x] Also done\n- [ ] Pending",
+      "## Tasks\n\n- [x] Done\n- [x] Also done\n- [ ] Pending",
     );
 
     const output = await captureOutput(() =>

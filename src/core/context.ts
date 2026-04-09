@@ -6,7 +6,8 @@
  */
 
 import { randomBytes } from "node:crypto";
-import { statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { contextTemplate } from "./templates.js";
 
 /**
@@ -63,9 +64,17 @@ export function extractDecisions(designContent: string): string[] {
 }
 
 /**
- * Get the creation time of a change folder (used for commit range detection).
+ * Get the start time of a change (used for commit range detection).
+ * Reads .started file written by `whyspec plan`. Falls back to folder birthtime.
  */
 export function getChangeFolderCreatedAt(changePath: string): Date {
+  const startedFile = join(changePath, ".started");
+  if (existsSync(startedFile)) {
+    const ts = readFileSync(startedFile, "utf-8").trim();
+    const parsed = new Date(ts);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  // Fallback to folder birthtime (less reliable across platforms)
   const stat = statSync(changePath);
   return stat.birthtime;
 }

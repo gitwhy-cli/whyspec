@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import { runInit } from "../commands/init.js";
+import { planCommand } from "../commands/plan.js";
+import { executeCommand } from "../commands/execute.js";
+import { captureCommand } from "../commands/capture.js";
 
 const program = new Command();
 
@@ -16,13 +20,8 @@ program
 program
   .command("init")
   .description("Initialize WhySpec in the current project")
-  .action(async (_opts, cmd) => {
-    const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "init" }));
-    } else {
-      console.log("whyspec init — not yet implemented");
-    }
+  .action(async () => {
+    await runInit();
   });
 
 // ── plan ────────────────────────────────────────────────────────────────────
@@ -32,11 +31,7 @@ program
   .argument("[name]", "Name of the change (e.g., add-jwt-auth)")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "plan", name }));
-    } else {
-      console.log(`whyspec plan ${name ?? ""} — not yet implemented`);
-    }
+    await planCommand(name, { json });
   });
 
 // ── execute ─────────────────────────────────────────────────────────────────
@@ -46,11 +41,7 @@ program
   .argument("[name]", "Name of the change to execute")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "execute", name }));
-    } else {
-      console.log(`whyspec execute ${name ?? ""} — not yet implemented`);
-    }
+    await executeCommand(name, { json });
   });
 
 // ── capture ─────────────────────────────────────────────────────────────────
@@ -60,11 +51,7 @@ program
   .argument("[name]", "Name of the change to capture")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "capture", name }));
-    } else {
-      console.log(`whyspec capture ${name ?? ""} — not yet implemented`);
-    }
+    await captureCommand(name, { json });
   });
 
 // ── show ────────────────────────────────────────────────────────────────────

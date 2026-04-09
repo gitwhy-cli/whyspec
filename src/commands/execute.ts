@@ -36,7 +36,8 @@ function readFileOrEmpty(filePath: string): string {
 }
 
 /**
- * Parse tasks.md for checkbox items.
+ * Parse tasks.md for checkbox items, scoped to the ## Tasks section only.
+ * Ignores checkboxes in ## Verification and other sections.
  * Recognizes: - [x], - [X] (completed) and - [ ] (pending).
  */
 export function parseTasks(content: string): {
@@ -51,9 +52,22 @@ export function parseTasks(content: string): {
   let total = 0;
   let completed = 0;
   const pending: PendingTask[] = [];
+  let inTasksSection = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // Enter the ## Tasks section
+    if (/^##\s+Tasks\b/i.test(line)) {
+      inTasksSection = true;
+      continue;
+    }
+    // Exit on any other ## heading
+    if (inTasksSection && /^##\s/.test(line)) {
+      break;
+    }
+    // Only count checkboxes within ## Tasks
+    if (!inTasksSection) continue;
 
     // Match completed tasks: - [x] or - [X]
     if (/^-\s+\[[xX]\]\s+/.test(line)) {
@@ -62,7 +76,7 @@ export function parseTasks(content: string): {
       continue;
     }
 
-    // Match pending tasks: - [ ]
+    // Match pending tasks: - [ ] with description
     const pendingMatch = line.match(/^-\s+\[ \]\s+(.+)/);
     if (pendingMatch) {
       total++;

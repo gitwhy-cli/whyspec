@@ -1,0 +1,35 @@
+README.md
+  fab03db375e86c5b 62,64-69
+docs/gitwhy.md
+  fab03db375e86c5b 1-25
+docs/workflows.md
+  fab03db375e86c5b 1-50
+docs/supported-tools.md
+  fab03db375e86c5b 1-51
+docs/commands.md
+  fab03db375e86c5b 1-52
+docs/getting-started.md
+  fab03db375e86c5b 1-47
+docs/concepts.md
+  fab03db375e86c5b 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "4c59fcbe594544d20ac5de66a066680041cccd70",
+  "prompts": {
+    "fab03db375e86c5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "857e2b6a-e516-4356-8432-1a63266b2eb6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 296,
+      "total_deletions": 112,
+      "accepted_lines": 296,
+      "overriden_lines": 0
+    }
+  }
+}

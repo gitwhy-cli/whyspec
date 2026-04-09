@@ -1,10 +1,10 @@
-# Supported Tools
+# Supported Agents
 
-WhySpec works with any AI coding agent. Run `whyspec init` and select your tools — WhySpec generates the right config for each.
+WhySpec works with any AI coding agent. Run `whyspec init` and select your agents — WhySpec generates the right config for each.
 
 ## Integrations
 
-| AI Tool | Integration | How |
+| AI Agent | Integration | How |
 |---------|------------|-----|
 | **Claude Code** | Native skills | `.claude/skills/whyspec-*/SKILL.md` |
 | **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |

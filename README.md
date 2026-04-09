@@ -83,6 +83,28 @@ whyspec capture "add-jwt-auth"  ->  .gitwhy/changes/add-jwt-auth/ctx_a1b2c3d4.md
                                       Decisions Made + Surprises + Trade-offs
 ```
 
+## What gets created
+
+```
+.gitwhy/
+├── changes/
+│   ├── add-jwt-auth/
+│   │   ├── intent.md          # why
+│   │   ├── design.md          # approach + decisions
+│   │   ├── tasks.md           # verification checklist
+│   │   └── ctx_a1b2c3d4.md    # captured reasoning
+│   ├── migrate-to-postgres/
+│   │   ├── intent.md
+│   │   ├── design.md
+│   │   ├── tasks.md
+│   │   └── ctx_f3e4d5c6.md
+│   └── add-rate-limiting/
+│       ├── intent.md
+│       └── design.md          # planning phase
+└── templates/
+    └── ...
+```
+
 ## The Decision Bridge
 
 WhySpec's core differentiator. It tracks how reasoning **evolves** from intent to outcome:

@@ -1,0 +1,31 @@
+docs/cli.md
+  fab03db375e86c5b 1-54
+docs/commands.md
+  fab03db375e86c5b 3,5,7-14,16,18-22,24,26,28,31-43
+docs/workflows.md
+  fab03db375e86c5b 10-12,20,31-33
+docs/getting-started.md
+  fab03db375e86c5b 24,33,39
+README.md
+  fab03db375e86c5b 65-66,72-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "b58f426909d82c6bccfc9b52a6d75a709d25666d",
+  "prompts": {
+    "fab03db375e86c5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "857e2b6a-e516-4356-8432-1a63266b2eb6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 115,
+      "total_deletions": 53,
+      "accepted_lines": 115,
+      "overriden_lines": 0
+    }
+  }
+}

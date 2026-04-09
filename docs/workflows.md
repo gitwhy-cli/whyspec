@@ -6,18 +6,18 @@ Common patterns for using WhySpec in your development workflow.
 
 The core WhySpec loop:
 
-```bash
-whyspec plan "add-jwt-auth"       # Surface decisions before coding
-whyspec execute "add-jwt-auth"    # Code with full context
-whyspec capture "add-jwt-auth"    # Record what actually happened
+```
+/whyspec:plan add-jwt-auth        # Surface decisions before coding
+/whyspec:execute add-jwt-auth     # Code with full context
+/whyspec:capture add-jwt-auth     # Record what actually happened
 ```
 
 **Why this order matters:** Planning surfaces decisions you'd otherwise make implicitly. Executing with that context keeps the agent focused. Capturing after records how reality diverged from the plan — the most valuable part.
 
 ## Debugging with WhySpec
 
-```bash
-whyspec debug "login-broken"      # Creates a structured debug session
+```
+/whyspec:debug login-broken       # Creates a structured debug session
 ```
 
 The debug workflow uses the scientific method:
@@ -28,9 +28,9 @@ The debug workflow uses the scientific method:
 
 ## Reviewing Past Decisions
 
-```bash
-whyspec search "authentication"   # Find past reasoning about auth
-whyspec show "add-jwt-auth"       # Full story with Decision Bridge delta
+```
+/whyspec:search authentication    # Find past reasoning about auth
+/whyspec:show add-jwt-auth        # Full story with Decision Bridge delta
 ```
 
 Use search when you need to understand why a past decision was made — especially useful when revisiting code months later or onboarding new team members.

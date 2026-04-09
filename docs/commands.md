@@ -1,52 +1,44 @@
 # Commands
 
-All commands support `--json` for agent consumption (CLI-as-oracle pattern).
+Slash commands and skills for use inside your AI coding agent.
 
-## Reference
+## Slash Commands
+
+| Command | Tool | Description |
+|---------|------|-------------|
+| `/whyspec:plan <name>` | Claude Code | Declare intent and plan decisions before coding |
+| `/whyspec:execute <name>` | Claude Code | Implement from plan with full reasoning context |
+| `/whyspec:capture <name>` | Claude Code | Save the reasoning behind what was built |
+| `/whyspec:show <name>` | Claude Code | View full story with Decision Bridge delta |
+| `/whyspec:search <query>` | Claude Code | Search past decisions and reasoning |
+| `/whyspec:debug <name>` | Claude Code | Debug with the scientific method |
+
+### Cursor
 
 | Command | Description |
 |---------|-------------|
-| `whyspec init` | Initialize WhySpec in your project |
-| `whyspec plan <name>` | Declare intent and plan decisions before coding |
-| `whyspec execute <name>` | Implement from plan with full reasoning context |
-| `whyspec capture <name>` | Save the reasoning behind what was built |
-| `whyspec show <name>` | View full story with Decision Bridge delta |
-| `whyspec search <query>` | Search past decisions and reasoning |
-| `whyspec debug <name>` | Debug with the scientific method |
-| `whyspec list` | List all active changes |
-| `whyspec status <name>` | Detailed status for a change |
-| `whyspec template <type>` | Get a raw file template |
+| `/whyspec-plan <name>` | Declare intent and plan decisions before coding |
+| `/whyspec-execute <name>` | Implement from plan with full reasoning context |
+| `/whyspec-capture <name>` | Save the reasoning behind what was built |
+
+### Other Tools (Copilot, Codex, Windsurf, Cline, etc.)
+
+Tools that read `AGENTS.md` will automatically use WhySpec commands via the CLI. No slash commands needed — the agent calls `whyspec plan`, `whyspec execute`, etc. directly.
 
 ## Core Workflow
 
-```bash
-whyspec plan "add-jwt-auth"       # Plan: declare intent + surface decisions
-whyspec execute "add-jwt-auth"    # Execute: code with full context
-whyspec capture "add-jwt-auth"    # Capture: record reasoning + resolve decisions
 ```
+You: /whyspec:plan add-jwt-auth
+AI:  Created .gitwhy/changes/add-jwt-auth/
+     ✓ intent.md  — why this change exists
+     ✓ design.md  — approach + 3 decisions to make
+     ✓ tasks.md   — verification-first checklist
 
-## Inspection
+You: /whyspec:execute add-jwt-auth
+AI:  Implementing with full context...
+     ✓ All tasks complete! 3 decisions resolved.
 
-```bash
-whyspec show "add-jwt-auth"       # View full story with Decision Bridge delta
-whyspec search "authentication"   # Search past decisions and reasoning
-whyspec list                      # List all active changes
-whyspec status "add-jwt-auth"     # Detailed status for a change
+You: /whyspec:capture add-jwt-auth
+AI:  Decision Bridge resolved.
+     Saved to ctx_a1b2c3d4.md
 ```
-
-## Debugging
-
-```bash
-whyspec debug "login-broken"      # Debug with the scientific method
-```
-
-## JSON Output
-
-Every command supports `--json` for programmatic consumption:
-
-```bash
-whyspec list --json               # Machine-readable output for AI agents
-whyspec show "add-jwt-auth" --json
-```
-
-This is the **CLI-as-oracle** pattern — your AI agent can call WhySpec commands and parse structured output to inform its own decisions.

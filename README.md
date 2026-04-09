@@ -62,11 +62,27 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 ## Docs
 
 → [Getting Started](docs/getting-started.md): first steps<br>
-→ [Commands](docs/commands.md): CLI reference<br>
+→ [Commands](docs/commands.md): slash commands & skills<br>
+→ [CLI](docs/cli.md): terminal reference<br>
 → [Concepts](docs/concepts.md): Decision Bridge, context IDs, philosophy<br>
 → [Supported Tools](docs/supported-tools.md): tool integrations & install paths<br>
 → [Workflows](docs/workflows.md): common patterns<br>
 → [GitWhy Integration](docs/gitwhy.md): SaaS platform & team sharing
+
+## Cross-Tool Support
+
+| AI Tool | Integration | How |
+|---------|------------|-----|
+| **Claude Code** | Native skills | `.claude/skills/whyspec-*/SKILL.md` |
+| **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
+| **GitHub Copilot** | Project instructions | `AGENTS.md` |
+| **Codex CLI** | Project instructions | `AGENTS.md` |
+| **Windsurf** | Project instructions | `AGENTS.md` |
+| **Cline** | Project instructions | `AGENTS.md` |
+| **Amazon Q** | Project instructions | `AGENTS.md` |
+| **RooCode** | Project instructions | `AGENTS.md` |
+
+Run `whyspec init` and select your tools. WhySpec generates the right config for each.
 
 ## Works With
 

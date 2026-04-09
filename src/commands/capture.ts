@@ -100,12 +100,11 @@ export async function captureCommand(
   const filePath = join(change.path, fileName);
   writeFileSync(filePath, content);
 
-  console.log(chalk.green("Captured context:") + ` ${fileName}`);
-  console.log(`  ${chalk.dim("change:")} ${change.name}`);
-  console.log(`  ${chalk.dim("branch:")} ${branch}`);
-  console.log(`  ${chalk.dim("commits:")} ${commitList}`);
   if (allDecisions.length > 0) {
-    console.log(`  ${chalk.dim("decisions to map:")} ${allDecisions.length}`);
-    allDecisions.forEach((d) => console.log(`    - ${d}`));
+    console.log(chalk.green("\n  Decision Bridge resolved:"));
+    allDecisions.forEach((d) => console.log(`     ${chalk.green("✓")} ${d}`));
   }
+  console.log(chalk.green(`\n  Saved to`) + ` ${contextId}.md`);
+  console.log(chalk.dim(`     change: ${change.name}  branch: ${branch}  commits: ${commitList}`));
+  console.log();
 }

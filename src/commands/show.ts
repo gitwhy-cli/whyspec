@@ -162,21 +162,22 @@ export async function showCommand(
   console.log(chalk.bold.magenta("── Decision Bridge ─────────────────────────────"));
 
   if (allPlanned.length > 0) {
-    console.log(chalk.bold("Planned decisions:"));
-    allPlanned.forEach((d) => console.log(`  ${chalk.dim("○")} ${d}`));
-  }
-
-  if (allDecided.length > 0) {
-    console.log(chalk.bold("\nDecisions made:"));
-    allDecided.forEach((d) => console.log(`  ${chalk.green("●")} ${d}`));
+    allPlanned.forEach((d) => {
+      const resolved = allDecided.some((dec) => {
+        const dWords = d.toLowerCase().split(/\W+/).filter((w) => w.length > 3);
+        return dWords.some((w) => dec.toLowerCase().includes(w));
+      });
+      const icon = resolved ? chalk.green("✓") : chalk.dim("○");
+      console.log(`  ${icon} ${d}`);
+    });
   }
 
   if (surprises.length > 0) {
-    console.log(chalk.bold.yellow("\nSurprises (not in plan):"));
-    surprises.forEach((d) => console.log(`  ${chalk.yellow("⚡")} ${d}`));
+    surprises.forEach((d) => console.log(`  ${chalk.yellow("⚠")} SURPRISE: ${d}`));
   }
 
   if (allPlanned.length === 0 && allDecided.length === 0) {
     console.log(chalk.dim("  No decisions tracked yet."));
   }
+  console.log();
 }

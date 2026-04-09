@@ -121,29 +121,39 @@ export async function executeCommand(
     return;
   }
 
-  // Non-JSON mode: display progress summary
-  console.log(chalk.bold(`Change: ${change.name}`));
-  console.log();
+  // Non-JSON mode: display task list with checkmarks
+  console.log(chalk.green("\n  Executing:") + ` ${change.name}`);
 
   if (progress.total === 0) {
-    console.log(chalk.yellow("No tasks found in tasks.md"));
+    console.log(chalk.yellow("     No tasks defined in tasks.md yet."));
+    console.log();
     return;
   }
 
-  // Progress bar
-  const pct = Math.round((progress.completed / progress.total) * 100);
-  const barLen = 30;
-  const filled = Math.round((pct / 100) * barLen);
-  const bar = chalk.green("█".repeat(filled)) + chalk.dim("░".repeat(barLen - filled));
-  console.log(`Progress: ${bar} ${pct}% (${progress.completed}/${progress.total})`);
-  console.log();
+  // Show all tasks (completed + pending) with numbers
+  const lines = tasksContent.split("\n");
+  let inTasksSection = false;
+  let taskNum = 0;
+  for (const line of lines) {
+    if (/^##\s+Tasks\b/i.test(line)) { inTasksSection = true; continue; }
+    if (inTasksSection && /^##\s/.test(line)) break;
+    if (!inTasksSection) continue;
 
-  if (pending.length > 0) {
-    console.log(chalk.bold("Pending tasks:"));
-    pending.forEach((t) => {
-      console.log(`  ${chalk.dim(`L${t.line}`)} - [ ] ${t.description}`);
-    });
-  } else {
-    console.log(chalk.green("All tasks completed!"));
+    if (/^-\s+\[[xX]\]\s+/.test(line)) {
+      taskNum++;
+      const desc = line.replace(/^-\s+\[[xX]\]\s+/, "").trim();
+      console.log(`     ${chalk.green("✓")} ${taskNum}. ${desc}`);
+    } else if (/^-\s+\[ \]\s+/.test(line)) {
+      taskNum++;
+      const desc = line.replace(/^-\s+\[ \]\s+/, "").trim();
+      console.log(`     ${chalk.dim("○")} ${taskNum}. ${desc}`);
+    }
   }
+
+  if (progress.remaining === 0) {
+    console.log(chalk.green(`     All tasks complete!`));
+  } else {
+    console.log(chalk.dim(`     ${progress.completed}/${progress.total} tasks complete`));
+  }
+  console.log();
 }

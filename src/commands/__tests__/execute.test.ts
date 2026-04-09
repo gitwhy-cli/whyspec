@@ -201,7 +201,6 @@ describe("execute command", () => {
     );
 
     expect(output).toContain("display-test");
-    expect(output).toContain("67%");
     expect(output).toContain("2/3");
     expect(output).toContain("Pending");
   });

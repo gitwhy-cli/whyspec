@@ -27,20 +27,18 @@ export async function searchCommand(
   }
 
   if (results.length === 0) {
-    console.log(chalk.yellow(`No results found for "${query}"`));
+    console.log(chalk.yellow(`\n  No results found for "${query}"\n`));
     return;
   }
 
-  console.log(chalk.bold(`Search results for "${query}"`) + chalk.dim(` (${results.length} matches)`));
-  console.log();
+  console.log(chalk.green(`\n  Found ${results.length} matches`) + ` for "${query}":\n`);
 
   for (const r of results) {
     const scoreColor = r.score >= 100 ? chalk.green : r.score >= 30 ? chalk.yellow : chalk.dim;
-    const scoreStr = scoreColor(`[${r.score}]`);
-    const sections = chalk.dim(`(${r.matched_sections.join(", ")})`);
+    const icon = r.score >= 100 ? chalk.green("●") : r.score >= 30 ? chalk.yellow("●") : chalk.dim("○");
 
-    console.log(`  ${scoreStr} ${chalk.bold(r.change_name)} ${chalk.dim("/")} ${r.title} ${sections}`);
-    console.log(`    ${chalk.dim(r.snippet)}`);
-    console.log();
+    console.log(`     ${icon} ${chalk.bold(r.change_name)} / ${r.title} ${scoreColor(`[${r.score}]`)}`);
+    console.log(`       ${chalk.dim(r.snippet)}`);
   }
+  console.log();
 }

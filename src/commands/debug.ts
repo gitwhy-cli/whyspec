@@ -69,24 +69,22 @@ export async function debugCommand(
   writeFileSync(join(changePath, ".started"), new Date().toISOString());
   writeFileSync(join(changePath, "debug.md"), fullTemplate);
 
-  console.log(chalk.green("Created debug session:") + ` ${slug}`);
-  console.log(`  ${chalk.dim("path:")} .gitwhy/changes/${slug}/`);
-  console.log(`  ${chalk.dim("file:")} debug.md`);
+  console.log(chalk.green(`\n  Created`) + ` .gitwhy/changes/${slug}/`);
+  console.log(`     ${chalk.green("✓")} debug.md — scientific investigation template`);
 
   if (relatedContexts.length > 0) {
-    console.log();
-    console.log(chalk.bold("Related past contexts:"));
+    console.log(`\n  Related past contexts:`);
     for (const ctx of relatedContexts) {
       const scoreColor = ctx.score >= 100 ? chalk.green : ctx.score >= 30 ? chalk.yellow : chalk.dim;
-      console.log(`  ${scoreColor(`[${ctx.score}]`)} ${ctx.change_name}/${ctx.id} — ${ctx.title}`);
+      console.log(`     ${scoreColor("●")} ${ctx.change_name}/${ctx.id} — ${ctx.title}`);
     }
   }
 
+  console.log(`\n  Next steps:`);
+  console.log(`     1. Fill in Symptoms (expected vs actual)`);
+  console.log(`     2. Form 3+ Hypotheses with disproof criteria`);
+  console.log(`     3. Investigate each hypothesis with evidence`);
+  console.log(`     4. Verify Root Cause before fixing (Iron Law)`);
+  console.log(`     5. Run whyspec capture to save reasoning`);
   console.log();
-  console.log(chalk.bold("Next steps:"));
-  console.log(`  1. Fill in ${chalk.cyan("Symptoms")} (expected vs actual)`);
-  console.log(`  2. Form 3+ ${chalk.cyan("Hypotheses")} with disproof criteria`);
-  console.log(`  3. ${chalk.cyan("Investigate")} each hypothesis with evidence`);
-  console.log(`  4. Verify ${chalk.cyan("Root Cause")} before fixing`);
-  console.log(`  5. Run ${chalk.cyan("whyspec capture")} to save debug reasoning`);
 }

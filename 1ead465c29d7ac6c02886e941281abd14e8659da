@@ -1,0 +1,23 @@
+README.md
+  fab03db375e86c5b 17-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "1ead465c29d7ac6c02886e941281abd14e8659da",
+  "prompts": {
+    "fab03db375e86c5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "857e2b6a-e516-4356-8432-1a63266b2eb6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 1,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}

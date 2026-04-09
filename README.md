@@ -14,9 +14,7 @@
 
 **Spec-driven development that captures reasoning.**
 
-A spec-driven context engineering framework for AI coding agents.
-
-Plan decisions before coding. Capture the reasoning after.
+A spec-driven context engineering framework for AI coding agents like Claude Code, Cursor, Copilot, and more.
 
 AI agents write code fast. But when the session closes, the reasoning evaporates. The prompt, the rejected alternatives, the trade-offs. All that survives is the diff. WhySpec captures the rest.
 

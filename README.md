@@ -14,27 +14,11 @@
   <a href="https://discord.gg/2X5X5XeFyT"><img src="https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-<details>
-<summary><strong>The reasoning layer for AI-assisted development.</strong></summary>
-<p align="center">
-  <img src="https://img.shields.io/github/stars/gitwhy-cli/whyspec?style=flat" alt="Stars">
-  <img src="https://img.shields.io/npm/dm/@gitwhy-cli/whyspec" alt="Downloads/month">
-</p>
-</details>
+**Spec-driven development that captures reasoning.**
 
-> **67% of code is AI-generated. 0% of reasoning is preserved.**
+Plan decisions before coding. Capture the "reasoning" after.
 
-```
-WhySpec is the reasoning layer for AI-assisted development.
-
--> intent not just code
--> decisions not just diffs
--> understanding not just output
--> persistent not ephemeral
--> the WHY behind the WHAT
-```
-
-AI agents write code fast. But when the session closes, the reasoning evaporates — the prompt, the rejected alternatives, the trade-offs. All that survives is the diff. WhySpec captures the rest.
+AI agents write code fast. But when the session closes, the reasoning evaporates. The prompt, the rejected alternatives, the trade-offs. All that survives is the diff. WhySpec captures the rest.
 
 ## See it in action
 

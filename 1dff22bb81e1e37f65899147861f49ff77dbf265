@@ -1,0 +1,41 @@
+src/commands/__tests__/e2e.test.ts
+  017bb17898ad0500 1-351
+src/commands/__tests__/capture.test.ts
+  017bb17898ad0500 196-202
+LICENSE
+  017bb17898ad0500 1-21
+.github/workflows/release.yml
+  017bb17898ad0500 9,12-15,44-48
+.npmignore
+  017bb17898ad0500 1-27
+src/core/format-compat.test.ts
+  017bb17898ad0500 1-177
+package.json
+  017bb17898ad0500 7-14,18-23,32-33
+CHANGELOG.md
+  017bb17898ad0500 1-86
+src/commands/capture.ts
+  017bb17898ad0500 12,76,79,83-89
+src/utils/git.ts
+  017bb17898ad0500 90-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "1dff22bb81e1e37f65899147861f49ff77dbf265",
+  "prompts": {
+    "017bb17898ad0500": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3f35cf10-edd1-4994-85be-4753a00688c9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 722,
+      "total_deletions": 6,
+      "accepted_lines": 722,
+      "overriden_lines": 0
+    }
+  }
+}

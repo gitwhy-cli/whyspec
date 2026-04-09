@@ -156,6 +156,21 @@ export async function runInit(): Promise<void> {
   const root = process.cwd();
   const gitwhyDir = path.join(root, ".gitwhy");
 
+  // Guard: must be in a project directory (git repo or has package.json/similar)
+  const isProject =
+    fs.existsSync(path.join(root, ".git")) ||
+    fs.existsSync(path.join(root, "package.json")) ||
+    fs.existsSync(path.join(root, "pyproject.toml")) ||
+    fs.existsSync(path.join(root, "Cargo.toml")) ||
+    fs.existsSync(path.join(root, "go.mod"));
+
+  if (!isProject) {
+    console.log(chalk.red("\n  Not a project directory."));
+    console.log(chalk.dim("  Run whyspec init inside a project (git repo, package.json, etc.).\n"));
+    process.exitCode = 1;
+    return;
+  }
+
   // Guard: already initialized — but repair missing skills from partial init
   if (fs.existsSync(gitwhyDir)) {
     const config = readConfig(root);

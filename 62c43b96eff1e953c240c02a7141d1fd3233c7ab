@@ -1,0 +1,27 @@
+package.json
+  b612b6c08193008b 60
+CLAUDE.md
+  b612b6c08193008b 1-28
+.gitignore
+  b612b6c08193008b 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "62c43b96eff1e953c240c02a7141d1fd3233c7ab",
+  "prompts": {
+    "b612b6c08193008b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c4ba2b2-19f3-434e-a23d-baa69bae41ee",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 20,
+      "total_deletions": 20,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}

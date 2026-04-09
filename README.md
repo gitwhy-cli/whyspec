@@ -16,7 +16,15 @@
 
 A spec-driven context engineering framework for AI coding agents like Claude Code, Cursor, Copilot, and more.
 
-AI agents write code fast. But when the session closes, the reasoning evaporates. The prompt, the rejected alternatives, the trade-offs. All that survives is the diff. WhySpec captures the rest.
+Our Vision:
+
+> Code tells you **what** was built. Tests tell you **how** it works. Only reasoning tells you **why** it exists.
+
+- **Plan before coding** — surface decisions upfront
+- **Capture after coding** — record what actually happened
+- **Track the delta** — see what changed and what surprised you
+
+In an era where AI writes most of the code, the human contribution isn't the syntax — it's the judgment. WhySpec preserves that judgment so it survives beyond the chat session that created it.
 
 ## See it in action
 

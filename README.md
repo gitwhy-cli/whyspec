@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="YOUR_CANVA_IMAGE_URL_HERE" alt="WhySpec — The Reasoning Layer" width="600">
+  <img src="assets/banner.png" alt="WhySpec — The Reasoning Layer" width="600">
 </p>
 
 <p align="center">
@@ -11,7 +11,7 @@
   <a href="https://github.com/gitwhy-cli/whyspec/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gitwhy-cli/whyspec.svg" alt="license"></a>
   <a href="https://github.com/gitwhy-cli/whyspec/actions"><img src="https://img.shields.io/github/actions/workflow/status/gitwhy-cli/whyspec/ci.yml?branch=main" alt="CI"></a>
   <a href="https://github.com/gitwhy-cli/whyspec"><img src="https://img.shields.io/github/stars/gitwhy-cli/whyspec" alt="GitHub stars"></a>
-  <a href="https://discord.gg/YOUR_DISCORD_INVITE"><img src="https://img.shields.io/discord/YOUR_SERVER_ID?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord"></a>
+  <a href="https://discord.gg/2X5X5XeFyT"><img src="https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
 <details>

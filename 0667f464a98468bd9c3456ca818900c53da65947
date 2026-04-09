@@ -1,0 +1,23 @@
+README.md
+  b612b6c08193008b 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "0667f464a98468bd9c3456ca818900c53da65947",
+  "prompts": {
+    "b612b6c08193008b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c4ba2b2-19f3-434e-a23d-baa69bae41ee",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 4,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -24,7 +24,7 @@ export function findRepoRoot(): string {
     return out.trim();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Not a git repository: ${msg}`);
+    throw new Error(`Not a git repository: ${msg}`, { cause: err });
   }
 }
 

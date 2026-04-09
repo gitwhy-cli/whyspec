@@ -1,0 +1,62 @@
+src/core/config.ts
+  40f010b902be7bc6 1-71
+src/core/storage.ts
+  40f010b902be7bc6 1-88
+src/utils/telemetry.ts
+  40f010b902be7bc6 1-42
+src/utils/telemetry.test.ts
+  5ad19d6c76b51dd3 1-63
+src/utils/slugify.ts
+  40f010b902be7bc6 1-23
+src/core/templates.test.ts
+  5ad19d6c76b51dd3 1-136
+src/core/storage.test.ts
+  5ad19d6c76b51dd3 1-117
+src/core/templates.ts
+  40f010b902be7bc6 1-185
+src/core/categorize.ts
+  40f010b902be7bc6 1-89
+src/utils/slugify.test.ts
+  5ad19d6c76b51dd3 1-40
+src/core/categorize.test.ts
+  5ad19d6c76b51dd3 1-95
+src/core/config.test.ts
+  5ad19d6c76b51dd3 1-82
+src/utils/git.ts
+  5ad19d6c76b51dd3 1-80
+src/utils/git.test.ts
+  5ad19d6c76b51dd3 1-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "17e077099041d11ae6919aca7ce20c9af8bc41b2",
+  "prompts": {
+    "40f010b902be7bc6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12fd916c-59f1-44a7-b105-a7e05d85c23d",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 498,
+      "overriden_lines": 0
+    },
+    "5ad19d6c76b51dd3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5e9c8952-7f12-446b-889c-acd14d0b3508",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 680,
+      "overriden_lines": 0
+    }
+  }
+}

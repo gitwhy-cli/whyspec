@@ -1,0 +1,33 @@
+skills/whyspec-plan/SKILL.md
+  1c49630fc8910968 1-170
+skills/whyspec-execute/SKILL.md
+  1c49630fc8910968 1-118
+skills/whyspec-capture/SKILL.md
+  1c49630fc8910968 1-154
+skills/whyspec-show/SKILL.md
+  1c49630fc8910968 1-90
+skills/whyspec-search/SKILL.md
+  1c49630fc8910968 1-69
+skills/whyspec-debug/SKILL.md
+  1c49630fc8910968 1-404
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "a500b8c6efc3684581de5bf70a60cd3b69bbf904",
+  "prompts": {
+    "1c49630fc8910968": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "edb51d24-570c-4137-9f7c-3db4deac9b51",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 1005,
+      "total_deletions": 0,
+      "accepted_lines": 1005,
+      "overriden_lines": 0
+    }
+  }
+}

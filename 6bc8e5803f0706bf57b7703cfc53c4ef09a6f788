@@ -1,0 +1,31 @@
+src/core/config.test.ts
+  af285287f52fb25e 45-46,53-54
+src/commands/plan.ts
+  af285287f52fb25e 45
+src/core/templates.ts
+  af285287f52fb25e 50-53
+src/utils/git.ts
+  af285287f52fb25e 62-89
+src/core/config.ts
+  af285287f52fb25e 19,23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "6bc8e5803f0706bf57b7703cfc53c4ef09a6f788",
+  "prompts": {
+    "af285287f52fb25e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "747fdd7e-1a21-4346-9fcc-2434654ef94d",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 46,
+      "total_deletions": 23,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    }
+  }
+}

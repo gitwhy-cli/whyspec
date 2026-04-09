@@ -5,6 +5,7 @@ import chalk from "chalk";
 import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
+import { readConfig } from "../core/config.js";
 import { generateClaudeCodeSkills } from "../adapters/claude-code.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
@@ -155,10 +156,30 @@ export async function runInit(): Promise<void> {
   const root = process.cwd();
   const gitwhyDir = path.join(root, ".gitwhy");
 
-  // Guard: already initialized
+  // Guard: already initialized — but repair missing skills from partial init
   if (fs.existsSync(gitwhyDir)) {
-    console.log(chalk.yellow("\n  WhySpec is already initialized in this directory."));
-    console.log(chalk.dim("  .gitwhy/ already exists.\n"));
+    const config = readConfig(root);
+    const tools = config.tools ?? ["claude-code"];
+    let repaired = false;
+
+    // Check if skills need to be installed (e.g. prior crash before skill step)
+    if (tools.includes("claude-code")) {
+      const skillCheck = path.join(root, ".claude", "skills", "whyspec-plan", "SKILL.md");
+      if (!fs.existsSync(skillCheck)) {
+        console.log(chalk.yellow("\n  Repairing missing skill files...\n"));
+        installSkillFiles(root, tools);
+        generateAgentsMd(root, tools);
+        repaired = true;
+      }
+    }
+
+    if (repaired) {
+      console.log(chalk.green.bold("  \u2713 Skills installed successfully!"));
+      console.log(`\n  Try: ${chalk.cyan.bold("/whyspec:plan")}\n`);
+    } else {
+      console.log(chalk.yellow("\n  WhySpec is already initialized in this directory."));
+      console.log(chalk.dim("  .gitwhy/ already exists.\n"));
+    }
     return;
   }
 

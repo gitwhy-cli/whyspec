@@ -7,10 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@gitwhy-cli/whyspec"><img src="https://img.shields.io/npm/v/@gitwhy-cli/whyspec.svg" alt="npm version"></a>
-  <a href="https://github.com/gitwhy-cli/whyspec/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gitwhy-cli/whyspec.svg" alt="license"></a>
-  <a href="https://github.com/gitwhy-cli/whyspec/actions"><img src="https://img.shields.io/github/actions/workflow/status/gitwhy-cli/whyspec/ci.yml?branch=main" alt="CI"></a>
-  <a href="https://github.com/gitwhy-cli/whyspec"><img src="https://img.shields.io/github/stars/gitwhy-cli/whyspec" alt="GitHub stars"></a>
+  <a href="https://github.com/gitwhy-cli/whyspec/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
   <a href="https://discord.gg/2X5X5XeFyT"><img src="https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 

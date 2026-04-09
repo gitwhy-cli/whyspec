@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
@@ -109,7 +110,8 @@ export function installSkillFiles(root: string, tools: string[]): void {
   // Claude Code skills
   if (tools.includes("claude-code")) {
     // Try authored skill files first (production-quality from skills/ directory)
-    const skillsDir = path.join(path.dirname(path.dirname(__dirname)), "skills");
+    const currentDir = path.dirname(fileURLToPath(import.meta.url));
+    const skillsDir = path.join(path.dirname(path.dirname(currentDir)), "skills");
     const authoredInstalled = installAuthoredSkills(root, skillsDir);
     if (!authoredInstalled) {
       // Fall back to adapter-generated placeholders

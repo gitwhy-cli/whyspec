@@ -1,0 +1,27 @@
+LICENSE
+  548fd36ba3a966a3 1-21
+CONTRIBUTING.md
+  548fd36ba3a966a3 1-103
+README.md
+  548fd36ba3a966a3 1-25,27-37,39,41-62,73-94,97-101,106,112,114,116,123-124,126-128,131,138-152,155,157-161,163,165,167,169,171-179,181-187,189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "2b29f22d39a4d3842127d281b71bdb643944286e",
+  "prompts": {
+    "548fd36ba3a966a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f6ad4a6-32bf-4b56-9bf5-ba5e50ecb9d8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 274,
+      "total_deletions": 44,
+      "accepted_lines": 264,
+      "overriden_lines": 0
+    }
+  }
+}

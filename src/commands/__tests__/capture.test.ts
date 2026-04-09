@@ -193,9 +193,15 @@ describe("capture command", () => {
     expect(files[0]).toMatch(/^ctx_[a-z0-9]{8}\.md$/);
 
     const content = readFileSync(join(changePath, files[0]), "utf-8");
+    // GitWhy-compatible header fields
+    expect(content).toMatch(/^# ctx-test/);
+    expect(content).toContain("**Context ID:** ctx_");
+    expect(content).toContain("**Agent:** whyspec");
+    expect(content).toContain("**Branch:**");
+    expect(content).toContain("**Date:**");
+    // WhySpec supplementary fields
     expect(content).toContain("**Change:** ctx-test");
     expect(content).toContain("**Intent:** .gitwhy/changes/ctx-test/intent.md");
-    expect(content).toContain("**Branch:**");
     expect(content).toContain("**Commits:**");
     expect(content).toContain("<context>");
   });

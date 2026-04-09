@@ -6,8 +6,12 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -37,3 +41,8 @@ jobs:
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

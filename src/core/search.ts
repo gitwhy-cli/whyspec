@@ -10,7 +10,7 @@
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 import { changesDir } from "./storage.js";
 import { autoCategorize } from "./categorize.js";
 
@@ -116,7 +116,7 @@ export function computeSearchScore(
   }
 
   // Fallback: if no specific section matched but the query IS in the content, give 10 points.
-  if (score === 0) {
+  if (score === 0 && content.toLowerCase().includes(lowerQuery)) {
     score += 10;
     matchedSections.push("content");
   }
@@ -136,7 +136,11 @@ function walkMarkdownFiles(dir: string): string[] {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...walkMarkdownFiles(fullPath));
-    } else if (entry.name.endsWith(".md")) {
+    } else if (
+      entry.name.startsWith("ctx_") && entry.name.endsWith(".md") ||
+      entry.name === "intent.md" ||
+      entry.name === "design.md"
+    ) {
       results.push(fullPath);
     }
   }
@@ -250,9 +254,8 @@ export function searchChanges(
       // Apply domain filter if specified.
       if (options?.domain && domain !== options.domain) continue;
 
-      // Derive ID from filename (without .md extension).
-      const fileName = filePath.split("/").pop() ?? "";
-      const id = fileName.replace(/\.md$/, "");
+      // Derive ID from filename (without .md extension). Use path.basename for cross-platform safety.
+      const id = basename(filePath, ".md");
 
       const snippet = extractSnippet(content, lowerQuery);
       const relPath = relative(repoRoot, filePath);

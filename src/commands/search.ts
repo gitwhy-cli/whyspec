@@ -13,7 +13,8 @@ export async function searchCommand(
   options: { json?: boolean; domain?: string; limit?: number },
 ): Promise<void> {
   const repoRoot = process.cwd();
-  const limit = options.limit ? Number(options.limit) : 10;
+  const parsed = Number.parseInt(String(options.limit ?? ""), 10);
+  const limit = Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
 
   const results = searchChanges(repoRoot, query, {
     domain: options.domain,

@@ -1,0 +1,27 @@
+landing/styles.css
+  dee5a1eae79a17ac 1-735
+landing/vercel.json
+  dee5a1eae79a17ac 1-23
+landing/index.html
+  dee5a1eae79a17ac 1-427
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "d939f3f52e69d9accbfc60cc43b3715aa65482e6",
+  "prompts": {
+    "dee5a1eae79a17ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "004caad9-d4df-44de-936d-94911ccb2a6f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 1185,
+      "total_deletions": 0,
+      "accepted_lines": 1185,
+      "overriden_lines": 0
+    }
+  }
+}

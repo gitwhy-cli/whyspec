@@ -61,11 +61,11 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 
 ## Docs
 
-→ [Getting Started](docs/getting-started.md): first steps
-→ [Commands](docs/commands.md): CLI reference
-→ [Concepts](docs/concepts.md): Decision Bridge, context IDs, philosophy
-→ [Supported Tools](docs/supported-tools.md): tool integrations & install paths
-→ [Workflows](docs/workflows.md): common patterns
+→ [Getting Started](docs/getting-started.md): first steps<br>
+→ [Commands](docs/commands.md): CLI reference<br>
+→ [Concepts](docs/concepts.md): Decision Bridge, context IDs, philosophy<br>
+→ [Supported Tools](docs/supported-tools.md): tool integrations & install paths<br>
+→ [Workflows](docs/workflows.md): common patterns<br>
 → [GitWhy Integration](docs/gitwhy.md): SaaS platform & team sharing
 
 ## Works With

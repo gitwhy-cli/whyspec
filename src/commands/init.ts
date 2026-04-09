@@ -23,7 +23,11 @@ export interface ConfigOptions {
 export function createGitwhyDir(root: string): void {
   const gitwhyDir = path.join(root, ".gitwhy");
   const changesDir = path.join(gitwhyDir, "changes");
+  const archiveDir = path.join(gitwhyDir, "archive");
+  const debugDir = path.join(gitwhyDir, "debug");
   fs.mkdirSync(changesDir, { recursive: true });
+  fs.mkdirSync(archiveDir, { recursive: true });
+  fs.mkdirSync(debugDir, { recursive: true });
 }
 
 export function writeConfigYaml(root: string, opts: ConfigOptions): void {
@@ -72,39 +76,6 @@ export function addToGitignore(root: string): void {
 }
 
 const WHYSPEC_COMMANDS = ["plan", "execute", "capture", "show", "search", "debug"] as const;
-
-const SKILL_DESCRIPTIONS: Record<string, { name: string; description: string; instruction: string }> = {
-  plan: {
-    name: "whyspec:plan",
-    description: "Plan before coding — declare intent, design decisions, and tasks",
-    instruction: "Run `whyspec plan --json \"<name>\"` to create a change folder, then write intent.md, design.md, and tasks.md using the returned templates.",
-  },
-  execute: {
-    name: "whyspec:execute",
-    description: "Implement with context — read plan files and execute tasks",
-    instruction: "Run `whyspec execute --json \"<name>\"` to get plan context, then implement each task, marking checkboxes in tasks.md as you go.",
-  },
-  capture: {
-    name: "whyspec:capture",
-    description: "Save your reasoning — capture decisions made after coding",
-    instruction: "Run `whyspec capture --json \"<name>\"` to get the capture template, then write ctx_<id>.md with decisions made, trade-offs, and surprises.",
-  },
-  show: {
-    name: "whyspec:show",
-    description: "View the full story of a change — intent, design, tasks, and reasoning",
-    instruction: "Run `whyspec show --json \"<name>\"` to display the complete change story with the Decision Bridge delta.",
-  },
-  search: {
-    name: "whyspec:search",
-    description: "Search past decisions across all changes",
-    instruction: "Run `whyspec search --json \"<query>\"` to find past reasoning, decisions, and context across all changes.",
-  },
-  debug: {
-    name: "whyspec:debug",
-    description: "Debug with science — structured investigation with hypothesis tracking",
-    instruction: "Run `whyspec debug --json \"<name>\"` to create a debug session with symptoms, hypotheses, evidence trail, and root cause analysis.",
-  },
-};
 
 /** Write GeneratedFile[] to disk, creating directories as needed. */
 function writeGeneratedFiles(root: string, files: GeneratedFile[]): void {

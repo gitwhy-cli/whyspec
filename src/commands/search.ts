@@ -6,7 +6,7 @@
  */
 
 import chalk from "chalk";
-import { searchChanges, type SearchResult } from "../core/search.js";
+import { searchChanges } from "../core/search.js";
 
 export async function searchCommand(
   query: string,

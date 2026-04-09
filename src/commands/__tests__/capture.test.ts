@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
-  existsSync,
   readFileSync,
   mkdirSync,
   rmSync,

@@ -25,13 +25,17 @@ afterEach(() => {
 // ── createGitwhyDir ──────────────────────────────────────────────────
 
 describe("createGitwhyDir", () => {
-  it("creates .gitwhy/ and .gitwhy/changes/ directories", () => {
+  it("creates the full .gitwhy directory structure", () => {
     createGitwhyDir(tmpDir);
 
     expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "changes"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "archive"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "debug"))).toBe(true);
     expect(fs.statSync(path.join(tmpDir, ".gitwhy")).isDirectory()).toBe(true);
     expect(fs.statSync(path.join(tmpDir, ".gitwhy", "changes")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, ".gitwhy", "archive")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, ".gitwhy", "debug")).isDirectory()).toBe(true);
   });
 
   it("is idempotent — calling twice does not throw", () => {

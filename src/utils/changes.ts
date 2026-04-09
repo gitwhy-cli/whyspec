@@ -3,11 +3,32 @@
  */
 
 import { existsSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, normalize, relative, sep } from "node:path";
+import { slugify } from "./slugify.js";
 
 export interface ResolvedChange {
   name: string;
   path: string;
+}
+
+function normalizeChangeName(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("Invalid change name.");
+  }
+
+  const normalizedPath = normalize(trimmed);
+  if (
+    normalizedPath === ".." ||
+    normalizedPath.startsWith(`..${sep}`) ||
+    normalizedPath.includes(`${sep}..${sep}`) ||
+    normalizedPath.endsWith(`${sep}..`) ||
+    normalizedPath.startsWith(sep)
+  ) {
+    throw new Error(`Invalid change name "${name}".`);
+  }
+
+  return slugify(trimmed);
 }
 
 /**
@@ -35,13 +56,18 @@ export function resolveChange(
   const changesDir = join(gitwhyDir, "changes");
 
   if (name) {
-    const changePath = join(changesDir, name);
+    const normalizedName = normalizeChangeName(name);
+    const changePath = join(changesDir, normalizedName);
+    const rel = relative(changesDir, changePath);
+    if (rel.startsWith("..") || rel === "") {
+      throw new Error(`Invalid change name "${name}".`);
+    }
     if (!existsSync(changePath)) {
       throw new Error(
-        `Change "${name}" not found. Run \`whyspec plan "${name}"\` first.`,
+        `Change "${normalizedName}" not found. Run \`whyspec plan "${normalizedName}"\` first.`,
       );
     }
-    return { name, path: changePath };
+    return { name: normalizedName, path: changePath };
   }
 
   const changes = listChanges(gitwhyDir);

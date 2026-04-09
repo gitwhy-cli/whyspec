@@ -1,8 +1,9 @@
 /**
  * E2E test scaffolding — exercises the full WhySpec lifecycle.
  *
- * Tests that CAN run now: init → plan → capture → execute
- * Tests marked .todo(): show, search, debug (Depends on Agent 7 — unskip after merge)
+ * Tests that CAN run now: init → plan → capture → execute → show → search
+ * Remaining .todo() tests cover secondary command paths not needed for the
+ * core release lifecycle.
  *
  * Each test uses a temporary directory for isolation.
  */
@@ -20,7 +21,9 @@ import {
 } from "../init.js";
 import { planCommand } from "../plan.js";
 import { captureCommand } from "../capture.js";
-import { executeCommand, parseTasks } from "../execute.js";
+import { executeCommand } from "../execute.js";
+import { showCommand } from "../show.js";
+import { searchCommand } from "../search.js";
 
 let tmpDir: string;
 let origCwd: typeof process.cwd;
@@ -56,11 +59,13 @@ afterEach(() => {
 // ── Init Lifecycle ─────────────────────────────────────────────────
 
 describe("E2E: init lifecycle", () => {
-  it("creates .gitwhy/ directory structure", () => {
+  it("creates the full .gitwhy/ directory structure", () => {
     createGitwhyDir(tmpDir);
 
     expect(existsSync(join(tmpDir, ".gitwhy"))).toBe(true);
     expect(existsSync(join(tmpDir, ".gitwhy", "changes"))).toBe(true);
+    expect(existsSync(join(tmpDir, ".gitwhy", "archive"))).toBe(true);
+    expect(existsSync(join(tmpDir, ".gitwhy", "debug"))).toBe(true);
   });
 
   it("writes config.yaml with valid structure", () => {
@@ -253,10 +258,10 @@ describe("E2E: execute lifecycle", () => {
   });
 });
 
-// ── Full Lifecycle: init → plan → capture → execute ────────────────
+// ── Full Lifecycle: init → plan → capture → execute → show → search ───────
 
-describe("E2E: full init → plan → capture → execute lifecycle", () => {
-  it("completes without errors", async () => {
+describe("E2E: full init → plan → capture → execute → show → search lifecycle", () => {
+  it("completes the core lifecycle without errors", async () => {
     // 1. Init
     createGitwhyDir(tmpDir);
     writeConfigYaml(tmpDir, {
@@ -308,44 +313,101 @@ describe("E2E: full init → plan → capture → execute lifecycle", () => {
     expect(parsed.progress.completed).toBe(2);
     expect(parsed.progress.remaining).toBe(1);
   });
+
+  it("surfaces the captured story through show and search", async () => {
+    createGitwhyDir(tmpDir);
+    writeConfigYaml(tmpDir, {
+      projectName: "full-lifecycle",
+      projectDescription: "Full E2E test",
+      tools: ["claude-code"],
+      telemetry: false,
+    });
+    addToGitignore(tmpDir);
+
+    await captureOutput(() => planCommand("auth-search", {}));
+
+    const changePath = join(tmpDir, ".gitwhy", "changes", "auth-search");
+    writeFileSync(
+      join(changePath, "intent.md"),
+      `# Intent: auth-search
+
+## Why This Change Exists
+We need secure session handling.
+
+## Decisions to Make
+- [ ] Token storage mechanism
+`,
+    );
+    writeFileSync(
+      join(changePath, "design.md"),
+      `# Design: auth-search
+
+## Approach
+Use cookies for session storage.
+
+## Decisions to Make
+- [ ] Token storage mechanism
+`,
+    );
+    writeFileSync(
+      join(changePath, "tasks.md"),
+      `# Tasks: auth-search
+
+## Verification
+- [x] Auth requests are accepted
+
+## Tasks
+- [x] Implement login endpoint
+- [x] Store session in cookie
+`,
+    );
+
+    await captureOutput(() => captureCommand("auth-search", {}));
+
+    const showOutput = await captureOutput(() =>
+      showCommand("auth-search", { json: true }),
+    );
+    const shown = JSON.parse(showOutput);
+    expect(shown.change_name).toBe("auth-search");
+    expect(shown.contexts).toHaveLength(1);
+    expect(shown.decision_bridge_delta.planned).toContain("Token storage mechanism");
+
+    const searchOutput = await captureOutput(() =>
+      searchCommand("auth-search", { json: true, limit: 5 }),
+    );
+    const results = JSON.parse(searchOutput);
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.some((result: { change_name: string }) => result.change_name === "auth-search")).toBe(true);
+  });
 });
 
-// ── Commands Depending on Agent 7 ──────────────────────────────────
+// ── Secondary Command Paths ────────────────────────────────────────
 
 describe("E2E: show command", () => {
-  // Depends on Agent 7 — unskip after merge
-  it.todo("displays full change story with Decision Bridge delta");
-  it.todo("--json returns structured show output");
+  it.todo("renders the rich non-JSON story output");
 });
 
 describe("E2E: search command", () => {
-  // Depends on Agent 7 — unskip after merge
-  it.todo("finds contexts by keyword with weighted scoring");
   it.todo("filters by --domain option");
-  it.todo("respects --limit option");
-  it.todo("--json returns structured search results");
+  it.todo("respects --limit option in non-JSON mode");
 });
 
 describe("E2E: debug command", () => {
-  // Depends on Agent 7 — unskip after merge
   it.todo("creates debug.md with hypothesis template");
   it.todo("--json returns structured debug output");
 });
 
 describe("E2E: list command", () => {
-  // Depends on Agent 7 — unskip after merge
   it.todo("lists all active changes with status");
   it.todo("--json returns structured list output");
 });
 
 describe("E2E: status command", () => {
-  // Depends on Agent 7 — unskip after merge
   it.todo("shows detailed status for a single change");
   it.todo("--json returns structured status output");
 });
 
 describe("E2E: template command", () => {
-  // Depends on Agent 7 — unskip after merge
   it.todo("returns raw template by type");
   it.todo("--json returns template string");
 });

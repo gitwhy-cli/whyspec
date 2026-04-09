@@ -5,7 +5,7 @@
  * Non-JSON mode: creates debug.md, prints related contexts and next steps.
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import chalk from "chalk";
 import { slugify } from "../utils/slugify.js";

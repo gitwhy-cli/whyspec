@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="WhySpec — The Reasoning Layer" width="100%">
+  <img src="https://raw.githubusercontent.com/gitwhy-cli/whyspec/main/assets/banner.png" alt="WhySpec — The Reasoning Layer" width="100%">
 </p>
 
 <p align="center">

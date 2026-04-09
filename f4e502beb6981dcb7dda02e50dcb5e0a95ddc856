@@ -1,0 +1,37 @@
+src/core/context.ts
+  9d731a54311b140f 1-71
+src/commands/__tests__/execute.test.ts
+  9d731a54311b140f 1-208
+src/commands/plan.ts
+  9d731a54311b140f 1-72
+src/commands/__tests__/capture.test.ts
+  9d731a54311b140f 1-226
+src/commands/capture.ts
+  9d731a54311b140f 1-104
+src/utils/changes.ts
+  9d731a54311b140f 1-59
+src/commands/__tests__/plan.test.ts
+  9d731a54311b140f 1-119
+src/commands/execute.ts
+  9d731a54311b140f 1-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "f4e502beb6981dcb7dda02e50dcb5e0a95ddc856",
+  "prompts": {
+    "9d731a54311b140f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0ccba343-49b7-45cb-b1a2-2bf8ae7fb327",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 994,
+      "overriden_lines": 0
+    }
+  }
+}

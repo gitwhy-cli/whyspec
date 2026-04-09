@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "f46cf06f6db606c3eff70cd17d752cc51e3edd20",
+  "prompts": {
+    "b612b6c08193008b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c4ba2b2-19f3-434e-a23d-baa69bae41ee",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}

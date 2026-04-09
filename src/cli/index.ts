@@ -5,6 +5,12 @@ import { runInit } from "../commands/init.js";
 import { planCommand } from "../commands/plan.js";
 import { executeCommand } from "../commands/execute.js";
 import { captureCommand } from "../commands/capture.js";
+import { showCommand } from "../commands/show.js";
+import { searchCommand } from "../commands/search.js";
+import { debugCommand } from "../commands/debug.js";
+import { listCommand } from "../commands/list.js";
+import { statusCommand } from "../commands/status.js";
+import { templateCommand } from "../commands/template.js";
 
 const program = new Command();
 
@@ -61,11 +67,7 @@ program
   .argument("<name>", "Name of the change to show")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "show", name }));
-    } else {
-      console.log(`whyspec show ${name} — not yet implemented`);
-    }
+    await showCommand(name, { json });
   });
 
 // ── search ──────────────────────────────────────────────────────────────────
@@ -77,11 +79,7 @@ program
   .option("--limit <n>", "Maximum results", "10")
   .action(async (query, opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "search", query, domain: opts.domain, limit: opts.limit }));
-    } else {
-      console.log(`whyspec search "${query}" — not yet implemented`);
-    }
+    await searchCommand(query, { json, domain: opts.domain, limit: opts.limit });
   });
 
 // ── debug ───────────────────────────────────────────────────────────────────
@@ -91,11 +89,7 @@ program
   .argument("[name]", "Name or description of the bug")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "debug", name }));
-    } else {
-      console.log(`whyspec debug ${name ?? ""} — not yet implemented`);
-    }
+    await debugCommand(name, { json });
   });
 
 // ── list ────────────────────────────────────────────────────────────────────
@@ -104,11 +98,7 @@ program
   .description("List all active changes with status")
   .action(async (_opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "list", changes: [] }));
-    } else {
-      console.log("whyspec list — not yet implemented");
-    }
+    await listCommand({ json });
   });
 
 // ── status ──────────────────────────────────────────────────────────────────
@@ -118,11 +108,7 @@ program
   .argument("<name>", "Name of the change")
   .action(async (name, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "status", name }));
-    } else {
-      console.log(`whyspec status ${name} — not yet implemented`);
-    }
+    await statusCommand(name, { json });
   });
 
 // ── template ────────────────────────────────────────────────────────────────
@@ -132,11 +118,7 @@ program
   .argument("<type>", "Template type: intent | design | tasks | context | debug")
   .action(async (type, _opts, cmd) => {
     const json = cmd.optsWithGlobals().json;
-    if (json) {
-      console.log(JSON.stringify({ status: "not-implemented", command: "template", type }));
-    } else {
-      console.log(`whyspec template ${type} — not yet implemented`);
-    }
+    await templateCommand(type, { json });
   });
 
 program.parse();

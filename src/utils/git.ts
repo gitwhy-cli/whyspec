@@ -28,35 +28,43 @@ export function findRepoRoot(): string {
   }
 }
 
-/** Returns the current branch name. */
+/** Returns the current branch name. Returns empty string if no commits yet. */
 export function getCurrentBranch(): string {
-  const out = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
-    encoding: "utf-8",
-    stdio: ["pipe", "pipe", "pipe"],
-  });
-  return out.trim();
+  try {
+    const out = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    return out.trim();
+  } catch {
+    return "";
+  }
 }
 
-/** Returns recent commits as { hash, message } pairs. */
+/** Returns recent commits as { hash, message } pairs. Returns empty array if no commits. */
 export function getRecentCommits(count = 10): Commit[] {
-  const out = execFileSync(
-    "git",
-    ["log", `--oneline`, `-${count}`],
-    { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-  );
+  try {
+    const out = execFileSync(
+      "git",
+      ["log", `--oneline`, `-${count}`],
+      { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+    );
 
-  return out
-    .trim()
-    .split("\n")
-    .filter((line) => line.length > 0)
-    .map((line) => {
-      const spaceIdx = line.indexOf(" ");
-      if (spaceIdx === -1) return { hash: line, message: "" };
-      return {
-        hash: line.slice(0, spaceIdx),
-        message: line.slice(spaceIdx + 1),
-      };
-    });
+    return out
+      .trim()
+      .split("\n")
+      .filter((line) => line.length > 0)
+      .map((line) => {
+        const spaceIdx = line.indexOf(" ");
+        if (spaceIdx === -1) return { hash: line, message: "" };
+        return {
+          hash: line.slice(0, spaceIdx),
+          message: line.slice(spaceIdx + 1),
+        };
+      });
+  } catch {
+    return [];
+  }
 }
 
 /** Returns commit SHAs since a given date. Used by capture to find commits since change creation. */

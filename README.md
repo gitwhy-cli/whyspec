@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="WhySpec — The Reasoning Layer" width="600">
+  <img src="assets/banner.png" alt="WhySpec — The Reasoning Layer" width="100%">
 </p>
 
 <p align="center">

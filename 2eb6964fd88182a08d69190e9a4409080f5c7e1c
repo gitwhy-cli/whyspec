@@ -1,0 +1,51 @@
+src/commands/debug.ts
+  b87d21c166936ac1 1-92
+src/core/search.ts
+  b87d21c166936ac1 1-284
+src/core/search.test.ts
+  b87d21c166936ac1 1-206
+src/commands/list.ts
+  b87d21c166936ac1 1-120
+src/commands/search.ts
+  b87d21c166936ac1 1-45
+src/commands/__tests__/list.test.ts
+  b87d21c166936ac1 1-80
+src/commands/__tests__/status.test.ts
+  b87d21c166936ac1 1-73
+src/cli/index.ts
+  b87d21c166936ac1 8-13,70,82,92,101,111,121
+src/commands/show.ts
+  b87d21c166936ac1 1-182
+src/commands/status.ts
+  b87d21c166936ac1 1-152
+src/commands/__tests__/debug.test.ts
+  b87d21c166936ac1 1-82
+src/commands/__tests__/template.test.ts
+  b87d21c166936ac1 1-73
+src/commands/__tests__/search.test.ts
+  b87d21c166936ac1 1-66
+src/commands/template.ts
+  b87d21c166936ac1 1-40
+src/commands/__tests__/show.test.ts
+  b87d21c166936ac1 1-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "2eb6964fd88182a08d69190e9a4409080f5c7e1c",
+  "prompts": {
+    "b87d21c166936ac1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fe13709-938e-4f2e-9416-b4cb6c488216",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 1932,
+      "total_deletions": 31,
+      "accepted_lines": 1931,
+      "overriden_lines": 0
+    }
+  }
+}

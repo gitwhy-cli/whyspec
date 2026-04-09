@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhySpec — The reasoning layer for AI coding</title>
+  <meta name="description" content="67% of code is AI-generated. 0% of reasoning is preserved. WhySpec captures WHY code was built the way it was — the decisions, trade-offs, and surprises that disappear when the chat window closes.">
+  <meta property="og:title" content="WhySpec — The reasoning layer for AI coding">
+  <meta property="og:description" content="Capture the reasoning behind AI-generated code. The Decision Bridge tracks how reasoning evolves from intent to outcome.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gitwhy.dev/whyspec">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WhySpec — The reasoning layer for AI coding">
+  <meta name="twitter:description" content="67% of code is AI-generated. 0% of reasoning is preserved. WhySpec captures the WHY.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>W</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- NAV                                         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">whyspec</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#compatibility">Agents</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/gitwhy-cli/whyspec" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- HERO                                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container">
+      <pre class="hero-logo" aria-label="WhySpec">
+ ██     ██ ██   ██ ██    ██
+ ██     ██ ██   ██  ██  ██
+ ██  █  ██ ███████   ████
+ ██ ███ ██ ██   ██    ██
+  ███ ███  ██   ██    ██
+
+    ███████ ██████  ███████  ██████
+    ██      ██   ██ ██      ██
+    ███████ ██████  █████   ██
+         ██ ██     ██      ██
+    ███████ ██     ███████  ██████</pre>
+
+      <h1 class="hero-tagline">The reasoning layer for AI coding</h1>
+      <p class="hero-subtitle">67% of code is AI-generated. 0% of reasoning is preserved.</p>
+
+      <div class="terminal hero-terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot"></span>
+          <span class="terminal-dot"></span>
+          <span class="terminal-dot"></span>
+          <span class="terminal-title">terminal</span>
+        </div>
+        <div class="terminal-body">
+<span class="t-prompt">$</span> whyspec plan <span class="t-str">"add-jwt-auth"</span>
+
+<span class="t-ok">✓</span> Created .gitwhy/changes/add-jwt-auth/
+  ├── intent.md    <span class="t-dim">(declare your WHY)</span>
+  ├── design.md    <span class="t-dim">(plan your HOW)</span>
+  └── tasks.md     <span class="t-dim">(track your WHAT)</span>
+        </div>
+      </div>
+
+      <div class="hero-install">
+        <code class="install-cmd" id="install-cmd">npm install -g @gitwhy-cli/whyspec</code>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText('npm install -g @gitwhy-cli/whyspec');this.textContent='copied';setTimeout(()=>this.textContent='copy',2000)" aria-label="Copy install command">copy</button>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="https://github.com/gitwhy-cli/whyspec" target="_blank" rel="noopener" class="btn btn-primary">View on GitHub</a>
+        <a href="https://github.com/gitwhy-cli/whyspec#quick-start" target="_blank" rel="noopener" class="btn btn-ghost">Quick Start</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FEATURES                                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="features" class="features">
+    <div class="container">
+
+      <!-- Feature 1: Decision Bridge -->
+      <div class="feature fade-in">
+        <div class="feature-number">01</div>
+        <h2 class="feature-title">The Decision Bridge</h2>
+        <p class="feature-desc">Track how reasoning evolves from intent to outcome. The plan predicts decisions. The capture records them. The delta shows what changed — and what surprised you.</p>
+        <div class="split-panel">
+          <div class="panel">
+            <div class="panel-label">BEFORE — design.md</div>
+            <div class="terminal">
+              <div class="terminal-body">
+<span class="t-heading">## Decisions to Make</span>
+<span class="t-unchecked">- [ ]</span> Token storage: cookie vs localStorage?
+<span class="t-unchecked">- [ ]</span> Hashing: bcrypt vs argon2?
+<span class="t-unchecked">- [ ]</span> Sessions: JWT vs server-side?
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-label">AFTER — ctx_a1b2c3d4.md</div>
+            <div class="terminal">
+              <div class="terminal-body">
+<span class="t-heading">&lt;decisions&gt;</span>
+<span class="t-checked">- [x]</span> Token storage: httpOnly cookie
+      <span class="t-dim">— XSS protection outweighs CSRF</span>
+<span class="t-checked">- [x]</span> Hashing: bcrypt
+      <span class="t-dim">— Better library support</span>
+<span class="t-checked">- [x]</span> JWT (stateless)
+      <span class="t-dim">— No session store needed</span>
+<span class="t-surprise">SURPRISE:</span> Added 2FA (not in plan)
+      <span class="t-dim">— Security review required it</span>
+<span class="t-heading">&lt;/decisions&gt;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Plan → Execute → Capture -->
+      <div class="feature fade-in">
+        <div class="feature-number">02</div>
+        <h2 class="feature-title">Plan &rarr; Execute &rarr; Capture</h2>
+        <p class="feature-desc">The reasoning lifecycle. Declare intent before coding. Implement with full context. Record the decisions, surprises, and trade-offs after.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-cmd">/whyspec:plan</div>
+              <div class="terminal">
+                <div class="terminal-body">
+<span class="t-prompt">$</span> whyspec plan <span class="t-str">"add-jwt-auth"</span>
+<span class="t-ok">✓</span> Created intent.md   <span class="t-dim">— goal, constraints, assumptions</span>
+<span class="t-ok">✓</span> Created design.md   <span class="t-dim">— approach, decisions to make</span>
+<span class="t-ok">✓</span> Created tasks.md    <span class="t-dim">— verification-first checklist</span>
+                </div>
+              </div>
+              <p class="step-label">Declare intent. List decisions to make.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-cmd">/whyspec:execute</div>
+              <div class="terminal">
+                <div class="terminal-body">
+<span class="t-prompt">$</span> whyspec execute <span class="t-str">"add-jwt-auth"</span>
+<span class="t-ok">✓</span> Reading intent.md + design.md...
+<span class="t-ok">✓</span> Task 1/4: Create auth middleware   <span class="t-dim">[committed]</span>
+<span class="t-ok">✓</span> Task 2/4: Add token signing        <span class="t-dim">[committed]</span>
+<span class="t-ok">✓</span> Task 3/4: Implement refresh flow    <span class="t-dim">[committed]</span>
+<span class="t-ok">✓</span> Task 4/4: Add rate limiting         <span class="t-dim">[committed]</span>
+  Ready to capture reasoning? Run /whyspec:capture
+                </div>
+              </div>
+              <p class="step-label">Implement with full context. Atomic commits.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-cmd">/whyspec:capture</div>
+              <div class="terminal">
+                <div class="terminal-body">
+<span class="t-prompt">$</span> whyspec capture <span class="t-str">"add-jwt-auth"</span>
+<span class="t-ok">✓</span> Read intent.md + design.md
+<span class="t-ok">✓</span> Mapped 3 decisions to outcomes
+<span class="t-ok">✓</span> Detected 1 surprise decision
+<span class="t-ok">✓</span> Linked 4 commits, 6 files changed
+<span class="t-ok">✓</span> Wrote ctx_a1b2c3d4.md
+                </div>
+              </div>
+              <p class="step-label">Record reasoning, decisions, surprises.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Context that persists -->
+      <div class="feature fade-in">
+        <div class="feature-number">03</div>
+        <h2 class="feature-title">Context that persists</h2>
+        <p class="feature-desc">Survives context resets. Works across sessions. Searchable. Your reasoning lives in <code>.gitwhy/</code> — visible, grep-able, and version-controlled.</p>
+        <div class="split-panel">
+          <div class="panel">
+            <div class="panel-label">.gitwhy/ file tree</div>
+            <div class="terminal">
+              <div class="terminal-body">
+.gitwhy/
+├── config.yaml
+├── changes/
+│   ├── add-jwt-auth/
+│   │   ├── intent.md
+│   │   ├── design.md
+│   │   ├── tasks.md
+│   │   └── <span class="t-highlight">ctx_a1b2c3d4.md</span>
+│   └── fix-safari-login/
+│       ├── debug.md
+│       └── <span class="t-highlight">ctx_e5f6g7h8.md</span>
+└── archive/
+    └── 2026-04-01-add-oauth/
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-label">ctx_a1b2c3d4.md</div>
+            <div class="terminal">
+              <div class="terminal-body">
+<span class="t-tag">&lt;context&gt;</span>
+  <span class="t-tag">&lt;title&gt;</span>JWT auth with httpOnly cookies<span class="t-tag">&lt;/title&gt;</span>
+  <span class="t-tag">&lt;story&gt;</span>
+    Phase 1 — Setup: Created middleware...
+    Phase 2 — Implementation: Added token
+    signing with RS256 for key rotation...
+  <span class="t-tag">&lt;/story&gt;</span>
+  <span class="t-tag">&lt;reasoning&gt;</span>
+    <span class="t-tag">&lt;decisions&gt;</span>
+      - RS256 over HS256 — allows key
+        rotation without redeploying
+      - 24h expiry — security vs UX
+    <span class="t-tag">&lt;/decisions&gt;</span>
+    <span class="t-tag">&lt;rejected&gt;</span>
+      - Session cookies — requires
+        server-side session store
+    <span class="t-tag">&lt;/rejected&gt;</span>
+  <span class="t-tag">&lt;/reasoning&gt;</span>
+<span class="t-tag">&lt;/context&gt;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Debug with science -->
+      <div class="feature fade-in">
+        <div class="feature-number">04</div>
+        <h2 class="feature-title">Debug with science</h2>
+        <p class="feature-desc">Structured debugging with the scientific method. Form hypotheses. Gather evidence. Prove root cause before fixing. Past contexts surface automatically.</p>
+        <div class="debug-flow">
+          <div class="flow-step">Symptoms</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step">Hypotheses</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step">Investigation</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step">Root Cause</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step">Fix</div>
+        </div>
+        <div class="terminal" style="max-width: 640px; margin: 0 auto;">
+          <div class="terminal-header">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">terminal</span>
+          </div>
+          <div class="terminal-body">
+<span class="t-prompt">$</span> whyspec debug <span class="t-str">"login-fails-safari"</span>
+
+<span class="t-ok">✓</span> Created .gitwhy/changes/login-fails-safari/
+<span class="t-ok">✓</span> Searching past contexts...
+  <span class="t-dim">Found 2 related contexts:</span>
+  <span class="t-dim">  • add-jwt-auth — "httpOnly cookie, SameSite=Lax"</span>
+  <span class="t-dim">  • fix-cors-headers — "Safari ITP restrictions"</span>
+
+<span class="t-ok">✓</span> Created debug.md
+  ├── Symptoms      <span class="t-dim">(expected vs actual)</span>
+  ├── Hypotheses    <span class="t-dim">(3+ falsifiable)</span>
+  ├── Investigation <span class="t-dim">(evidence trail)</span>
+  ├── Root Cause    <span class="t-dim">(no fix without proof)</span>
+  └── Prevention    <span class="t-dim">(avoid next time)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CROSS-TOOL COMPATIBILITY                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="compatibility" class="compatibility">
+    <div class="container">
+      <h2 class="section-title">Works with your AI agent</h2>
+      <p class="section-desc">Native support via skill files and AGENTS.md. If your agent can read files or run CLI commands, WhySpec works.</p>
+      <div class="agent-grid">
+        <div class="agent-card">
+          <div class="agent-name">Claude Code</div>
+          <div class="agent-method">.claude/skills/</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">Cursor</div>
+          <div class="agent-method">custom commands</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">GitHub Copilot</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">Codex CLI</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">Windsurf</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">Cline</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">Amazon Q</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-name">RooCode</div>
+          <div class="agent-method">AGENTS.md</div>
+        </div>
+      </div>
+      <p class="compat-note">Works alongside <strong>OpenSpec</strong>, <strong>GSD</strong>, and <strong>gstack</strong> — fills the reasoning gap they leave open.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FAQ                                         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="faq" class="faq">
+    <div class="container">
+      <h2 class="section-title">FAQ</h2>
+
+      <details class="faq-item">
+        <summary class="faq-question">HOW IS WHYSPEC DIFFERENT FROM OPENSPEC / GSD / GSTACK?</summary>
+        <div class="faq-answer">
+          <p>OpenSpec plans before code. GSD executes with deep context. gstack manages the sprint lifecycle. WhySpec captures the reasoning AFTER code — the "why" that none of them preserve.</p>
+          <p>It works WITH all three. Competes with none.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">WHY CAPTURE REASONING AFTER CODING?</summary>
+        <div class="faq-answer">
+          <p>Because the best insights happen DURING implementation. Plans predict decisions. Reality reveals surprises. The delta between plan and outcome is where the real learning lives.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">WHAT IS THE DECISION BRIDGE?</summary>
+        <div class="faq-answer">
+          <p>A tracking system that maps "Decisions to Make" (from your plan) to "Decisions Made" (after implementation). It shows what changed, what was surprising, and WHY. No other tool does this.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">DOES WHYSPEC WORK WITH MY AI AGENT?</summary>
+        <div class="faq-answer">
+          <p>If your agent can read files or run CLI commands, yes. Native support for Claude Code, Cursor, Copilot, Codex, Windsurf, Cline, Amazon Q, RooCode, and more via AGENTS.md.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">WHERE DO CONTEXTS LIVE?</summary>
+        <div class="faq-answer">
+          <p>In <code>.gitwhy/changes/</code> in your project root. Gitignored by default for solo use. Remove from .gitignore to share with your team. Or sync to GitWhy cloud for enterprise search.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">IS THIS JUST DOCUMENTATION?</summary>
+        <div class="faq-answer">
+          <p>No. Documentation describes WHAT exists. WhySpec captures WHY it was built that way — the reasoning, rejected alternatives, trade-offs, and surprises that documentation never includes.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">HOW DOES THIS RELATE TO GITWHY?</summary>
+        <div class="faq-answer">
+          <p>WhySpec is the free, open-source CLI. GitWhy is the paid SaaS with cloud sync, team search, PR integration, and dashboards. WhySpec contexts work seamlessly with GitWhy — zero conversion needed.</p>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FOOTER                                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-logo">whyspec</span>
+          <span class="footer-sep">/</span>
+          <span class="footer-tagline">the reasoning layer</span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/gitwhy-cli/whyspec" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.npmjs.com/package/@gitwhy-cli/whyspec" target="_blank" rel="noopener">npm</a>
+          <a href="https://gitwhy.dev" target="_blank" rel="noopener">GitWhy</a>
+        </div>
+      </div>
+      <p class="footer-copy">MIT License &middot; Built by <a href="https://gitwhy.dev" target="_blank" rel="noopener">gitwhy-cli</a></p>
+    </div>
+  </footer>
+
+  <!-- Minimal scroll fade-in observer -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+    });
+  </script>
+
+</body>
+</html>

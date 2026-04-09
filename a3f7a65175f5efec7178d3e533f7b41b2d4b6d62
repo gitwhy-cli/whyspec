@@ -1,0 +1,36 @@
+src/utils/git.ts
+  89ea11298ff6283c 31,33-41,44,46-51,53-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "a3f7a65175f5efec7178d3e533f7b41b2d4b6d62",
+  "prompts": {
+    "89ea11298ff6283c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7bb0ee1-db50-42e6-a653-12dd0027268d",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 24,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    },
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}

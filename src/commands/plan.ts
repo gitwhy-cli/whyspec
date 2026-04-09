@@ -68,7 +68,16 @@ export async function planCommand(
   writeFileSync(join(changePath, "design.md"), designTemplate(slug));
   writeFileSync(join(changePath, "tasks.md"), tasksTemplate(slug));
 
-  console.log(chalk.green("Created change plan:") + ` ${slug}`);
-  console.log(`  ${chalk.dim("path:")} .gitwhy/changes/${slug}/`);
-  console.log(`  ${chalk.dim("files:")} intent.md, design.md, tasks.md`);
+  // Count decisions to make from the templates
+  const intentContent = intentTemplate(slug);
+  const designContent = designTemplate(slug);
+  const decisionCount = (intentContent.match(/^- \[ \]/gm) || []).length +
+    (designContent.match(/^- \[ \]/gm) || []).length;
+
+  console.log(chalk.green(`\n  Created`) + ` .gitwhy/changes/${slug}/`);
+  console.log(`     ${chalk.green("✓")} intent.md  — why this change exists`);
+  console.log(`     ${chalk.green("✓")} design.md  — approach + decisions to make`);
+  console.log(`     ${chalk.green("✓")} tasks.md   — verification-first checklist`);
+  console.log(`     Decision Bridge: ${decisionCount} open questions to resolve.`);
+  console.log();
 }

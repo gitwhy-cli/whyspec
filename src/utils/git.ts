@@ -87,6 +87,22 @@ export function getFilesChanged(since: Date): string[] {
   }
 }
 
+/** Returns the remote origin URL (owner/repo format if GitHub, raw URL otherwise). */
+export function getRemoteUrl(): string {
+  try {
+    const out = execFileSync("git", ["remote", "get-url", "origin"], {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const url = out.trim();
+    // Extract owner/repo from GitHub URLs
+    const match = url.match(/github\.com[:/](.+?)(?:\.git)?$/);
+    return match ? match[1] : url;
+  } catch {
+    return "";
+  }
+}
+
 /**
  * Adds an entry to .gitignore if not already present.
  * Creates .gitignore if it doesn't exist.

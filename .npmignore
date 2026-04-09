@@ -1,0 +1,27 @@
+# Source files (compiled output is in dist/)
+src/
+
+# Test and dev config
+*.test.ts
+*.spec.ts
+vitest.config.ts
+tsconfig.json
+eslint.config.js
+.prettierrc
+
+# CI/CD
+.github/
+
+# Planning and tasks
+tasks/
+.omc/
+.gitwhy/
+
+# Editor and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Development docs (README and LICENSE are auto-included by npm)
+CONTRIBUTING.md

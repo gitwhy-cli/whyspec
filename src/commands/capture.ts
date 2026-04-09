@@ -9,7 +9,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
-import { getCurrentBranch, getCommitsSince, getFilesChanged } from "../utils/git.js";
+import { getCurrentBranch, getCommitsSince, getFilesChanged, getRemoteUrl } from "../utils/git.js";
 import {
   generateContextId,
   renderContextXml,
@@ -73,15 +73,22 @@ export async function captureCommand(
     return;
   }
 
-  // Non-JSON mode: write ctx_<id>.md with metadata header
+  // Non-JSON mode: write ctx_<id>.md with GitWhy-compatible metadata header
   const contextId = generateContextId();
   const branch = getCurrentBranch();
+  const repository = getRemoteUrl();
   const commitList = commits.length > 0 ? commits.map((c) => c.slice(0, 7)).join(", ") : "none";
 
   const metadataHeader = [
+    `# ${change.name}`,
+    "",
+    `**Context ID:** ${contextId}`,
+    `**Agent:** whyspec`,
+    ...(repository ? [`**Repository:** ${repository}`] : []),
+    `**Branch:** ${branch}`,
+    `**Date:** ${new Date().toISOString()}`,
     `**Change:** ${change.name}`,
     `**Intent:** .gitwhy/changes/${change.name}/intent.md`,
-    `**Branch:** ${branch}`,
     `**Commits:** ${commitList}`,
     "",
     "---",

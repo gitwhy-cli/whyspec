@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Built by <a href="https://gitwhy.dev">GitWhy</a></strong>
+  <strong>Built by <a href="https://gitwhy.dev">GitWhy</a> with ❤️</strong>
 </p>
 
 <p align="center">

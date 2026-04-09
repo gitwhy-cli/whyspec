@@ -14,6 +14,8 @@ npm test
 
 **Requirements:** Node.js 20+, npm 10+
 
+> **Note:** `dist/` and `node_modules/` are gitignored. Run `npm install` and `npm run build` after cloning — the build step compiles TypeScript to `dist/` which is where the CLI entry point lives.
+
 ## Project Structure
 
 ```
@@ -97,6 +99,8 @@ npx vitest run src/commands/__tests__/plan.test.ts  # Single file
 - [ ] `npm run lint` passes
 - [ ] New commands have tests
 - [ ] New adapters have tests
+
+**Optional but recommended:** Post GitWhy context to your PR (`git why post-pr`). PRs with reasoning context — why you made the choices you did, what alternatives you considered — are easier to review and more likely to get merged.
 
 ## Questions?
 

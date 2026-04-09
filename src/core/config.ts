@@ -16,22 +16,12 @@ export const ConfigSchema = z.object({
       name: z.string().default(""),
       description: z.string().default(""),
     })
-    .default({}),
+    .default(() => ({ name: "", description: "" })),
   telemetry: z.boolean().default(true),
   default_agent: z.string().default("claude-code"),
   tools: z.array(z.string()).default(["claude-code"]),
-  context: z
-    .object({
-      auto_detect_commits: z.boolean().default(true),
-      auto_detect_files: z.boolean().default(true),
-    })
-    .default({}),
-  rules: z
-    .object({
-      require_intent: z.boolean().default(false),
-      require_design: z.boolean().default(false),
-    })
-    .default({}),
+  context: z.string().default(""),
+  rules: z.string().default(""),
 });
 
 export type WhySpecConfig = z.infer<typeof ConfigSchema>;

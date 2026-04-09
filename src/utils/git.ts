@@ -59,6 +59,34 @@ export function getRecentCommits(count = 10): Commit[] {
     });
 }
 
+/** Returns commit SHAs since a given date. Used by capture to find commits since change creation. */
+export function getCommitsSince(since: Date): string[] {
+  try {
+    const out = execFileSync(
+      "git",
+      ["log", `--since=${since.toISOString()}`, "--format=%H", "--max-count=100"],
+      { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+    );
+    return out.trim().split("\n").filter((l) => l.length > 0);
+  } catch {
+    return [];
+  }
+}
+
+/** Returns files changed since a given date. Used by capture to detect changed files. */
+export function getFilesChanged(since: Date): string[] {
+  try {
+    const out = execFileSync(
+      "git",
+      ["log", `--since=${since.toISOString()}`, "--format=", "--name-only", "--max-count=100"],
+      { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+    );
+    return [...new Set(out.trim().split("\n").filter((l) => l.length > 0))];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Adds an entry to .gitignore if not already present.
  * Creates .gitignore if it doesn't exist.

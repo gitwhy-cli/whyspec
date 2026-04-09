@@ -42,15 +42,16 @@ describe("writeConfig", () => {
       telemetry: false,
       default_agent: "cursor",
       tools: ["cursor", "copilot"],
-      context: { auto_detect_commits: false, auto_detect_files: true },
-      rules: { require_intent: true, require_design: false },
+      context: "We use React + TypeScript",
+      rules: "Always write tests first",
     };
     writeConfig(tmp, input);
     const config = readConfig(tmp);
     expect(config.telemetry).toBe(false);
     expect(config.default_agent).toBe("cursor");
     expect(config.tools).toEqual(["cursor", "copilot"]);
-    expect(config.rules.require_intent).toBe(true);
+    expect(config.context).toBe("We use React + TypeScript");
+    expect(config.rules).toBe("Always write tests first");
   });
 });
 

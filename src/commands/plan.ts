@@ -42,7 +42,7 @@ export async function planCommand(
     );
   }
 
-  const config = readConfig(gitwhyDir);
+  const config = readConfig(process.cwd());
 
   if (options.json) {
     // JSON mode: return structured data, don't create files

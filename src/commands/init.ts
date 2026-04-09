@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import chalk from "chalk";
@@ -155,6 +156,14 @@ export function detectProjectName(root: string): string {
 export async function runInit(): Promise<void> {
   const root = process.cwd();
   const gitwhyDir = path.join(root, ".gitwhy");
+
+  // Guard: reject home directory — common accident, always wrong
+  if (root === os.homedir()) {
+    console.log(chalk.red("\n  Cannot initialize in your home directory."));
+    console.log(chalk.dim("  cd into a project first, then run whyspec init.\n"));
+    process.exitCode = 1;
+    return;
+  }
 
   // Guard: must be in a project directory (git repo or has package.json/similar)
   const isProject =

@@ -16,7 +16,7 @@
 
 A spec-driven context engineering framework for AI coding agents like Claude Code, Cursor, Copilot, and more.
 
-Our Vision:
+## Our Vision
 
 > Code tells you **what** was built. Tests tell you **how** it works. Only reasoning tells you **why** it exists.
 

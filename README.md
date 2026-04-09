@@ -59,100 +59,14 @@ whyspec init                        # Set up WhySpec
 
 That's it. WhySpec teaches your AI agent to plan before coding and capture reasoning after.
 
-## How It Works
+## Docs
 
-**1. Plan** — Before coding, declare intent and surface decisions that need to be made.
-
-```
-whyspec plan "add-jwt-auth"    ->   .gitwhy/changes/add-jwt-auth/
-                                      intent.md   (why this change exists)
-                                      design.md   (approach + decisions to make)
-                                      tasks.md    (verification-first checklist)
-```
-
-**2. Execute** — Code with full context. The agent reads your plan and works through tasks.
-
-```
-whyspec execute "add-jwt-auth"  ->  Returns intent + design + tasks as context
-```
-
-**3. Capture** — After coding, record the reasoning. Resolve the Decision Bridge.
-
-```
-whyspec capture "add-jwt-auth"  ->  .gitwhy/changes/add-jwt-auth/ctx_a1b2c3d4.md
-                                      Decisions Made + Surprises + Trade-offs
-```
-
-## What gets created
-
-```
-.gitwhy/
-├── changes/
-│   ├── add-jwt-auth/
-│   │   ├── intent.md          # why
-│   │   ├── design.md          # approach + decisions
-│   │   ├── tasks.md           # verification checklist
-│   │   └── ctx_a1b2c3d4.md    # captured reasoning
-│   ├── migrate-to-postgres/
-│   │   ├── intent.md
-│   │   ├── design.md
-│   │   ├── tasks.md
-│   │   └── ctx_f3e4d5c6.md
-│   └── add-rate-limiting/
-│       ├── intent.md
-│       └── design.md          # planning phase
-└── templates/
-    └── ...
-```
-
-## The Decision Bridge
-
-WhySpec's core differentiator. It tracks how reasoning **evolves** from intent to outcome:
-
-```
-BEFORE (plan):                           AFTER (capture):
-  ## Decisions to Make                     ## Decisions Made
-  - [ ] Token storage:                     - [x] Token storage: httpOnly cookie
-        cookie vs localStorage?                  -- XSS protection outweighs CSRF
-  - [ ] Hashing: bcrypt vs argon2?         - [x] Hashing: bcrypt
-                                                 -- Better library support
-                                           SURPRISE: Added 2FA (not in plan)
-                                                 -- Security review required it
-```
-
-The plan **predicts** decisions. The capture **records** decisions. The delta shows what was anticipated, what changed, and what was surprising.
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `whyspec init` | Initialize WhySpec in your project |
-| `whyspec plan <name>` | Declare intent and plan decisions before coding |
-| `whyspec execute <name>` | Implement from plan with full reasoning context |
-| `whyspec capture <name>` | Save the reasoning behind what was built |
-| `whyspec show <name>` | View full story with Decision Bridge delta |
-| `whyspec search <query>` | Search past decisions and reasoning |
-| `whyspec debug <name>` | Debug with the scientific method |
-| `whyspec list` | List all active changes |
-| `whyspec status <name>` | Detailed status for a change |
-| `whyspec template <type>` | Get a raw file template |
-
-All commands support `--json` for agent consumption (CLI-as-oracle pattern).
-
-## Cross-Tool Support
-
-| AI Tool | Integration | How |
-|---------|------------|-----|
-| **Claude Code** | Native skills | `.claude/skills/whyspec-*/SKILL.md` |
-| **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
-| **GitHub Copilot** | Project instructions | `AGENTS.md` |
-| **Codex CLI** | Project instructions | `AGENTS.md` |
-| **Windsurf** | Project instructions | `AGENTS.md` |
-| **Cline** | Project instructions | `AGENTS.md` |
-| **Amazon Q** | Project instructions | `AGENTS.md` |
-| **RooCode** | Project instructions | `AGENTS.md` |
-
-Run `whyspec init` and select your tools. WhySpec generates the right config for each.
+→ [Getting Started](docs/getting-started.md): first steps
+→ [Commands](docs/commands.md): CLI reference
+→ [Concepts](docs/concepts.md): Decision Bridge, context IDs, philosophy
+→ [Supported Tools](docs/supported-tools.md): tool integrations & install paths
+→ [Workflows](docs/workflows.md): common patterns
+→ [GitWhy Integration](docs/gitwhy.md): SaaS platform & team sharing
 
 ## Works With
 
@@ -165,24 +79,6 @@ WhySpec is complementary to existing AI coding tools. It fills the reasoning gap
 | **gstack** | Sprint lifecycle (review, QA, ship) | Persistent WHY behind each change |
 
 WhySpec works **alongside** all three. Use them for planning and execution. Use WhySpec for reasoning.
-
-## GitWhy Integration
-
-WhySpec is the open-source reasoning layer. [GitWhy](https://gitwhy.dev) is the SaaS platform that aggregates reasoning across repos and teams.
-
-WhySpec contexts (`ctx_<id>.md`) use the GitWhy format — zero conversion needed. Your local reasoning files work with `git why log` and GitWhy cloud out of the box.
-
-```
-Solo (default):     .gitwhy/ gitignored, private local reasoning
-Team (opt-in):      Remove from .gitignore, reasoning visible in PRs
-Enterprise:         Keep gitignored + push to GitWhy cloud
-```
-
-## Philosophy
-
-Code tells you **what** was built. Tests tell you **how** it works. Only reasoning tells you **why** it exists.
-
-In an era where AI writes most of the code, the human contribution isn't the syntax — it's the judgment. WhySpec preserves that judgment so it survives beyond the chat session that created it.
 
 ## Contributing
 

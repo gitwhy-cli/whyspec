@@ -1,0 +1,38 @@
+src/commands/init.ts
+  89ea11298ff6283c 3,113-114
+src/ui/ascii-logo.ts
+  89ea11298ff6283c 4,8-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "191c96b5a746c88de5551b6facba7ee48579952a",
+  "prompts": {
+    "89ea11298ff6283c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7bb0ee1-db50-42e6-a653-12dd0027268d",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 16,
+      "total_deletions": 13,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    },
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}

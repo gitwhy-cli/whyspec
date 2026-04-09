@@ -1,0 +1,44 @@
+src/adapters/agents-md.ts
+  ee470c6ea5251d84 1-176
+src/adapters/cursor.ts
+  ee470c6ea5251d84 1-234
+src/adapters/types.ts
+  71f719cc79d0a530 1-32
+src/adapters/claude-code.ts
+  71f719cc79d0a530 1-222
+src/adapters/adapters.test.ts
+  ee470c6ea5251d84 1-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4408bc5b04f82e1dd0963845ec8ee76b413f6de2",
+  "prompts": {
+    "71f719cc79d0a530": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "010a95c1-66db-4138-be74-fe00e98aafe6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 254,
+      "overriden_lines": 0
+    },
+    "ee470c6ea5251d84": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a65c6407-f1b0-493f-8cd2-d0df6bc21908",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 636,
+      "overriden_lines": 0
+    }
+  }
+}

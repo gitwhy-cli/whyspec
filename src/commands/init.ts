@@ -314,7 +314,7 @@ function removeLegacyClaudeSkills(root: string): boolean {
 
 function getSkillsSourceDir(): string {
   const currentDir = path.dirname(fileURLToPath(import.meta.url));
-  return path.join(path.dirname(path.dirname(currentDir)), "skills");
+  return path.join(path.dirname(path.dirname(currentDir)), "skill-sources");
 }
 
 function getCodexSkillsRoot(): string {

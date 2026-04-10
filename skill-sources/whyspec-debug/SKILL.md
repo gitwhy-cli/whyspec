@@ -253,7 +253,7 @@ Once root cause is verified (HIGH or MEDIUM confidence):
      Evidence entries: N
      Past contexts referenced: N
 
-   View full investigation: /whyspec:show <bug-name>
+   View full investigation: /whyspec-show <bug-name>
    ```
 
 ## Resuming an Investigation

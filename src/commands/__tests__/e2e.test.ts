@@ -85,21 +85,23 @@ describe("E2E: init lifecycle", () => {
     expect(content).toContain("version:");
   });
 
-  it("ignores .gitwhy via .gitignore even in git repos", () => {
+  it("removes legacy .gitwhy ignore entries in git repos", () => {
     rmSync(join(tmpDir, ".gitignore"), { force: true });
-    writeFileSync(join(tmpDir, ".gitignore"), "node_modules/\n");
+    writeFileSync(join(tmpDir, ".gitignore"), "node_modules/\n.gitwhy/\n");
     rmSync(join(tmpDir, ".git"), { recursive: true, force: true });
     const gitInfoDir = join(tmpDir, ".git", "info");
     mkdirSync(gitInfoDir, { recursive: true });
     writeFileSync(join(tmpDir, ".git", "HEAD"), "ref: refs/heads/main\n");
     writeFileSync(join(tmpDir, ".git", "config"), "[core]\n\trepositoryformatversion = 0\n");
     writeFileSync(join(tmpDir, ".git", "description"), "test repo\n");
-    writeFileSync(join(tmpDir, ".git", "info", "exclude"), "");
+    writeFileSync(join(tmpDir, ".git", "info", "exclude"), ".gitwhy/\n");
     addToGitignore(tmpDir);
 
     const gitignore = readFileSync(join(tmpDir, ".gitignore"), "utf-8");
+    const exclude = readFileSync(join(tmpDir, ".git", "info", "exclude"), "utf-8");
 
-    expect(gitignore).toContain(".gitwhy/");
+    expect(gitignore).toBe("node_modules/\n");
+    expect(exclude).not.toContain(".gitwhy/");
   });
 
   it("detects project name from package.json", () => {
@@ -283,6 +285,7 @@ describe("E2E: full init → plan → capture → execute → show → search li
     addToGitignore(tmpDir);
 
     expect(existsSync(join(tmpDir, ".gitwhy", "config.yaml"))).toBe(true);
+    expect(existsSync(join(tmpDir, ".gitignore"))).toBe(false);
 
     // 2. Plan
     await captureOutput(() => planCommand("auth-feature", {}));
@@ -333,6 +336,7 @@ describe("E2E: full init → plan → capture → execute → show → search li
       telemetry: false,
     });
     addToGitignore(tmpDir);
+    expect(existsSync(join(tmpDir, ".gitignore"))).toBe(false);
 
     await captureOutput(() => planCommand("auth-search", {}));
 

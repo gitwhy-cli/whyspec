@@ -6,7 +6,7 @@ argument-hint: "[change-name]"
 
 Implement a change — read the plan, work through tasks, commit atomically.
 
-When all tasks are done, run `/whyspec:capture` to save your reasoning.
+When all tasks are done, run `/whyspec-capture` to save your reasoning.
 
 ---
 
@@ -128,8 +128,8 @@ When all tasks are done, run `/whyspec:capture` to save your reasoning.
 
    | Status | When | What to show |
    |--------|------|-------------|
-   | DONE | All tasks completed and verified | Full summary + `/whyspec:capture` prompt |
-   | DONE_WITH_CONCERNS | Tasks done but something feels off | Summary + concerns + `/whyspec:capture` |
+   | DONE | All tasks completed and verified | Full summary + `/whyspec-capture` prompt |
+   | DONE_WITH_CONCERNS | Tasks done but something feels off | Summary + concerns + `/whyspec-capture` |
    | BLOCKED | Cannot proceed without input | Blocker details + resume command |
    | NEEDS_CONTEXT | Missing information | Specific question about what's missing |
 
@@ -143,7 +143,7 @@ When all tasks are done, run `/whyspec:capture` to save your reasoning.
    - [x] Task 1: description — committed as "feat: ..."
    - [x] Task 2: description — committed as "feat: ..."
 
-   Ready to capture reasoning? Run /whyspec:capture
+   Ready to capture reasoning? Run /whyspec-capture
    ```
 
 ## Tools
@@ -207,4 +207,4 @@ Why good: Specific blocker with evidence from code. Options with trade-offs.
 - **Pause on unclear tasks** — don't guess at ambiguous requirements. Ask for clarification.
 - **Pause on design issues** — if reality doesn't match the plan, stop and suggest design.md updates before continuing.
 - **Mark checkboxes immediately** — update tasks.md after each task completion, not at the end.
-- **Always prompt capture** — end every execution session with the `/whyspec:capture` suggestion.
+- **Always prompt capture** — end every execution session with the `/whyspec-capture` suggestion.

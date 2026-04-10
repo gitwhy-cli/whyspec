@@ -159,51 +159,48 @@ describe("writeConfigYaml", () => {
 // ── addToGitignore ───────────────────────────────────────────────────
 
 describe("addToGitignore", () => {
-  it("creates .gitignore if it does not exist and there is no .git directory", () => {
+  it("does not create .gitignore if it does not exist", () => {
     addToGitignore(tmpDir);
 
-    const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
-    expect(content).toBe(".gitwhy/\n");
+    expect(fs.existsSync(path.join(tmpDir, ".gitignore"))).toBe(false);
   });
 
-  it("appends to existing .gitignore when there is no .git directory", () => {
+  it("leaves existing .gitignore unchanged when .gitwhy/ is not present", () => {
     fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/\n", "utf-8");
 
     addToGitignore(tmpDir);
 
     const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
-    expect(content).toBe("node_modules/\n.gitwhy/\n");
+    expect(content).toBe("node_modules/\n");
   });
 
-  it("appends with newline if existing file has no trailing newline", () => {
-    fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/", "utf-8");
-
-    addToGitignore(tmpDir);
-
-    const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
-    expect(content).toBe("node_modules/\n.gitwhy/\n");
-  });
-
-  it("does not duplicate entry if already present", () => {
+  it("removes .gitwhy/ from .gitignore", () => {
     fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/\n.gitwhy/\n", "utf-8");
 
     addToGitignore(tmpDir);
 
     const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
-    const matches = content.split("\n").filter((l) => l.trim() === ".gitwhy/");
-    expect(matches).toHaveLength(1);
+    expect(content).toBe("node_modules/\n");
   });
 
-  it("writes to .gitignore even when .git directory exists", () => {
-    fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
+  it("removes duplicate .gitwhy/ entries from .gitignore", () => {
+    fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/\n.gitwhy/\n.gitwhy/\n", "utf-8");
 
     addToGitignore(tmpDir);
 
     const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
-    expect(content).toBe(".gitwhy/\n");
+    expect(content).toBe("node_modules/\n");
   });
 
-  it("migrates .gitwhy/ from .git/info/exclude to .gitignore", () => {
+  it("does not create .gitignore even when .git directory exists", () => {
+    fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
+
+    addToGitignore(tmpDir);
+
+    expect(fs.existsSync(path.join(tmpDir, ".gitignore"))).toBe(false);
+  });
+
+  it("removes .gitwhy/ from both .gitignore and .git/info/exclude", () => {
     fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
     fs.writeFileSync(
       path.join(tmpDir, ".git", "info", "exclude"),
@@ -218,11 +215,10 @@ describe("addToGitignore", () => {
 
     addToGitignore(tmpDir);
 
-    // .gitwhy/ should be in .gitignore now
-    expect(fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8")).toBe("node_modules/\n.gitwhy/\n");
-    // .gitwhy/ should be removed from .git/info/exclude
+    expect(fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8")).toBe("node_modules/\n");
     const excludeContent = fs.readFileSync(path.join(tmpDir, ".git", "info", "exclude"), "utf-8");
     expect(excludeContent).not.toContain(".gitwhy/");
+    expect(excludeContent).toBe("# comments\n");
   });
 });
 
@@ -298,31 +294,36 @@ describe("ensureVsCodeShowsGitwhy", () => {
 // ── installSkillFiles ────────────────────────────────────────────────
 
 describe("installSkillFiles", () => {
-  it("creates 6 Claude command files for claude-code", () => {
+  it("creates 6 Claude Code skill directories for claude-code", () => {
     installSkillFiles(tmpDir, ["claude-code"]);
 
     const commands = ["plan", "execute", "capture", "show", "search", "debug"];
     for (const cmd of commands) {
-      const commandPath = path.join(tmpDir, ".claude", "commands", `whyspec:${cmd}.md`);
-      expect(fs.existsSync(commandPath)).toBe(true);
+      const skillPath = path.join(tmpDir, "skills", `whyspec-${cmd}`, "SKILL.md");
+      expect(fs.existsSync(skillPath)).toBe(true);
 
-      const commandContent = fs.readFileSync(commandPath, "utf-8");
-      expect(commandContent).toContain("argument-hint:");
-      expect(commandContent).toContain("/whyspec:");
+      const skillContent = fs.readFileSync(skillPath, "utf-8");
+      expect(skillContent).toContain("argument-hint:");
+      expect(skillContent).toContain("/whyspec-");
     }
 
+    expect(fs.existsSync(path.join(tmpDir, ".claude", "commands"))).toBe(false);
     expect(fs.existsSync(path.join(tmpDir, ".claude", "skills"))).toBe(false);
   });
 
-  it("removes legacy Claude skill folders when reinstalling commands", () => {
+  it("removes legacy Claude command files and legacy skill folders during reinstall", () => {
     const legacyPath = path.join(tmpDir, ".claude", "skills", "whyspec-plan");
     fs.mkdirSync(legacyPath, { recursive: true });
     fs.writeFileSync(path.join(legacyPath, "SKILL.md"), "legacy", "utf-8");
+    const legacyCommandPath = path.join(tmpDir, ".claude", "commands", "whyspec:plan.md");
+    fs.mkdirSync(path.dirname(legacyCommandPath), { recursive: true });
+    fs.writeFileSync(legacyCommandPath, "legacy", "utf-8");
 
     installSkillFiles(tmpDir, ["claude-code"]);
 
     expect(fs.existsSync(legacyPath)).toBe(false);
-    expect(fs.existsSync(path.join(tmpDir, ".claude", "commands", "whyspec:plan.md"))).toBe(true);
+    expect(fs.existsSync(legacyCommandPath)).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "skills", "whyspec-plan", "SKILL.md"))).toBe(true);
   });
 
   it("does nothing if claude-code is not selected", () => {

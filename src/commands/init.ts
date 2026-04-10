@@ -7,11 +7,10 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
-import { generateClaudeCodeCommands } from "../adapters/claude-code.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
-import { COMMAND_ARGUMENT_HINTS, COMMAND_DESCRIPTIONS, type GeneratedFile } from "../adapters/types.js";
+import { type GeneratedFile } from "../adapters/types.js";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -130,31 +129,23 @@ export function addToGitignore(root: string): void {
   const gitDir = path.join(root, ".git");
   const gitExcludePath = path.join(gitDir, "info", "exclude");
 
-  // Always use .gitignore (committed, visible to all agents).
-  // .git/info/exclude is local-only and some agents delete files
-  // listed there on startup, causing data loss.
-  if (fs.existsSync(gitignorePath)) {
-    const content = fs.readFileSync(gitignorePath, "utf-8");
-    const lines = content.split("\n");
-    if (!lines.some((line) => line.trim() === entry)) {
-      const separator = content.endsWith("\n") ? "" : "\n";
-      fs.writeFileSync(gitignorePath, content + separator + entry + "\n", "utf-8");
+  const removeEntry = (filePath: string): void => {
+    if (!fs.existsSync(filePath)) {
+      return;
     }
-  } else {
-    fs.writeFileSync(gitignorePath, entry + "\n", "utf-8");
-  }
 
-  // Migrate: remove from .git/info/exclude if it was previously added there.
-  // This prevents double-ignoring and completes the migration to .gitignore.
-  if (fs.existsSync(gitExcludePath)) {
-    const excludeContent = fs.readFileSync(gitExcludePath, "utf-8");
-    const excludeLines = excludeContent.split("\n");
-    if (excludeLines.some((line) => line.trim() === entry)) {
-      const filtered = excludeLines
-        .filter((line) => line.trim() !== entry);
-      fs.writeFileSync(gitExcludePath, filtered.join("\n"), "utf-8");
+    const content = fs.readFileSync(filePath, "utf-8");
+    const lines = content.split("\n");
+    const filtered = lines.filter((line) => line.trim() !== entry);
+
+    if (filtered.length !== lines.length) {
+      fs.writeFileSync(filePath, filtered.join("\n"), "utf-8");
     }
-  }
+  };
+
+  // Migration-only cleanup: keep .gitwhy visible and unmanaged by ignore files.
+  removeEntry(gitignorePath);
+  removeEntry(gitExcludePath);
 }
 
 const WHYSPEC_COMMANDS = ["plan", "execute", "capture", "show", "search", "debug"] as const;
@@ -248,8 +239,7 @@ export function ensureVsCodeShowsGitwhy(root: string): void {
 }
 
 /**
- * Install authored skill files from skills/ directory if they exist (Agent 5's work).
- * Falls back to adapter-generated placeholders if authored files aren't available.
+ * Install authored skill files from skill-sources/ if they exist.
  */
 function installAuthoredSkills(root: string, skillsSourceDir: string): boolean {
   if (!fs.existsSync(skillsSourceDir)) return false;
@@ -275,22 +265,31 @@ function installClaudeCommandsFromSkills(root: string, skillsSourceDir: string):
       continue;
     }
 
-    const raw = fs.readFileSync(src, "utf-8");
-    const parts = raw.split("---");
-    const body = parts.length >= 3 ? parts.slice(2).join("---").trim() : raw.trim();
-    const frontmatter = [
-      "---",
-      `description: ${COMMAND_DESCRIPTIONS[cmd]}`,
-      `argument-hint: ${COMMAND_ARGUMENT_HINTS[cmd]}`,
-      "---",
-    ].join("\n");
-    const content = `${frontmatter}\n\n${body.replaceAll("/whyspec-", "/whyspec:")}\n`;
-    const dest = path.join(root, `whyspec:${cmd}.md`);
+    const dest = path.join(root, "skills", `whyspec-${cmd}`, "SKILL.md");
     fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.writeFileSync(dest, content, "utf-8");
+    fs.copyFileSync(src, dest);
     installed = true;
   }
   return installed;
+}
+
+function removeLegacyClaudeCommands(root: string): boolean {
+  const commandsRoot = path.join(root, ".claude", "commands");
+  let removed = false;
+
+  for (const cmd of WHYSPEC_COMMANDS) {
+    const legacyPath = path.join(commandsRoot, `whyspec:${cmd}.md`);
+    if (fs.existsSync(legacyPath)) {
+      fs.rmSync(legacyPath, { force: true });
+      removed = true;
+    }
+  }
+
+  if (removed && fs.existsSync(commandsRoot) && fs.readdirSync(commandsRoot).length === 0) {
+    fs.rmdirSync(commandsRoot);
+  }
+
+  return removed;
 }
 
 function removeLegacyClaudeSkills(root: string): boolean {
@@ -340,11 +339,9 @@ export function installSkillFiles(root: string, tools: string[]): void {
 
   // Claude Code skills
   if (tools.includes("claude-code")) {
+    removeLegacyClaudeCommands(root);
     removeLegacyClaudeSkills(root);
-    const commandsInstalled = installClaudeCommandsFromSkills(path.join(root, ".claude", "commands"), skillsDir);
-    if (!commandsInstalled) {
-      writeGeneratedFiles(root, generateClaudeCodeCommands());
-    }
+    installClaudeCommandsFromSkills(root, skillsDir);
   }
 
   // Cursor commands
@@ -418,13 +415,14 @@ export async function runInit(): Promise<void> {
 
     // Check if skills need to be installed (e.g. prior crash before skill step)
     if (tools.includes("claude-code")) {
-      const commandCheck = path.join(root, ".claude", "commands", "whyspec:plan.md");
+      const skillCheck = path.join(root, "skills", "whyspec-plan", "SKILL.md");
+      const removedLegacyCommands = removeLegacyClaudeCommands(root);
       const removedLegacySkills = removeLegacyClaudeSkills(root);
-      if (removedLegacySkills) {
+      if (removedLegacyCommands || removedLegacySkills) {
         repaired = true;
       }
-      if (!fs.existsSync(commandCheck)) {
-        console.log(chalk.yellow("\n  Repairing missing Claude commands...\n"));
+      if (!fs.existsSync(skillCheck)) {
+        console.log(chalk.yellow("\n  Repairing missing Claude Code skills...\n"));
         installSkillFiles(root, tools);
         generateAgentsMd(root, tools);
         repaired = true;
@@ -474,9 +472,7 @@ export async function runInit(): Promise<void> {
 
     if (repaired) {
       const exampleCommand = tools.includes("claude-code") || tools.includes("cursor")
-        ? tools.includes("claude-code")
-          ? "/whyspec:plan"
-          : "/whyspec-plan"
+        ? "/whyspec-plan"
         : tools.includes("codex")
           ? "$whyspec-plan"
           : "whyspec plan";
@@ -516,7 +512,7 @@ export async function runInit(): Promise<void> {
     telemetry: process.env.WHYSPEC_TELEMETRY !== "0",
   });
 
-  // 6. Ignore .gitwhy for Git without hiding it from agent file trees
+  // 6. Keep .gitwhy visible to tools and repair any legacy ignore entries
   addToGitignore(root);
   ensureVsCodeShowsGitwhy(root);
   ensureVisibleGitwhyAlias(root, selectedTools);

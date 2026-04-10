@@ -63,7 +63,7 @@ The Decision Bridge delta is the most valuable output — it reveals the gap bet
    If context hasn't been captured yet:
    ```
    ## Reasoning (AFTER)
-   Not yet captured. Run /whyspec:capture to complete the story.
+   Not yet captured. Run /whyspec-capture to complete the story.
    ```
 
 3. **Highlight the Decision Bridge Delta**
@@ -116,10 +116,10 @@ The Decision Bridge delta is the most valuable output — it reveals the gap bet
    | Missing | What to show | Suggestion |
    |---------|-------------|------------|
    | No design.md | Intent + Tasks only | "Design not captured. Was this a quick fix?" |
-   | No tasks.md | Intent + Design only | "No tasks defined. Run `/whyspec:execute` to start." |
-   | No context | Intent + Design + Tasks | "Reasoning not captured yet. Run `/whyspec:capture`." |
+   | No tasks.md | Intent + Design only | "No tasks defined. Run `/whyspec-execute` to start." |
+   | No context | Intent + Design + Tasks | "Reasoning not captured yet. Run `/whyspec-capture`." |
    | No intent (shouldn't happen) | Whatever exists | "Intent missing — this change may not have been planned with WhySpec." |
-   | Tasks partially done | Show progress bar | "Progress: ███░░ 3/5 tasks — resume with `/whyspec:execute <name>`" |
+   | Tasks partially done | Show progress bar | "Progress: ███░░ 3/5 tasks — resume with `/whyspec-execute <name>`" |
 
 ## Tools
 

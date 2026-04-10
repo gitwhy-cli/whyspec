@@ -15,7 +15,7 @@ export function renderWelcomeScreen(): string {
   lines.push(chalk.white("    \u2514\u2500\u2500 changes/"));
   lines.push("");
   lines.push(chalk.dim("  Quick start after setup:"));
-  lines.push(`    ${chalk.green("/whyspec:plan")}      Claude Code command`);
+  lines.push(`    ${chalk.green("/whyspec-plan")}      Claude Code skill`);
   lines.push(`    ${chalk.green("/whyspec-plan")}      Cursor command`);
   lines.push(`    ${chalk.green("$whyspec-plan")}      Codex skill`);
   lines.push("");
@@ -34,13 +34,11 @@ export function renderSuccessMessage(tools: string[]): string {
   const usesClaudeCommands = tools.includes("claude-code");
   const usesCursorCommands = tools.includes("cursor");
   const usesCodex = tools.includes("codex");
-  const exampleCommand = usesClaudeCommands
-    ? "/whyspec:plan"
-    : usesCursorCommands
-      ? "/whyspec-plan"
-      : usesCodex
-        ? "$whyspec-plan"
-        : "whyspec plan";
+  const exampleCommand = usesClaudeCommands || usesCursorCommands
+    ? "/whyspec-plan"
+    : usesCodex
+      ? "$whyspec-plan"
+      : "whyspec plan";
 
   lines.push("");
   lines.push(chalk.green.bold("  \u2713 WhySpec initialized!"));

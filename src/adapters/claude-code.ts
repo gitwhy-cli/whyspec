@@ -8,7 +8,7 @@ import {
 
 /**
  * Generate compact instructions for each WhySpec command.
- * Used by adapters that embed skill content (Codex, Claude commands).
+ * Used by adapters that embed skill content (Codex, Claude Code skills).
  * The canonical full-length skills live in skills/whyspec-{cmd}/SKILL.md.
  */
 export function getSkillInstructions(command: WhySpecCommand): string {
@@ -16,7 +16,7 @@ export function getSkillInstructions(command: WhySpecCommand): string {
     case "plan":
       return `Plan a change — create intent.md, design.md, and tasks.md with the Decision Bridge.
 
-When ready to implement, run \`/whyspec:execute\`
+When ready to implement, run \`/whyspec-execute\`
 
 ## Workflow
 
@@ -47,7 +47,7 @@ When ready to implement, run \`/whyspec:execute\`
     case "execute":
       return `Implement a change — read the plan, work through tasks, commit atomically.
 
-When all tasks are done, run \`/whyspec:capture\`
+When all tasks are done, run \`/whyspec-capture\`
 
 ## Workflow
 
@@ -75,7 +75,7 @@ When all tasks are done, run \`/whyspec:capture\`
     case "capture":
       return `Capture reasoning — resolve the Decision Bridge and preserve the full story.
 
-View the complete story with \`/whyspec:show\`
+View the complete story with \`/whyspec-show\`
 
 ## Workflow
 
@@ -112,7 +112,7 @@ View the complete story with \`/whyspec:show\`
 
 ## Important
 - The Decision Bridge delta is the core value — always show it.
-- If context hasn't been captured, suggest running /whyspec:capture.`;
+- If context hasn't been captured, suggest running /whyspec-capture.`;
 
     case "search":
       return `Search reasoning — find past decisions and contexts across all changes.
@@ -169,13 +169,11 @@ export function generateClaudeCodeCommands(
       "---",
     ].join("\n");
 
-    const instructions = getSkillInstructions(command)
-      .replaceAll("/whyspec-", "/whyspec:")
-      .replaceAll("Run /whyspec:", "Run /whyspec:");
-    const invocationLine = `Invoke this command as \`/whyspec:${command}\`.`;
+    const instructions = getSkillInstructions(command);
+    const invocationLine = `Invoke this command as \`/whyspec-${command}\`.`;
 
     return {
-      path: `${prefix}.claude/commands/whyspec:${command}.md`,
+      path: `${prefix}skills/whyspec-${command}/SKILL.md`,
       content: `${frontmatter}\n\n${invocationLine}\n\n${instructions}\n`,
     };
   });

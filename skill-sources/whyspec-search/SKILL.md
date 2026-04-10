@@ -69,8 +69,8 @@ Search is not just a lookup tool — it's the **team knowledge check** before ne
       > "src/middleware/auth.ts — modified to extract JWT sub claim for
       >  per-user rate limiting after authentication."
 
-   View full story: `/whyspec:show add-auth`
-   Narrow by domain: `/whyspec:search "authentication" --domain auth`
+   View full story: `/whyspec-show add-auth`
+   Narrow by domain: `/whyspec-search "authentication" --domain auth`
    Why good: Shows the actual reasoning from past decisions. A developer
    searching for "authentication" immediately sees WHY RS256 was chosen,
    WHY httpOnly cookies, and WHERE token decisions connect to rate limiting.
@@ -97,7 +97,7 @@ Search is not just a lookup tool — it's the **team knowledge check** before ne
 
    Suggestions:
    - Try broader terms: "session", "timeout", "token expiry"
-   - Search by domain: `/whyspec:search "session" --domain auth`
+   - Search by domain: `/whyspec-search "session" --domain auth`
    - Check if this decision was captured: maybe it predates WhySpec adoption
    Why good: Empty results get helpful guidance, not a dead end.
    </good>
@@ -113,9 +113,9 @@ Search is not just a lookup tool — it's the **team knowledge check** before ne
 3. **Connect results to the current context**
 
    If the search was triggered during planning or debugging, connect the findings:
-   - During `/whyspec:plan`: "Past decision in add-auth chose RS256 — your new feature should be compatible with this."
-   - During `/whyspec:debug`: "Similar bug was investigated in debug-token-expiry — root cause was clock skew between services."
-   - Standalone: Offer follow-up actions: `/whyspec:show <name>` or narrower search.
+   - During `/whyspec-plan`: "Past decision in add-auth chose RS256 — your new feature should be compatible with this."
+   - During `/whyspec-debug`: "Similar bug was investigated in debug-token-expiry — root cause was clock skew between services."
+   - Standalone: Offer follow-up actions: `/whyspec-show <name>` or narrower search.
 
 ## Tools
 

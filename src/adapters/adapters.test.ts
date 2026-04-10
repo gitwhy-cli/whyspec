@@ -10,18 +10,18 @@ import { WHYSPEC_COMMANDS, COMMAND_DESCRIPTIONS } from "./types.js";
 describe("claude-code adapter", () => {
   const commands = generateClaudeCodeCommands();
 
-  it("generates 6 Claude command files", () => {
+  it("generates 6 Claude Code skill files", () => {
     expect(commands).toHaveLength(6);
   });
 
-  it("generates colon-style Claude command paths", () => {
+  it("generates hyphen-style Claude skill paths", () => {
     const paths = commands.map((f) => f.path);
     for (const command of WHYSPEC_COMMANDS) {
-      expect(paths).toContain(`.claude/commands/whyspec:${command}.md`);
+      expect(paths).toContain(`skills/whyspec-${command}/SKILL.md`);
     }
   });
 
-  it("each Claude command file has frontmatter with description and argument-hint", () => {
+  it("each Claude skill file has frontmatter with description and argument-hint", () => {
     for (const file of commands) {
       expect(file.content).toMatch(/^---\n/);
       expect(file.content).toMatch(/description:\s*.+/);
@@ -29,9 +29,9 @@ describe("claude-code adapter", () => {
     }
   });
 
-  it("Claude command files use colon-style slash command references", () => {
+  it("Claude skill files use hyphen-style slash command references", () => {
     for (const file of commands) {
-      expect(file.content).toContain("/whyspec:");
+      expect(file.content).toContain("/whyspec-");
     }
   });
 
@@ -58,7 +58,7 @@ describe("claude-code adapter", () => {
   });
 
   it("plan command emphasizes action-first over forcing questions", () => {
-    const planCommand = commands.find((f) => f.path.includes("whyspec:plan"));
+    const planCommand = commands.find((f) => f.path.includes("whyspec-plan"));
     expect(planCommand).toBeDefined();
     expect(planCommand!.content).toContain("Act first");
     expect(planCommand!.content).toContain("do NOT");

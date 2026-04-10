@@ -3,7 +3,7 @@
  * Adapters return these; the caller handles writing to disk.
  */
 export interface GeneratedFile {
-  /** Relative path from project root (e.g., ".claude/skills/whyspec-plan/SKILL.md") */
+  /** Relative path from project root (e.g., "skills/whyspec-plan/SKILL.md") */
   path: string;
   /** File content */
   content: string;

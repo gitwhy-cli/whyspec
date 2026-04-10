@@ -6,7 +6,7 @@ argument-hint: "<change-name-or-description>"
 
 Plan a change — create intent.md, design.md, and tasks.md with the Decision Bridge.
 
-When ready to implement, run `/whyspec:execute`
+When ready to implement, run `/whyspec-execute`
 
 ---
 
@@ -14,7 +14,7 @@ When ready to implement, run `/whyspec:execute`
 
 ## Iron Law
 
-**ACT FIRST, ASK ONLY WHEN STUCK.** The user invoked `/whyspec:plan` with a description of what they want. Your job is to structure their intent into plan files — not to interview them.
+**ACT FIRST, ASK ONLY WHEN STUCK.** The user invoked `/whyspec-plan` with a description of what they want. Your job is to structure their intent into plan files — not to interview them.
 
 ## Red Flags — If You're Thinking This, STOP
 
@@ -38,7 +38,7 @@ When ready to implement, run `/whyspec:execute`
 
    <examples>
    <good>
-   User: `/whyspec:plan add dark mode support`
+   User: `/whyspec-plan add dark mode support`
    Agent: Creates change folder, writes intent.md capturing dark mode as the goal,
    design.md with CSS custom properties vs class-based approach trade-off,
    tasks.md with implementation steps.
@@ -46,20 +46,20 @@ When ready to implement, run `/whyspec:execute`
    </good>
 
    <bad>
-   User: `/whyspec:plan add dark mode support`
+   User: `/whyspec-plan add dark mode support`
    Agent: "What problem does this solve? Who feels this pain today?"
    Why bad: The user literally just told you — they want dark mode. Asking "what problem does
    this solve" is patronizing checklist-walking. The answer is obvious from the input.
    </bad>
 
    <good>
-   User: `/whyspec:plan`
+   User: `/whyspec-plan`
    Agent: "What change are you planning?"
    Why good: ARGUMENTS is empty. ONE question to get started is justified.
    </good>
 
    <bad>
-   User: `/whyspec:plan refactor auth middleware`
+   User: `/whyspec-plan refactor auth middleware`
    Agent: "What constraints exist? What does success look like? How will you know it works?"
    Why bad: Three rounds of corporate interview questions. The user wants to refactor auth
    middleware — explore the codebase to understand constraints, don't ask generic questions.
@@ -129,7 +129,7 @@ When ready to implement, run `/whyspec:execute`
    - [ ] Response on limit: 429 with Retry-After header vs 429 with custom error body?
 
    These checkboxes form the "before" side of the Decision Bridge.
-   They will be resolved during /whyspec:capture after implementation.
+   They will be resolved during /whyspec-capture after implementation.
 
    ## Constraints
 
@@ -237,7 +237,7 @@ When ready to implement, run `/whyspec:execute`
    Decisions to make: N pending
    Tasks: N defined
 
-   Ready to implement? Run /whyspec:execute
+   Ready to implement? Run /whyspec-execute
    ```
 
 ## Tools
@@ -301,7 +301,7 @@ If you hit any of these, STOP and ask the user (max 3 attempts before escalating
 
 - **Don't interrogate the user** — if ARGUMENTS contains a meaningful description, proceed. Only ask when ARGUMENTS is empty or genuinely ambiguous.
 - **Ground plans in the codebase** — read relevant code before writing. Plans that ignore the actual architecture are useless.
-- **Don't implement code** — this skill creates plan files only. Implementation happens in `/whyspec:execute`.
+- **Don't implement code** — this skill creates plan files only. Implementation happens in `/whyspec-execute`.
 - **Don't skip "Decisions to Make"** — every unsettled design choice must be a checkbox. If you can't find any decisions, you haven't thought hard enough about the change.
 - **Use CLI-as-oracle** — always call `whyspec plan --json` to create the folder. Don't create paths or generate IDs manually.
 - **Apply `context` and `rules` as constraints** — they guide your writing but must NOT appear in the output files.

@@ -47,14 +47,38 @@ describe("createGitwhyDir", () => {
 });
 
 describe("ensureVisibleGitwhyAlias", () => {
-  it("creates a visible gitwhy alias for Codex users", () => {
+  it("creates a visible gitwhy helper workspace for Codex users", () => {
     createGitwhyDir(tmpDir);
+    writeConfigYaml(tmpDir, {
+      projectName: "test-project",
+      projectDescription: "",
+      tools: ["codex"],
+      telemetry: true,
+    });
 
     ensureVisibleGitwhyAlias(tmpDir, ["codex"]);
 
-    const aliasPath = path.join(tmpDir, "gitwhy");
-    expect(fs.existsSync(aliasPath)).toBe(true);
-    expect(fs.realpathSync(aliasPath)).toBe(fs.realpathSync(path.join(tmpDir, ".gitwhy")));
+    const helperPath = path.join(tmpDir, "gitwhy");
+    expect(fs.existsSync(helperPath)).toBe(true);
+    expect(fs.statSync(helperPath).isDirectory()).toBe(true);
+    expect(fs.existsSync(path.join(helperPath, "README.md"))).toBe(true);
+    expect(fs.realpathSync(path.join(helperPath, "changes"))).toBe(
+      fs.realpathSync(path.join(tmpDir, ".gitwhy", "changes")),
+    );
+    expect(fs.realpathSync(path.join(helperPath, "config.yaml"))).toBe(
+      fs.realpathSync(path.join(tmpDir, ".gitwhy", "config.yaml")),
+    );
+  });
+
+  it("upgrades the legacy gitwhy symlink into a real helper directory", () => {
+    createGitwhyDir(tmpDir);
+    fs.symlinkSync(".gitwhy", path.join(tmpDir, "gitwhy"), "dir");
+
+    ensureVisibleGitwhyAlias(tmpDir, ["codex"]);
+
+    const helperPath = path.join(tmpDir, "gitwhy");
+    expect(fs.lstatSync(helperPath).isDirectory()).toBe(true);
+    expect(fs.lstatSync(path.join(helperPath, "changes")).isSymbolicLink()).toBe(true);
   });
 
   it("does not create the alias when Codex is not configured", () => {
@@ -267,24 +291,20 @@ describe("ensureVsCodeShowsGitwhy", () => {
 // ── installSkillFiles ────────────────────────────────────────────────
 
 describe("installSkillFiles", () => {
-  it("creates 6 SKILL.md files and 6 command files for claude-code", () => {
+  it("creates 6 Claude command files for claude-code", () => {
     installSkillFiles(tmpDir, ["claude-code"]);
 
     const commands = ["plan", "execute", "capture", "show", "search", "debug"];
     for (const cmd of commands) {
-      const skillPath = path.join(tmpDir, ".claude", "skills", `whyspec-${cmd}`, "SKILL.md");
       const commandPath = path.join(tmpDir, ".claude", "commands", `whyspec:${cmd}.md`);
-      expect(fs.existsSync(skillPath)).toBe(true);
       expect(fs.existsSync(commandPath)).toBe(true);
-
-      const content = fs.readFileSync(skillPath, "utf-8");
-      expect(content).toContain(`name: whyspec-${cmd}`);
-      expect(content).toContain("---");
 
       const commandContent = fs.readFileSync(commandPath, "utf-8");
       expect(commandContent).toContain("argument-hint:");
       expect(commandContent).toContain("/whyspec:");
     }
+
+    expect(fs.existsSync(path.join(tmpDir, ".claude", "skills"))).toBe(false);
   });
 
   it("does nothing if claude-code is not selected", () => {

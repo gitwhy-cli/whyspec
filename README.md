@@ -81,7 +81,7 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 
 | AI Agent | Integration | How |
 |---------|------------|-----|
-| **Claude Code** | Project commands + skills | `.claude/commands/whyspec:*.md` + `.claude/skills/whyspec-*/SKILL.md` |
+| **Claude Code** | Project commands | `.claude/commands/whyspec:*.md` |
 | **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
 | **Codex CLI** | Native skills + project instructions | `~/.codex/skills/whyspec-*` + `AGENTS.md` |
 | **GitHub Copilot** | Project instructions | `AGENTS.md` |

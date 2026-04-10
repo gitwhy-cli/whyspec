@@ -7,7 +7,7 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
-import { generateClaudeCodeCommands, generateClaudeCodeSkills } from "../adapters/claude-code.js";
+import { generateClaudeCodeCommands } from "../adapters/claude-code.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
@@ -39,19 +39,63 @@ export function ensureVisibleGitwhyAlias(root: string, tools: string[]): void {
     return;
   }
 
-  const aliasPath = path.join(root, "gitwhy");
+  const helperPath = path.join(root, "gitwhy");
   const targetPath = path.join(root, ".gitwhy");
 
-  if (fs.existsSync(aliasPath)) {
+  if (!fs.existsSync(targetPath)) {
     return;
   }
 
-  const relativeTarget = path.relative(path.dirname(aliasPath), targetPath) || ".gitwhy";
-  fs.symlinkSync(
-    relativeTarget,
-    aliasPath,
-    process.platform === "win32" ? "junction" : "dir",
-  );
+  if (fs.existsSync(helperPath) && fs.lstatSync(helperPath).isSymbolicLink()) {
+    fs.unlinkSync(helperPath);
+  }
+
+  fs.mkdirSync(helperPath, { recursive: true });
+
+  const readmePath = path.join(helperPath, "README.md");
+  if (!fs.existsSync(readmePath)) {
+    fs.writeFileSync(
+      readmePath,
+      [
+        "# WhySpec workspace",
+        "",
+        "This visible folder mirrors `.gitwhy/` for Codex file trees.",
+        "Edit files through `gitwhy/` or `.gitwhy/` interchangeably.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+  }
+
+  const entries = [
+    ["config.yaml", path.join(targetPath, "config.yaml"), "file"],
+    ["changes", path.join(targetPath, "changes"), "dir"],
+    ["archive", path.join(targetPath, "archive"), "dir"],
+    ["debug", path.join(targetPath, "debug"), "dir"],
+  ] as const;
+
+  for (const [name, sourcePath, linkType] of entries) {
+    const entryPath = path.join(helperPath, name);
+    if (fs.existsSync(entryPath)) {
+      if (fs.lstatSync(entryPath).isSymbolicLink()) {
+        const currentTarget = fs.realpathSync(entryPath);
+        const expectedTarget = fs.realpathSync(sourcePath);
+        if (currentTarget === expectedTarget) {
+          continue;
+        }
+        fs.unlinkSync(entryPath);
+      } else {
+        continue;
+      }
+    }
+
+    const relativeTarget = path.relative(path.dirname(entryPath), sourcePath);
+    fs.symlinkSync(
+      relativeTarget,
+      entryPath,
+      process.platform === "win32" ? "junction" : linkType,
+    );
+  }
 }
 
 export function writeConfigYaml(root: string, opts: ConfigOptions): void {
@@ -288,13 +332,7 @@ export function installSkillFiles(root: string, tools: string[]): void {
 
   // Claude Code skills
   if (tools.includes("claude-code")) {
-    // Try authored skill files first (production-quality from skills/ directory)
-    const authoredInstalled = installAuthoredSkills(path.join(root, ".claude", "skills"), skillsDir);
     const commandsInstalled = installClaudeCommandsFromSkills(path.join(root, ".claude", "commands"), skillsDir);
-    if (!authoredInstalled) {
-      // Fall back to adapter-generated placeholders
-      writeGeneratedFiles(root, generateClaudeCodeSkills());
-    }
     if (!commandsInstalled) {
       writeGeneratedFiles(root, generateClaudeCodeCommands());
     }
@@ -371,10 +409,9 @@ export async function runInit(): Promise<void> {
 
     // Check if skills need to be installed (e.g. prior crash before skill step)
     if (tools.includes("claude-code")) {
-      const skillCheck = path.join(root, ".claude", "skills", "whyspec-plan", "SKILL.md");
       const commandCheck = path.join(root, ".claude", "commands", "whyspec:plan.md");
-      if (!fs.existsSync(skillCheck) || !fs.existsSync(commandCheck)) {
-        console.log(chalk.yellow("\n  Repairing missing skill files...\n"));
+      if (!fs.existsSync(commandCheck)) {
+        console.log(chalk.yellow("\n  Repairing missing Claude commands...\n"));
         installSkillFiles(root, tools);
         generateAgentsMd(root, tools);
         repaired = true;

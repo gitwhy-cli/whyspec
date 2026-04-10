@@ -6,7 +6,7 @@ WhySpec works with any AI coding agent. Run `whyspec init` and select your agent
 
 | AI Agent | Integration | How |
 |---------|------------|-----|
-| **Claude Code** | Project commands + skills | `.claude/commands/whyspec:*.md` + `.claude/skills/whyspec-*/SKILL.md` |
+| **Claude Code** | Project commands | `.claude/commands/whyspec:*.md` |
 | **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
 | **Codex CLI** | Native skills + project instructions | `~/.codex/skills/whyspec-*` + `AGENTS.md` |
 | **GitHub Copilot** | Project instructions | `AGENTS.md` |
@@ -17,9 +17,9 @@ WhySpec works with any AI coding agent. Run `whyspec init` and select your agent
 
 ## How It Works
 
-### Claude Code (Project Commands + Skills)
+### Claude Code (Project Commands)
 
-WhySpec generates Claude project commands for the slash-command UI, plus skills for the underlying workflow instructions:
+WhySpec generates Claude project commands for the slash-command UI:
 
 ```
 .claude/commands/
@@ -29,14 +29,9 @@ WhySpec generates Claude project commands for the slash-command UI, plus skills 
 ├── whyspec:show.md
 ├── whyspec:search.md
 └── whyspec:debug.md
-
-.claude/skills/
-├── whyspec-plan/SKILL.md
-├── whyspec-execute/SKILL.md
-└── ...
 ```
 
-Use `/whyspec:plan`, `/whyspec:execute`, etc. directly in Claude Code. The gray suggestion text comes from each command file's frontmatter, not from `SKILL.md`.
+Use `/whyspec:plan`, `/whyspec:execute`, etc. directly in Claude Code. The gray suggestion text comes from each command file's frontmatter.
 
 ### Cursor (Slash Commands)
 
@@ -67,7 +62,7 @@ WhySpec installs native Codex skills into the global Codex skills directory:
 
 Use `$whyspec-plan`, `$whyspec-execute`, etc. in Codex after restarting it.
 
-If Codex hides `.gitwhy/` after a reload, WhySpec also creates a visible `gitwhy/ -> .gitwhy/` alias during init for Codex users.
+If Codex hides `.gitwhy/` after a reload, WhySpec also creates a visible `gitwhy/` helper workspace during init for Codex users.
 
 ### AGENTS.md (Copilot, Windsurf, Cline, etc.)
 

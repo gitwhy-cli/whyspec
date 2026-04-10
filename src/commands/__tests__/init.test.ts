@@ -194,28 +194,35 @@ describe("addToGitignore", () => {
     expect(matches).toHaveLength(1);
   });
 
-  it("writes to .git/info/exclude instead of .gitignore when the repo has a .git directory", () => {
+  it("writes to .gitignore even when .git directory exists", () => {
     fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
 
     addToGitignore(tmpDir);
 
-    const excludePath = path.join(tmpDir, ".git", "info", "exclude");
-    expect(fs.readFileSync(excludePath, "utf-8")).toBe(".gitwhy/\n");
-    expect(fs.existsSync(path.join(tmpDir, ".gitignore"))).toBe(false);
+    const content = fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8");
+    expect(content).toBe(".gitwhy/\n");
   });
 
-  it("migrates existing .gitignore entries into .git/info/exclude for git repos", () => {
+  it("migrates .gitwhy/ from .git/info/exclude to .gitignore", () => {
     fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
     fs.writeFileSync(
+      path.join(tmpDir, ".git", "info", "exclude"),
+      "# comments\n.gitwhy/\n",
+      "utf-8",
+    );
+    fs.writeFileSync(
       path.join(tmpDir, ".gitignore"),
-      "node_modules/\n.gitwhy/\ncoverage/\n",
+      "node_modules/\n",
       "utf-8",
     );
 
     addToGitignore(tmpDir);
 
-    expect(fs.readFileSync(path.join(tmpDir, ".git", "info", "exclude"), "utf-8")).toBe(".gitwhy/\n");
-    expect(fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8")).toBe("node_modules/\ncoverage/\n");
+    // .gitwhy/ should be in .gitignore now
+    expect(fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8")).toBe("node_modules/\n.gitwhy/\n");
+    // .gitwhy/ should be removed from .git/info/exclude
+    const excludeContent = fs.readFileSync(path.join(tmpDir, ".git", "info", "exclude"), "utf-8");
+    expect(excludeContent).not.toContain(".gitwhy/");
   });
 });
 

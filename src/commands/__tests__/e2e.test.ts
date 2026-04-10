@@ -85,7 +85,7 @@ describe("E2E: init lifecycle", () => {
     expect(content).toContain("version:");
   });
 
-  it("ignores .gitwhy via .git/info/exclude in git repos", () => {
+  it("ignores .gitwhy via .gitignore even in git repos", () => {
     rmSync(join(tmpDir, ".gitignore"), { force: true });
     writeFileSync(join(tmpDir, ".gitignore"), "node_modules/\n");
     rmSync(join(tmpDir, ".git"), { recursive: true, force: true });
@@ -97,11 +97,9 @@ describe("E2E: init lifecycle", () => {
     writeFileSync(join(tmpDir, ".git", "info", "exclude"), "");
     addToGitignore(tmpDir);
 
-    const exclude = readFileSync(join(tmpDir, ".git", "info", "exclude"), "utf-8");
     const gitignore = readFileSync(join(tmpDir, ".gitignore"), "utf-8");
 
-    expect(exclude).toContain(".gitwhy/");
-    expect(gitignore).not.toContain(".gitwhy/");
+    expect(gitignore).toContain(".gitwhy/");
   });
 
   it("detects project name from package.json", () => {

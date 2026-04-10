@@ -126,46 +126,35 @@ export function writeConfigYaml(root: string, opts: ConfigOptions): void {
 
 export function addToGitignore(root: string): void {
   const entry = ".gitwhy/";
-  const gitDir = path.join(root, ".git");
   const gitignorePath = path.join(root, ".gitignore");
+  const gitDir = path.join(root, ".git");
   const gitExcludePath = path.join(gitDir, "info", "exclude");
 
-  const ensureIgnoreEntry = (filePath: string): void => {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, "utf-8");
-      const lines = content.split("\n");
-      if (lines.some((line) => line.trim() === entry)) {
-        return;
-      }
+  // Always use .gitignore (committed, visible to all agents).
+  // .git/info/exclude is local-only and some agents delete files
+  // listed there on startup, causing data loss.
+  if (fs.existsSync(gitignorePath)) {
+    const content = fs.readFileSync(gitignorePath, "utf-8");
+    const lines = content.split("\n");
+    if (!lines.some((line) => line.trim() === entry)) {
       const separator = content.endsWith("\n") ? "" : "\n";
-      fs.writeFileSync(filePath, content + separator + entry + "\n", "utf-8");
-      return;
+      fs.writeFileSync(gitignorePath, content + separator + entry + "\n", "utf-8");
     }
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, entry + "\n", "utf-8");
-  };
-
-  const removeIgnoreEntry = (filePath: string): void => {
-    if (!fs.existsSync(filePath)) {
-      return;
-    }
-
-    const content = fs.readFileSync(filePath, "utf-8");
-    const filtered = content
-      .split("\n")
-      .filter((line) => line.trim() !== entry && line.length > 0);
-
-    const nextContent = filtered.length > 0 ? `${filtered.join("\n")}\n` : "";
-    fs.writeFileSync(filePath, nextContent, "utf-8");
-  };
-
-  if (fs.existsSync(gitDir)) {
-    ensureIgnoreEntry(gitExcludePath);
-    removeIgnoreEntry(gitignorePath);
-    return;
+  } else {
+    fs.writeFileSync(gitignorePath, entry + "\n", "utf-8");
   }
 
-  ensureIgnoreEntry(gitignorePath);
+  // Migrate: remove from .git/info/exclude if it was previously added there.
+  // This prevents double-ignoring and completes the migration to .gitignore.
+  if (fs.existsSync(gitExcludePath)) {
+    const excludeContent = fs.readFileSync(gitExcludePath, "utf-8");
+    const excludeLines = excludeContent.split("\n");
+    if (excludeLines.some((line) => line.trim() === entry)) {
+      const filtered = excludeLines
+        .filter((line) => line.trim() !== entry);
+      fs.writeFileSync(gitExcludePath, filtered.join("\n"), "utf-8");
+    }
+  }
 }
 
 const WHYSPEC_COMMANDS = ["plan", "execute", "capture", "show", "search", "debug"] as const;

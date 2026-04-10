@@ -21,22 +21,24 @@ export const WHYSPEC_COMMANDS = [
 
 export type WhySpecCommand = (typeof WHYSPEC_COMMANDS)[number];
 
-/** One-line descriptions for each command, used across all adapters. */
+/** One-line descriptions for each command, used across all adapters.
+ * IMPORTANT: These must be trigger conditions ("Use when..."), not workflow summaries.
+ * Summary descriptions cause Claude to shortcut the skill body. */
 export const COMMAND_DESCRIPTIONS: Record<WhySpecCommand, string> = {
-  plan: "Declare intent and plan decisions before coding",
-  execute: "Implement from plan with full reasoning context",
-  capture: "Save the reasoning behind what was built",
-  show: "View the full story of a change with Decision Bridge delta",
-  search: "Search past decisions and reasoning across all changes",
-  debug: "Debug with the scientific method and capture root cause",
+  plan: "Use when planning a code change, capturing decisions before coding, or setting up the Decision Bridge",
+  execute: "Use when starting implementation, continuing work, or executing tasks from a WhySpec plan",
+  capture: "Use after coding to preserve reasoning — resolves the Decision Bridge with actual outcomes",
+  show: "Use when reviewing the full story of a change — intent, design, tasks, and Decision Bridge delta",
+  search: "Use when looking for why something was built a certain way or finding past decisions",
+  debug: "Use when encountering any bug, test failure, or unexpected behavior — before proposing fixes",
 };
 
 /** Gray placeholder text shown beside slash commands in UIs that support it. */
 export const COMMAND_ARGUMENT_HINTS: Record<WhySpecCommand, string> = {
-  plan: "change description",
-  execute: "change name",
-  capture: "change name",
-  show: "change name",
-  search: "query",
-  debug: "issue description",
+  plan: "<change-name-or-description>",
+  execute: "[change-name]",
+  capture: "[change-name]",
+  show: "[change-name]",
+  search: "<query> [--domain <domain>]",
+  debug: "<bug-description-or-change-name>",
 };

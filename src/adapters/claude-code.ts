@@ -7,49 +7,47 @@ import {
 } from "./types.js";
 
 /**
- * Generate the placeholder instructions for each WhySpec command skill.
- * These are filled with real content by Agent 5 (skill authoring).
- * The placeholders show the CLI-as-oracle pattern so the skill is functional
- * even before Agent 5 enriches it.
+ * Generate compact instructions for each WhySpec command.
+ * Used by adapters that embed skill content (Codex, Claude commands).
+ * The canonical full-length skills live in skills/whyspec-{cmd}/SKILL.md.
  */
-function getSkillInstructions(command: WhySpecCommand): string {
+export function getSkillInstructions(command: WhySpecCommand): string {
   switch (command) {
     case "plan":
-      return `# WhySpec Plan
+      return `Plan a change — create intent.md, design.md, and tasks.md with the Decision Bridge.
 
-Use this skill when the developer wants to plan a change before coding.
+When ready to implement, run \`/whyspec:execute\`
 
 ## Workflow
 
-1. Ask the developer 2-3 forcing questions:
-   - "What problem does this solve?"
-   - "What constraints exist?"
-   - "How will you know it works?"
+1. Parse what the user typed. If they gave a meaningful description, act immediately — do NOT
+   ask generic questions like "What problem does this solve?" or "What constraints exist?"
+   Only ask if ARGUMENTS is empty or genuinely ambiguous.
 
 2. Call the CLI to create the change folder:
    \`\`\`bash
    whyspec plan --json "<change-name>"
    \`\`\`
 
-3. Parse the JSON response to get the folder path and templates.
+3. Explore the codebase to understand the affected area before writing plan files.
 
 4. Create three files in the change folder:
    - **intent.md** — Why this change exists, decisions to make, constraints, success criteria
    - **design.md** — Technical approach, trade-off matrix, architecture, questions to resolve
    - **tasks.md** — Verification criteria (defined FIRST), then implementation checklist
 
-5. The "Decisions to Make" section in design.md is the BEFORE side of the Decision Bridge.
-   These will be resolved by /whyspec-capture after implementation.
+5. The "Decisions to Make" section in intent.md is the BEFORE side of the Decision Bridge.
 
 ## Important
-- Always call the CLI first — it handles path creation and validation.
-- Capture COMPLETE reasoning, not abbreviated summaries.
-- Every decision-to-make should be a checkbox: \`- [ ] Token storage: cookie vs localStorage?\``;
+- Act first, ask only when stuck. The user told you what they want.
+- Ground plans in the actual codebase — read relevant files before writing.
+- Every unsettled design choice must be a checkbox in "Decisions to Make".
+- Scale the plan to the change — a typo fix gets 3 lines, not a trade-off matrix.`;
 
     case "execute":
-      return `# WhySpec Execute
+      return `Implement a change — read the plan, work through tasks, commit atomically.
 
-Use this skill when the developer wants to implement a planned change.
+When all tasks are done, run \`/whyspec:capture\`
 
 ## Workflow
 
@@ -58,107 +56,82 @@ Use this skill when the developer wants to implement a planned change.
    whyspec execute --json "<change-name>"
    \`\`\`
 
-2. Parse the JSON response to get intent, design, tasks, and progress.
+2. Read intent.md and design.md BEFORE coding — understand the goal first.
 
-3. Read intent.md and design.md for WHY context — understand the goal before coding.
-
-4. Work through tasks.md sequentially:
+3. Work through tasks.md sequentially:
    - Show progress: "Working on task 3/7: <description>"
    - Implement the code changes
    - Mark each task complete: \`- [ ]\` → \`- [x]\` in tasks.md
+   - Run the task's verify: check
    - Commit atomically (one commit per task or logical unit)
 
-5. On completion, prompt: "Ready to capture reasoning? Run /whyspec-capture"
+4. If reality contradicts the design, STOP and flag it — don't silently override.
 
 ## Important
-- Use intent.md as context while implementing — it contains the WHY.
-- Track deviations from the plan — surprises are valuable for capture.
-- Do not skip tasks or mark them done without implementing.`;
+- Never skip the plan. Read intent.md before writing code.
+- Commit atomically — one commit per task, not one giant commit.
+- Pause on design contradictions — update the plan before continuing.`;
 
     case "capture":
-      return `# WhySpec Capture
+      return `Capture reasoning — resolve the Decision Bridge and preserve the full story.
 
-Use this skill when the developer wants to save reasoning after coding.
+View the complete story with \`/whyspec:show\`
 
 ## Workflow
 
-1. Call the CLI to get the capture template and metadata:
+1. Call the CLI to get the capture template:
    \`\`\`bash
    whyspec capture --json "<change-name>"
    \`\`\`
 
-2. Parse the JSON response to get the template, linked commits, and files changed.
+2. Read intent.md and design.md for the Decision Bridge mapping.
 
-3. Read intent.md and design.md from the change folder.
-
-4. Create a ctx_<id>.md file in the change folder using the GitWhy SaaS XML format:
-   - Map each "Decision to Make" from design.md → "Decisions Made" with rationale
-   - Map each "Question to Resolve" → resolved answer
-   - Capture "Surprises" — decisions NOT in the plan
-   - Include story, rejected alternatives, trade-offs, verification, risks
-
-5. This completes the Decision Bridge: plan PREDICTED decisions, capture RECORDS them.
+3. Create ctx_<id>.md in GitWhy SaaS XML format:
+   - Map each "Decision to Make" → "Decisions Made" with full rationale
+   - Map each "Question to Resolve" → answer with reasoning
+   - Capture "Surprises" — decisions NOT in the original plan
 
 ## Important
-- The context file uses \`<context>\` XML tags (GitWhy SaaS format).
-- Include ALL decisions, not just the ones from the plan.
+- Capture reasoning, not summaries. "We chose X because Y outweighs Z" not just "we used X."
+- Every planned decision must be resolved. Prompt the user for any gaps.
 - Surprises (unplanned decisions) are the most valuable part of the capture.`;
 
     case "show":
-      return `# WhySpec Show
-
-Use this skill when the developer wants to view the full story of a change.
+      return `Show the full story — intent, design, tasks, reasoning — with the Decision Bridge delta.
 
 ## Workflow
 
-1. Call the CLI to get the full change data:
+1. Call the CLI:
    \`\`\`bash
    whyspec show --json "<change-name>"
    \`\`\`
 
-2. Parse the JSON response containing intent, design, tasks, context, surprises, and Decision Bridge delta.
+2. Display: Intent (WHY) → Design (HOW) → Tasks (WHAT) → Reasoning (AFTER)
 
-3. Display the change story in sections:
-   - **Intent** — WHY (from intent.md)
-   - **Design** — HOW (from design.md)
-   - **Tasks** — WHAT (from tasks.md with completion status)
-   - **Context** — REASONING (from ctx_<id>.md)
-   - **Decision Bridge Delta** — Decisions to Make vs Decisions Made, highlighting changes and surprises
+3. Highlight the Decision Bridge Delta: planned vs actual decisions with rationale.
 
 ## Important
-- The Decision Bridge delta is the unique value — always show it.
-- If context hasn't been captured yet, show intent + design + tasks and suggest running /whyspec-capture.`;
+- The Decision Bridge delta is the core value — always show it.
+- If context hasn't been captured, suggest running /whyspec:capture.`;
 
     case "search":
-      return `# WhySpec Search
-
-Use this skill when the developer wants to find past decisions and reasoning.
+      return `Search reasoning — find past decisions and contexts across all changes.
 
 ## Workflow
 
-1. Call the CLI to search across all changes:
+1. Call the CLI:
    \`\`\`bash
    whyspec search --json "<query>"
    \`\`\`
 
-2. Parse the JSON response containing scored results with snippets.
-
-3. Display results ranked by relevance:
-   - Title matches score highest (100 points)
-   - Reasoning/decision matches score next (30 points)
-   - File path matches score lower (20 points)
-
-4. For each result, show: title, change name, score, and a relevant snippet.
+2. Display results ranked by relevance with reasoning snippets — not just titles.
 
 ## Important
-- Search covers both active changes and archived ones.
-- Search also finds intent.md and design.md — not just captured contexts.
-- Use this before starting new work: "Has anyone reasoned about this area before?"`;
+- Always show reasoning snippets, not just titles.
+- Search includes plan files (intent.md, design.md), not just captured contexts.`;
 
     case "debug":
-      return `# WhySpec Debug
-
-Use this skill when the developer is investigating a bug.
+      return `Debug with scientific method. No fix without root cause.
 
 ## Workflow
 
@@ -167,59 +140,20 @@ Use this skill when the developer is investigating a bug.
    whyspec debug --json "<bug-description>"
    \`\`\`
 
-2. Parse the JSON response to get the debug folder path and related past contexts.
+2. Search past contexts first — check if this domain has been reasoned about before.
 
 3. Follow the scientific method:
-   - **Symptoms** — Expected vs actual behavior, error messages, reproduction steps
-   - **Related contexts** — Search past decisions in this area (from CLI response)
-   - **Hypotheses** — Form 3+ falsifiable hypotheses with "what would prove this wrong?"
-   - **Investigation** — Test each hypothesis with evidence gathering
-   - **Root cause** — Prove the diagnosis BEFORE proposing a fix (Iron Law)
-   - **Fix** — Apply the fix and verify
-   - **Prevention** — How to prevent this class of bug in the future
-
-4. Create debug.md with the full investigation trail.
-
-5. Auto-prompt: "Ready to capture debug reasoning? Run /whyspec-capture"
+   - **Symptoms** — Expected vs actual, error messages, reproduction steps
+   - **Hypotheses** — 3+ falsifiable claims with concrete tests
+   - **Investigation** — Test one at a time, record evidence
+   - **Root cause** — Prove diagnosis BEFORE proposing fix (Iron Law)
+   - **Fix + Capture** — Minimal fix, then auto-capture reasoning
 
 ## Important
-- No fix without root cause — this is the Iron Law.
-- Check related past contexts BEFORE forming hypotheses — past decisions inform better hypotheses.
-- The debug.md persists across sessions so investigation survives context resets.`;
+- No fix without root cause — the Iron Law is non-negotiable.
+- Write debug.md incrementally — it persists across context resets.
+- Always capture the investigation as a context file when resolved.`;
   }
-}
-
-/**
- * Generate Claude Code skill files for all 6 WhySpec commands.
- *
- * Creates .claude/skills/whyspec-<command>/SKILL.md with:
- * - YAML frontmatter (name, description)
- * - Placeholder instructions showing the CLI-as-oracle pattern
- *
- * @param projectRoot - Optional project root prefix for paths (default: "")
- * @returns Array of GeneratedFile objects
- */
-export function generateClaudeCodeSkills(
-  projectRoot: string = "",
-): GeneratedFile[] {
-  const prefix = projectRoot ? `${projectRoot}/` : "";
-
-  return WHYSPEC_COMMANDS.map((command) => {
-    const frontmatter = [
-      "---",
-      `name: whyspec-${command}`,
-      `description: ${COMMAND_DESCRIPTIONS[command]}`,
-      "---",
-    ].join("\n");
-
-    const instructions = getSkillInstructions(command);
-    const content = `${frontmatter}\n\n${instructions}\n`;
-
-    return {
-      path: `${prefix}.claude/skills/whyspec-${command}/SKILL.md`,
-      content,
-    };
-  });
 }
 
 export function generateClaudeCodeCommands(

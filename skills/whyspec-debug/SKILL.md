@@ -1,34 +1,65 @@
 ---
 name: whyspec-debug
-description: Debug with scientific method — gather symptoms, form falsifiable hypotheses, test systematically, verify root cause before fixing. Searches team knowledge first and captures the full investigation as persistent context.
+description: Use when encountering any bug, test failure, or unexpected behavior — before proposing fixes.
+argument-hint: "<bug-description-or-change-name>"
 ---
 
 # WhySpec Debug — Scientific Investigation
 
 Debug systematically. No fix without root cause.
 
-This skill implements a structured debugging process that captures the full investigation
-as persistent context — symptoms, hypotheses, evidence, root cause, and fix rationale.
-
 The investigation is automatically saved as a context file when resolved.
-
----
-
-## Purpose
-
-Debugging is not guessing. This skill enforces:
-
-1. **Team knowledge first** — search past reasoning before reinventing
-2. **Scientific method** — falsifiable hypotheses tested with evidence
-3. **Iron Law** — no fix is proposed until root cause is verified
-4. **Persistent state** — debug.md survives context resets so investigations can resume
-5. **Reasoning capture** — every investigation produces a context file for future developers
 
 ---
 
 **Input**: A bug description, error message, or change name for an existing debug session.
 
----
+## Iron Law
+
+**NO FIX WITHOUT VERIFIED ROOT CAUSE.** Guessing at fixes creates more bugs than it solves. A wrong diagnosis leads to a wrong fix that masks the real problem.
+
+## Red Flags — If You're Thinking This, STOP
+
+- "The fix is obvious, I'll just apply it" → If it's obvious, verification takes 10 seconds. Do it.
+- "I'll try this fix and see if it works" → That's guess-and-check, not debugging. Form a hypothesis first.
+- "This is too simple to need the full process" → Simple bugs have root causes too. The process is fast for simple bugs.
+- "I already know what's wrong from the stack trace" → The stack trace shows WHERE, not WHY. Investigate the WHY.
+- "Let me just add some logging and see" → Logging is a test for a hypothesis. What's your hypothesis?
+
+## Rationalization Table
+
+| If you catch yourself thinking... | Reality |
+|----------------------------------|---------|
+| "The fix is obvious, skip investigation" | Obvious fixes have root causes too. Verify in 30 seconds. |
+| "It's just a typo/config issue" | Confirm it. Read the code. Don't assume. |
+| "I'll just try this quick fix first" | The first fix sets the pattern. Do it right from the start. |
+| "No time for full investigation" | Systematic debugging is FASTER than guess-and-check thrashing. |
+| "I already know what's wrong" | Then verification should take 10 seconds. Do it anyway. |
+| "It works on my machine" | That's a symptom, not a diagnosis. Find the environmental difference. |
+| "The error message tells me exactly what's wrong" | Error messages describe symptoms. Root causes are upstream. |
+| "Let me just revert the last change" | Revert is a workaround, not a fix. Why did the change break things? |
+
+## Tools
+
+| Tool | When to use | When NOT to use |
+|------|------------|-----------------|
+| **Grep** | Search for error messages, function names, patterns in code | Don't grep before forming hypotheses — symptoms first |
+| **Read** | Read suspect files, stack trace locations, config files | Don't read unrelated files — stay focused on hypotheses |
+| **Bash** | Run tests to reproduce, `git log`/`git diff` to find trigger commits, execute test commands for hypotheses | Don't run destructive commands or modify production data |
+| **Glob** | Find files by pattern when error references unknown paths | Don't glob the entire repo — scope to suspect areas |
+| **Write** | Write/update debug.md (investigation state) and ctx_<id>.md (final capture) | Don't write fix code until root cause is verified |
+| **WebSearch** | ONLY for: error messages with no codebase matches, library changelogs, CVE lookups | Never search web for: "how to debug X", generic solutions, or before investigating the codebase |
+| **AskUserQuestion** | Escalation ONLY — after 2 rounds of failed hypotheses, or when root cause is outside codebase | Don't ask before investigating. The codebase has the answers. |
+
+### Codebase First, Web Never-First
+
+Read the codebase BEFORE considering web search. Web search is justified ONLY when:
+- Error message has zero matches in the codebase or git history
+- Library version changelog needed (breaking changes between versions)
+- Security advisory lookup (CVEs)
+- Stack trace references internal framework code you can't read locally
+
+Never search the web for: "how to fix X", architecture decisions, or generic debugging advice.
 
 ## Step 0: Team Knowledge Search
 
@@ -39,15 +70,12 @@ whyspec search --json "<keywords from bug description>"
 ```
 
 If results exist:
-- Display: "Found N past contexts in this domain"
-- List relevant titles and key decisions from past investigations
-- Note any past decisions that might inform the current bug
+- Display relevant titles and key decisions from past investigations
+- Note past decisions that might inform the current bug (e.g., "The auth middleware was deliberately changed in add-auth — this might explain the current session bug")
 
 If no results: note "No prior context found" and continue.
 
-This step takes seconds. It prevents re-investigating solved problems and surfaces past decisions that may explain the current behavior.
-
----
+This takes seconds. It prevents re-investigating solved problems.
 
 ## Step 1: Symptoms Gathering
 
@@ -58,11 +86,11 @@ whyspec debug --json "<bug-name>"
 ```
 
 Parse the JSON response:
-- `path`: Debug session directory (e.g., `.gitwhy/changes/<bug-name>/`)
+- `path`: Debug session directory
 - `template`: debug.md template structure
-- `related_contexts`: Past contexts in the same domain (from Step 0)
+- `related_contexts`: Past contexts in the same domain
 
-**Gather symptoms** — use **AskUserQuestion** if the user hasn't provided enough detail, or investigate the codebase directly:
+**Gather symptoms** — investigate the codebase directly. Only ask the user if you genuinely can't find the information yourself:
 
 | Symptom | What to capture |
 |---------|----------------|
@@ -73,332 +101,188 @@ Parse the JSON response:
 | Timeline | When it started, what changed recently |
 | Scope | Who is affected, how often, which environments |
 
-**Write debug.md immediately** — this file IS the investigation state:
-
-```markdown
-# Debug: <bug-name>
-
-## Status: INVESTIGATING
-
+<examples>
+<good>
 ## Symptoms
-
-**Expected:** [what should happen]
-**Actual:** [what actually happens]
-**Error:**
+**Expected:** POST /api/users returns 201 with user object
+**Actual:** Returns 500 with "Cannot read properties of undefined (reading 'email')"
+**Error:** TypeError at src/handlers/users.ts:47 — `req.body.email` is undefined
+**Stack trace:**
 ```
-[exact error message or stack trace]
+TypeError: Cannot read properties of undefined (reading 'email')
+    at createUser (src/handlers/users.ts:47:28)
+    at Layer.handle (node_modules/express/lib/router/layer.js:95:5)
 ```
-**Reproduction:** [minimal steps to reproduce]
-**Timeline:** [when it started, what changed recently]
-**Scope:** [who/what is affected, frequency]
+**Reproduction:** `curl -X POST localhost:3000/api/users -H "Content-Type: application/json" -d '{"name":"test"}'`
+**Timeline:** Started after commit a1b2c3d (merged express-validator upgrade, Apr 8)
+**Scope:** All POST endpoints with body parsing, not just /users. GET endpoints unaffected.
+Why good: Exact error with file:line, exact reproduction command,
+identified the trigger commit, and noticed the scope is broader than reported.
+</good>
 
-## Related Past Contexts
+<bad>
+## Symptoms
+**Expected:** API should work
+**Actual:** Getting 500 errors
+**Error:** Server error
+Why bad: Vague symptoms lead to vague hypotheses. No file, no line,
+no reproduction steps, no timeline.
+</bad>
+</examples>
 
-[Results from Step 0, or "None found"]
-[If found: relevant decisions, reasoning excerpts]
-
-## Hypotheses
-
-[Populated in Step 2]
-
-## Evidence Log
-
-[Populated in Step 3]
-
-## Root Cause
-
-[Populated in Step 4]
-
-## Fix
-
-[Populated in Step 5]
-
-## Prevention
-
-[Populated in Step 5]
-```
-
-**CRITICAL**: Write debug.md to `<path>/debug.md` NOW, after this step. It persists across context resets and enables resuming the investigation.
-
----
+**Write debug.md immediately** to `<path>/debug.md`. It persists across context resets.
 
 ## Step 2: Hypothesis Formation
 
-Form **3 or more falsifiable hypotheses**. Each must include a specific claim, a concrete test, and a way to disprove it:
+Form **3 or more falsifiable hypotheses**:
 
-```markdown
-## Hypotheses
-
-### H1: [Specific, testable claim about the root cause]
-- **Test:** [Concrete action — a command to run, a log to check, a condition to verify]
-- **Disproof:** [What evidence would prove this hypothesis WRONG]
+<examples>
+<good>
+### H1: express-validator upgrade broke body parsing middleware order
+- **Test:** `git diff a1b2c3d -- src/app.ts` — check if middleware registration order changed
+- **Disproof:** If middleware order is identical pre/post upgrade, this is wrong
 - **Status:** UNTESTED
-- **Likelihood:** HIGH / MEDIUM / LOW
+- **Likelihood:** HIGH (scope matches — all POST endpoints affected, timing matches upgrade)
 
-### H2: [Different claim — consider a different subsystem or mechanism]
-- **Test:** [Concrete action]
-- **Disproof:** [What would disprove it]
+### H2: express-validator v7 changed req.body population timing
+- **Test:** Add `console.log(req.body)` before and after validation middleware, compare output
+- **Disproof:** If req.body is populated before validation in both versions, this is wrong
 - **Status:** UNTESTED
-- **Likelihood:** HIGH / MEDIUM / LOW
+- **Likelihood:** MEDIUM (v7 changelog mentions "async validation" changes)
 
-### H3: [Third claim — consider edge cases, race conditions, configuration]
-- **Test:** [Concrete action]
-- **Disproof:** [What would disprove it]
+### H3: Content-Type header handling changed in the upgrade
+- **Test:** Send request with `Content-Type: application/json; charset=utf-8` — does it parse?
+- **Disproof:** If extended Content-Type works the same in both versions, this is wrong
 - **Status:** UNTESTED
-- **Likelihood:** HIGH / MEDIUM / LOW
-```
+- **Likelihood:** LOW (but worth testing — charset handling has caused issues before)
+Why good: Each hypothesis is specific, testable, and falsifiable.
+They target different root causes. Likelihood is justified with evidence.
+</good>
 
-**Hypothesis quality rules:**
-- Each hypothesis must be **specific enough to test** — "something is wrong with auth" is not a hypothesis
-- Each hypothesis must be **falsifiable** — there must be evidence that could prove it wrong
-- Hypotheses should target **different root causes** — not three variations of the same idea
-- **Use past contexts**: if Step 0 found related reasoning, let those decisions inform your hypotheses. A past choice ("we used X because of Y") might explain the current behavior.
+<bad>
+### H1: Something is wrong with the API
+- **Test:** Check the API
+- **Disproof:** If the API works
+### H2: Maybe a dependency issue
+- **Test:** Check dependencies
+Why bad: Not specific enough to test. "Check the API" is not a concrete action.
+</bad>
+</examples>
 
-Rank by likelihood. Test the most likely first.
-
-Update debug.md with all hypotheses before proceeding.
-
----
+Rank by likelihood. Test the most likely first. Update debug.md before proceeding.
 
 ## Step 3: Hypothesis Testing
 
-Test each hypothesis **one at a time, sequentially**. For each:
+Test each hypothesis **one at a time, sequentially**:
 
-1. **Execute the test** described in the hypothesis
-2. **Record evidence** — exact output, logs, observed behavior
-3. **Evaluate** — does the evidence support, refute, or leave the hypothesis inconclusive?
-4. **Update status**: `CONFIRMED`, `DISPROVED`, or `INCONCLUSIVE`
-5. **Update debug.md immediately** with findings
+1. Execute the test described in the hypothesis
+2. Record evidence — exact output, logs, observed behavior
+3. Evaluate — support, refute, or inconclusive?
+4. Update status: `CONFIRMED`, `DISPROVED`, or `INCONCLUSIVE`
+5. Update debug.md immediately
 
-```markdown
-## Evidence Log
+**Rules:**
+- **One hypothesis at a time** — never test multiple simultaneously
+- **Max 3 tests per hypothesis** — if inconclusive after 3, mark INCONCLUSIVE and move on
+- **Preserve the crime scene** — record current state before modifying suspect code
+- **Update debug.md after each test** — don't batch
 
-### H1: [claim] — DISPROVED
-**Test performed:** [exact command or action taken]
-**Evidence:**
-```
-[exact output, log entries, or observations]
-```
-**Conclusion:** [why this hypothesis is disproved — what the evidence shows]
+If ALL hypotheses are disproved:
+- Form new hypotheses based on what evidence revealed
+- If stuck after a second round, escalate to the user
 
-### H2: [claim] — CONFIRMED
-**Test performed:** [exact command or action taken]
-**Evidence:**
-```
-[exact output showing the root cause]
-```
-**Conclusion:** [why this is confirmed — the causal link between evidence and symptom]
-```
+## Step 4: Root Cause Verification
 
-**Testing rules:**
+Before proposing ANY fix:
 
-- **One hypothesis at a time** — never test multiple simultaneously. Confounded evidence is useless.
-- **Max 3 tests per hypothesis** — if evidence is inconclusive after 3 attempts, mark INCONCLUSIVE and move to the next.
-- **Preserve the crime scene** — before modifying suspect code, record its current state in the evidence log.
-- **Update debug.md after each test** — don't batch. Each test result is written immediately.
-
-If ALL hypotheses are disproved or inconclusive:
-- Form new hypotheses based on what the evidence revealed
-- If still stuck after a second round, escalate to the user (see Escalation Rules)
-
----
-
-## Step 4: Root Cause Verification — The Iron Law
-
-**No fix without verified root cause.**
-
-Before proposing ANY fix, you must:
-
-1. **State the root cause clearly and specifically**
+1. **State the root cause** clearly and specifically
 2. **Explain the causal chain**: [trigger] → [mechanism] → [symptom]
-3. **Verify predictive power**: can you predict the symptom from the cause? Can you reliably reproduce it?
-
-Update debug.md:
+3. **Verify predictive power**: can you predict the symptom from the cause?
 
 ```markdown
 ## Root Cause
-
-**Cause:** [precise description of what is wrong — not symptoms, the actual defect]
-**Causal chain:** [trigger event] → [mechanism/code path] → [observed symptom]
-**Verified by:** [how the causal link was confirmed — which test, which evidence]
-**Confidence:** HIGH / MEDIUM / LOW
+**Cause:** express-validator v7 switched to async validation, body parsing
+now completes AFTER route handler starts executing
+**Causal chain:** express-validator upgrade → async body parsing → req.body
+undefined when handler reads it synchronously → TypeError
+**Verified by:** Adding `await` before validation resolved the issue in test
+**Confidence:** HIGH
 ```
-
-**Confidence thresholds:**
 
 | Confidence | Criteria | Action |
 |-----------|----------|--------|
-| HIGH | Reproduction is reliable, causal chain is clear, evidence is unambiguous | Proceed to fix |
-| MEDIUM | Strong evidence but some uncertainty remains | Proceed with caution, note risks |
-| LOW | Circumstantial evidence, cannot reliably reproduce | **Escalate to user** — do NOT fix |
-
-If confidence is LOW:
-- Present all evidence gathered to the user via **AskUserQuestion**
-- Show: what was tested, what was found, what remains uncertain
-- Ask for additional context, access, or direction
-- **Do NOT guess at a fix**
-
-Update debug.md status: `## Status: ROOT CAUSE IDENTIFIED`
-
----
+| HIGH | Reliable reproduction, clear causal chain | Proceed to fix |
+| MEDIUM | Strong evidence, some uncertainty | Proceed with caution, note risks |
+| LOW | Circumstantial evidence | **Escalate — do NOT fix** |
 
 ## Step 5: Fix + Auto-Capture
 
-Once root cause is verified with HIGH or MEDIUM confidence:
+Once root cause is verified (HIGH or MEDIUM confidence):
 
-### 5a. Implement the fix
+1. **Implement the minimal fix** — fix the bug, don't refactor surrounding code
+2. **Verify the fix** — run reproduction steps again, run test suite
+3. **Update debug.md** — add fix details and prevention measures:
+   ```markdown
+   ## Fix
+   **Change:** Added `await` before express-validator `validationResult()` calls
+   **Files:** src/middleware/validate.ts (3 lines changed)
+   **Verification:** `npm test` — 47 pass, 0 fail. Manual curl test returns 201.
 
-- Make the **minimal, targeted change** that addresses the root cause
-- Don't refactor surrounding code — fix the bug, nothing more
-- Verify the fix resolves the symptom (run the reproduction steps again)
+   ## Prevention
+   - Added eslint rule for async validation middleware
+   - Added integration test: POST with body → verify req.body populated
+   - Updated UPGRADE.md with express-validator v7 migration notes
+   ```
+4. **Commit** atomically with root cause in message
+5. **Auto-capture** reasoning:
+   ```bash
+   whyspec capture --json "<bug-name>"
+   ```
+   Write `<path>/ctx_<id>.md` with the full investigation story.
 
-### 5b. Update debug.md
+6. **Show summary:**
+   ```
+   ## Debug Complete: <bug-name>
 
-```markdown
-## Fix
+   Root cause: [one-line summary]
+   Fix: [what was changed]
+   Context: ctx_<id>.md
 
-**Change:** [what was modified and how]
-**Files:** [files changed]
-**Verification:** [how the fix was confirmed — test results, manual reproduction]
+   Investigation:
+     Hypotheses tested: N (M confirmed, P disproved)
+     Evidence entries: N
+     Past contexts referenced: N
 
-## Prevention
-
-**How to prevent recurrence:**
-- [Concrete preventive measure — e.g., "add input validation for X"]
-- [Process improvement — e.g., "add test case for this edge case"]
-- [Monitoring — e.g., "add alert for this error pattern"]
-```
-
-Update debug.md status: `## Status: RESOLVED`
-
-### 5c. Commit the fix
-
-Commit atomically with a clear message referencing the root cause.
-
-### 5d. Auto-capture reasoning
-
-Generate a context file to preserve the full investigation:
-
-```bash
-whyspec capture --json "<bug-name>"
-```
-
-Write `<path>/ctx_<id>.md` in SaaS XML format:
-
-```xml
-<context>
-  <title>Debug: [short description — bug and fix]</title>
-
-  <story>
-    Phase 1 — Symptoms:
-    [What was observed, when it started, reproduction steps]
-
-    Phase 2 — Investigation:
-    [Hypotheses formed, tests performed, evidence gathered]
-    [Which hypotheses were disproved and why]
-
-    Phase 3 — Root Cause:
-    [The actual defect, causal chain, how it was verified]
-
-    Phase 4 — Fix:
-    [What was changed, how the fix was confirmed]
-  </story>
-
-  <reasoning>
-    Why the bug existed and why this fix is correct.
-
-    <decisions>
-      - [Fix approach chosen] — [rationale for this approach]
-    </decisions>
-
-    <rejected>
-      - [Alternative fix considered] — [why it was rejected]
-      - [Disproved hypothesis] — [what evidence ruled it out]
-    </rejected>
-
-    <tradeoffs>
-      - [Any trade-offs in the fix — scope, performance, complexity]
-    </tradeoffs>
-  </reasoning>
-
-  <files>
-    [Files changed to fix the bug]
-  </files>
-
-  <verification>[Test results confirming the fix]</verification>
-  <risks>[Potential side effects, related areas to watch]</risks>
-</context>
-```
-
-### 5e. Show summary
-
-```
-## Debug Complete: <bug-name>
-
-Root cause: [one-line summary]
-Fix: [what was changed]
-Context: ctx_<id>.md
-
-Investigation:
-  Hypotheses tested: N (M confirmed, P disproved)
-  Evidence entries: N
-  Past contexts referenced: N
-
-View full investigation: /whyspec-show <bug-name>
-```
-
----
+   View full investigation: /whyspec:show <bug-name>
+   ```
 
 ## Resuming an Investigation
 
-If the user invokes `/whyspec-debug` and a `debug.md` already exists for that change:
-
-1. **Read debug.md** from the change folder
-2. **Check the Status field** and resume from the appropriate step:
-
-| Status | Resume from |
-|--------|-------------|
-| `INVESTIGATING` | Last completed step — check which sections are populated |
-| `ROOT CAUSE IDENTIFIED` | Step 5 — implement the fix |
-| `RESOLVED` | Investigation is complete — show summary |
-
-3. **Announce**: "Resuming debug session: <name> — Status: <status>"
-4. **Show progress**: display completed sections and what remains
-
-This is why writing debug.md incrementally is critical — it's the contract for resumability.
-
----
+If debug.md already exists for a change:
+1. Read debug.md
+2. Check Status and resume from the appropriate step
+3. Announce: "Resuming debug session: <name> — Status: <status>"
 
 ## Escalation Rules
 
-Escalate to the user (via **AskUserQuestion**) when:
+| Trigger | Action |
+|---------|--------|
+| All hypotheses disproved (2 rounds) | Present full evidence, ask for new direction |
+| Cannot reproduce | Document symptoms, ask for environment details |
+| Root cause outside codebase | Document findings, suggest infrastructure investigation |
+| Confidence is LOW | Present evidence, explain uncertainty, do NOT fix |
+| Fix introduces significant risk | Present fix + risk assessment, ask for approval |
+| 3 failed fix attempts | Stop. Present what was tried. Ask for help. |
 
-| Trigger | What to present |
-|---------|----------------|
-| All hypotheses disproved (2 rounds) | Full evidence summary, ask for new direction |
-| Cannot reproduce | Symptoms documented, ask for environment details or access |
-| Root cause outside codebase | Findings documented, suggest infrastructure/environment investigation |
-| Root cause confidence is LOW | Evidence summary, explain uncertainty, ask for guidance |
-| Fix would introduce significant risk | Proposed fix, risk assessment, ask for approval |
-
-When escalating, always present:
-- What was tested and what was found
-- What remains uncertain
-- A specific question or request for the user
-
-**Never silently give up.** If you're stuck, say so with evidence.
-
----
+**Never silently give up.** If stuck, present evidence and ask.
 
 ## Guardrails
 
-- **No fix without root cause** — the Iron Law is non-negotiable. Never propose a fix based on a guess, a hunch, or pattern-matching without evidence.
-- **Max 3 tests per hypothesis** — if evidence is inconclusive after 3 attempts, mark INCONCLUSIVE and form new hypotheses or escalate.
-- **Always capture reasoning** — every debug session MUST produce both `debug.md` AND `ctx_<id>.md`. No silent fixes. The investigation is as valuable as the fix.
-- **Write debug.md incrementally** — update after EVERY step, not at the end. This is the resumability contract. If context resets, the investigation survives.
-- **Don't skip team knowledge** — always run Step 0, even for "obvious" bugs. Past contexts prevent repeated mistakes and surface relevant decisions.
-- **Don't guess at root cause** — if uncertain after investigation, escalate. Wrong diagnosis leads to wrong fixes that mask the real problem.
-- **Test one hypothesis at a time** — never test multiple simultaneously. Sequential testing produces clean evidence.
-- **Preserve evidence** — before modifying suspect code, record its current state. Don't destroy the crime scene.
-- **Minimal fixes only** — fix the bug, don't refactor. Keep the diff focused on the root cause.
-- **Don't skip prevention** — after fixing, always document how to prevent recurrence. Future developers need this.
+- **No fix without root cause** — the Iron Law is non-negotiable
+- **Max 3 tests per hypothesis** — escalate if inconclusive
+- **Always capture reasoning** — every debug session produces both debug.md AND ctx_<id>.md
+- **Write debug.md incrementally** — update after EVERY step, not at the end
+- **Don't skip team knowledge** — always run Step 0
+- **Test one hypothesis at a time** — sequential testing produces clean evidence
+- **Preserve evidence** — record state before modifying suspect code
+- **Minimal fixes only** — fix the bug, don't refactor

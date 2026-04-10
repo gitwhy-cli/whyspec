@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateClaudeCodeCommands, generateClaudeCodeSkills } from "./claude-code.js";
+import { generateClaudeCodeCommands } from "./claude-code.js";
 import { generateCursorCommands } from "./cursor.js";
 import { generateCodexSkills } from "./codex.js";
 import { generateAgentsMd } from "./agents-md.js";
@@ -8,85 +8,7 @@ import { WHYSPEC_COMMANDS, COMMAND_DESCRIPTIONS } from "./types.js";
 // ─── Claude Code Adapter ─────────────────────────────────────────────────────
 
 describe("claude-code adapter", () => {
-  const files = generateClaudeCodeSkills();
   const commands = generateClaudeCodeCommands();
-
-  it("generates 6 SKILL.md files", () => {
-    expect(files).toHaveLength(6);
-  });
-
-  it("generates correct file paths", () => {
-    const paths = files.map((f) => f.path);
-    for (const command of WHYSPEC_COMMANDS) {
-      expect(paths).toContain(`.claude/skills/whyspec-${command}/SKILL.md`);
-    }
-  });
-
-  it("each file has valid YAML frontmatter with name and description", () => {
-    for (const file of files) {
-      // Frontmatter is delimited by --- lines
-      expect(file.content).toMatch(/^---\n/);
-      const parts = file.content.split("---");
-      // parts[0] is empty (before first ---), parts[1] is frontmatter
-      expect(parts.length).toBeGreaterThanOrEqual(3);
-
-      const frontmatter = parts[1];
-      expect(frontmatter).toMatch(/name:\s*whyspec-\w+/);
-      expect(frontmatter).toMatch(/description:\s*.+/);
-    }
-  });
-
-  it("frontmatter name matches the command in the path", () => {
-    for (const file of files) {
-      const pathMatch = file.path.match(/whyspec-(\w+)/);
-      const nameMatch = file.content.match(/name:\s*whyspec-(\w+)/);
-      expect(pathMatch).not.toBeNull();
-      expect(nameMatch).not.toBeNull();
-      expect(pathMatch![1]).toBe(nameMatch![1]);
-    }
-  });
-
-  it("frontmatter description matches COMMAND_DESCRIPTIONS", () => {
-    for (const file of files) {
-      const commandMatch = file.path.match(
-        /whyspec-(plan|execute|capture|show|search|debug)/,
-      );
-      expect(commandMatch).not.toBeNull();
-      const command = commandMatch![1] as keyof typeof COMMAND_DESCRIPTIONS;
-      expect(file.content).toContain(
-        `description: ${COMMAND_DESCRIPTIONS[command]}`,
-      );
-    }
-  });
-
-  it("each file has non-empty instructions after frontmatter", () => {
-    for (const file of files) {
-      const parts = file.content.split("---");
-      // Everything after the second --- is instructions
-      const instructions = parts.slice(2).join("---").trim();
-      expect(instructions.length).toBeGreaterThan(50);
-    }
-  });
-
-  it("each file references the CLI-as-oracle pattern", () => {
-    for (const file of files) {
-      expect(file.content).toContain("whyspec");
-      expect(file.content).toContain("--json");
-    }
-  });
-
-  it("does not reference colon-style slash commands", () => {
-    for (const file of files) {
-      expect(file.content).not.toContain("/whyspec:");
-    }
-  });
-
-  it("respects projectRoot prefix", () => {
-    const prefixed = generateClaudeCodeSkills("/my/project");
-    for (const file of prefixed) {
-      expect(file.path).toMatch(/^\/my\/project\//);
-    }
-  });
 
   it("generates 6 Claude command files", () => {
     expect(commands).toHaveLength(6);
@@ -111,6 +33,35 @@ describe("claude-code adapter", () => {
     for (const file of commands) {
       expect(file.content).toContain("/whyspec:");
     }
+  });
+
+  it("each command file has non-empty instructions after frontmatter", () => {
+    for (const file of commands) {
+      const parts = file.content.split("---");
+      const instructions = parts.slice(2).join("---").trim();
+      expect(instructions.length).toBeGreaterThan(50);
+    }
+  });
+
+  it("each command file references the CLI with --json flag", () => {
+    for (const file of commands) {
+      expect(file.content).toContain("whyspec");
+      expect(file.content).toContain("--json");
+    }
+  });
+
+  it("respects projectRoot prefix", () => {
+    const prefixed = generateClaudeCodeCommands("/my/project");
+    for (const file of prefixed) {
+      expect(file.path).toMatch(/^\/my\/project\//);
+    }
+  });
+
+  it("plan command emphasizes action-first over forcing questions", () => {
+    const planCommand = commands.find((f) => f.path.includes("whyspec:plan"));
+    expect(planCommand).toBeDefined();
+    expect(planCommand!.content).toContain("Act first");
+    expect(planCommand!.content).toContain("do NOT");
   });
 });
 
@@ -216,7 +167,6 @@ describe("codex adapter", () => {
       expect(file.content).toContain(
         `description: ${COMMAND_DESCRIPTIONS[command]}`,
       );
-      expect(file.content).not.toContain("/whyspec:");
     }
   });
 

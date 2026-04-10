@@ -4,7 +4,7 @@ import {
   COMMAND_DESCRIPTIONS,
   WhySpecCommand,
 } from "./types.js";
-import { generateClaudeCodeSkills } from "./claude-code.js";
+import { getSkillInstructions } from "./claude-code.js";
 
 function getDisplayName(command: WhySpecCommand): string {
   return `WhySpec ${command[0].toUpperCase()}${command.slice(1)}`;
@@ -45,14 +45,20 @@ export function generateCodexSkills(
   projectRoot: string = "",
 ): GeneratedFile[] {
   const prefix = projectRoot ? `${projectRoot}/` : "";
-  const claudeSkills = generateClaudeCodeSkills().map((file) => {
-    const commandMatch = file.path.match(/whyspec-(plan|execute|capture|show|search|debug)\//);
-    if (!commandMatch) {
-      return file;
-    }
+
+  const skillFiles = WHYSPEC_COMMANDS.map((command) => {
+    const frontmatter = [
+      "---",
+      `name: whyspec-${command}`,
+      `description: ${COMMAND_DESCRIPTIONS[command]}`,
+      "---",
+    ].join("\n");
+
+    const instructions = getSkillInstructions(command);
+
     return {
-      ...file,
-      path: `${prefix}whyspec-${commandMatch[1]}/SKILL.md`,
+      path: `${prefix}whyspec-${command}/SKILL.md`,
+      content: `${frontmatter}\n\n${instructions}\n`,
     };
   });
 
@@ -61,5 +67,5 @@ export function generateCodexSkills(
     content: renderOpenAiMetadata(command),
   }));
 
-  return [...claudeSkills, ...metadataFiles];
+  return [...skillFiles, ...metadataFiles];
 }

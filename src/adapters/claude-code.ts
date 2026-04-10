@@ -2,6 +2,7 @@ import {
   GeneratedFile,
   WHYSPEC_COMMANDS,
   COMMAND_DESCRIPTIONS,
+  COMMAND_ARGUMENT_HINTS,
   WhySpecCommand,
 } from "./types.js";
 
@@ -217,6 +218,31 @@ export function generateClaudeCodeSkills(
     return {
       path: `${prefix}.claude/skills/whyspec-${command}/SKILL.md`,
       content,
+    };
+  });
+}
+
+export function generateClaudeCodeCommands(
+  projectRoot: string = "",
+): GeneratedFile[] {
+  const prefix = projectRoot ? `${projectRoot}/` : "";
+
+  return WHYSPEC_COMMANDS.map((command) => {
+    const frontmatter = [
+      "---",
+      `description: ${COMMAND_DESCRIPTIONS[command]}`,
+      `argument-hint: ${COMMAND_ARGUMENT_HINTS[command]}`,
+      "---",
+    ].join("\n");
+
+    const instructions = getSkillInstructions(command)
+      .replaceAll("/whyspec-", "/whyspec:")
+      .replaceAll("Run /whyspec:", "Run /whyspec:");
+    const invocationLine = `Invoke this command as \`/whyspec:${command}\`.`;
+
+    return {
+      path: `${prefix}.claude/commands/whyspec:${command}.md`,
+      content: `${frontmatter}\n\n${invocationLine}\n\n${instructions}\n`,
     };
   });
 }

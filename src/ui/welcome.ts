@@ -15,10 +15,9 @@ export function renderWelcomeScreen(): string {
   lines.push(chalk.white("    \u2514\u2500\u2500 changes/"));
   lines.push("");
   lines.push(chalk.dim("  Quick start after setup:"));
-  lines.push(`    ${chalk.green("whyspec-plan")}      Plan before coding`);
-  lines.push(`    ${chalk.green("whyspec-execute")}   Implement with context`);
-  lines.push(`    ${chalk.green("whyspec-capture")}   Save your reasoning`);
-  lines.push(`    ${chalk.green("whyspec-debug")}     Debug with science`);
+  lines.push(`    ${chalk.green("/whyspec:plan")}      Claude Code command`);
+  lines.push(`    ${chalk.green("/whyspec-plan")}      Cursor command`);
+  lines.push(`    ${chalk.green("$whyspec-plan")}      Codex skill`);
   lines.push("");
 
   return lines.join("\n");
@@ -32,13 +31,16 @@ export function renderTelemetryNotice(): string {
 
 export function renderSuccessMessage(tools: string[]): string {
   const lines: string[] = [];
-  const usesSlashCommands = tools.includes("claude-code") || tools.includes("cursor");
+  const usesClaudeCommands = tools.includes("claude-code");
+  const usesCursorCommands = tools.includes("cursor");
   const usesCodex = tools.includes("codex");
-  const exampleCommand = usesSlashCommands
-    ? "/whyspec-plan"
-    : usesCodex
-      ? "$whyspec-plan"
-      : "whyspec plan";
+  const exampleCommand = usesClaudeCommands
+    ? "/whyspec:plan"
+    : usesCursorCommands
+      ? "/whyspec-plan"
+      : usesCodex
+        ? "$whyspec-plan"
+        : "whyspec plan";
 
   lines.push("");
   lines.push(chalk.green.bold("  \u2713 WhySpec initialized!"));
@@ -46,6 +48,9 @@ export function renderSuccessMessage(tools: string[]): string {
   lines.push(chalk.dim("  Created:"));
   lines.push(chalk.white("    .gitwhy/config.yaml"));
   lines.push(chalk.white("    .gitwhy/changes/"));
+  if (usesCodex) {
+    lines.push(chalk.white("    gitwhy/  -> .gitwhy/"));
+  }
   if (tools.length > 0) {
     lines.push("");
     lines.push(chalk.dim(`  Tools configured: ${tools.join(", ")}`));

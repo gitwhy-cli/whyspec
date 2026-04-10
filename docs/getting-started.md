@@ -11,7 +11,7 @@ npm install -g @gitwhy-cli/whyspec
 ```bash
 cd your-project
 whyspec init                        # Set up WhySpec
-# Then use /whyspec-plan in Claude Code or Cursor, or $whyspec-plan in Codex
+# Then use /whyspec:plan in Claude Code, /whyspec-plan in Cursor, or $whyspec-plan in Codex
 ```
 
 That's it. WhySpec teaches your AI agent to plan before coding and capture reasoning after.
@@ -21,7 +21,7 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 **1. Plan** — Before coding, declare intent and surface decisions that need to be made.
 
 ```
-/whyspec-plan add-jwt-auth     ->   .gitwhy/changes/add-jwt-auth/
+/whyspec:plan add-jwt-auth     ->   .gitwhy/changes/add-jwt-auth/
                                       intent.md   (why this change exists)
                                       design.md   (approach + decisions to make)
                                       tasks.md    (verification-first checklist)
@@ -30,13 +30,13 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 **2. Execute** — Code with full context. The agent reads your plan and works through tasks.
 
 ```
-/whyspec-execute add-jwt-auth  ->   Returns intent + design + tasks as context
+/whyspec:execute add-jwt-auth  ->   Returns intent + design + tasks as context
 ```
 
 **3. Capture** — After coding, record the reasoning. Resolve the Decision Bridge.
 
 ```
-/whyspec-capture add-jwt-auth  ->   .gitwhy/changes/add-jwt-auth/ctx_a1b2c3d4.md
+/whyspec:capture add-jwt-auth  ->   .gitwhy/changes/add-jwt-auth/ctx_a1b2c3d4.md
                                       Decisions Made + Surprises + Trade-offs
 ```
 

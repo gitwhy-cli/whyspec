@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateClaudeCodeSkills } from "./claude-code.js";
+import { generateClaudeCodeCommands, generateClaudeCodeSkills } from "./claude-code.js";
 import { generateCursorCommands } from "./cursor.js";
 import { generateCodexSkills } from "./codex.js";
 import { generateAgentsMd } from "./agents-md.js";
@@ -9,6 +9,7 @@ import { WHYSPEC_COMMANDS, COMMAND_DESCRIPTIONS } from "./types.js";
 
 describe("claude-code adapter", () => {
   const files = generateClaudeCodeSkills();
+  const commands = generateClaudeCodeCommands();
 
   it("generates 6 SKILL.md files", () => {
     expect(files).toHaveLength(6);
@@ -84,6 +85,31 @@ describe("claude-code adapter", () => {
     const prefixed = generateClaudeCodeSkills("/my/project");
     for (const file of prefixed) {
       expect(file.path).toMatch(/^\/my\/project\//);
+    }
+  });
+
+  it("generates 6 Claude command files", () => {
+    expect(commands).toHaveLength(6);
+  });
+
+  it("generates colon-style Claude command paths", () => {
+    const paths = commands.map((f) => f.path);
+    for (const command of WHYSPEC_COMMANDS) {
+      expect(paths).toContain(`.claude/commands/whyspec:${command}.md`);
+    }
+  });
+
+  it("each Claude command file has frontmatter with description and argument-hint", () => {
+    for (const file of commands) {
+      expect(file.content).toMatch(/^---\n/);
+      expect(file.content).toMatch(/description:\s*.+/);
+      expect(file.content).toMatch(/argument-hint:\s*.+/);
+    }
+  });
+
+  it("Claude command files use colon-style slash command references", () => {
+    for (const file of commands) {
+      expect(file.content).toContain("/whyspec:");
     }
   });
 });

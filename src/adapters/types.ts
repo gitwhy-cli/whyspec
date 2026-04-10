@@ -30,3 +30,13 @@ export const COMMAND_DESCRIPTIONS: Record<WhySpecCommand, string> = {
   search: "Search past decisions and reasoning across all changes",
   debug: "Debug with the scientific method and capture root cause",
 };
+
+/** Gray placeholder text shown beside slash commands in UIs that support it. */
+export const COMMAND_ARGUMENT_HINTS: Record<WhySpecCommand, string> = {
+  plan: "change description",
+  execute: "change name",
+  capture: "change name",
+  show: "change name",
+  search: "query",
+  debug: "issue description",
+};

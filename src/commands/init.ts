@@ -7,11 +7,11 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
-import { generateClaudeCodeSkills } from "../adapters/claude-code.js";
+import { generateClaudeCodeCommands, generateClaudeCodeSkills } from "../adapters/claude-code.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
-import type { GeneratedFile } from "../adapters/types.js";
+import { COMMAND_ARGUMENT_HINTS, COMMAND_DESCRIPTIONS, type GeneratedFile } from "../adapters/types.js";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -32,6 +32,26 @@ export function createGitwhyDir(root: string): void {
   fs.mkdirSync(changesDir, { recursive: true });
   fs.mkdirSync(archiveDir, { recursive: true });
   fs.mkdirSync(debugDir, { recursive: true });
+}
+
+export function ensureVisibleGitwhyAlias(root: string, tools: string[]): void {
+  if (!tools.includes("codex")) {
+    return;
+  }
+
+  const aliasPath = path.join(root, "gitwhy");
+  const targetPath = path.join(root, ".gitwhy");
+
+  if (fs.existsSync(aliasPath)) {
+    return;
+  }
+
+  const relativeTarget = path.relative(path.dirname(aliasPath), targetPath) || ".gitwhy";
+  fs.symlinkSync(
+    relativeTarget,
+    aliasPath,
+    process.platform === "win32" ? "junction" : "dir",
+  );
 }
 
 export function writeConfigYaml(root: string, opts: ConfigOptions): void {
@@ -213,6 +233,33 @@ function installAuthoredSkills(root: string, skillsSourceDir: string): boolean {
   return installed;
 }
 
+function installClaudeCommandsFromSkills(root: string, skillsSourceDir: string): boolean {
+  if (!fs.existsSync(skillsSourceDir)) return false;
+  let installed = false;
+  for (const cmd of WHYSPEC_COMMANDS) {
+    const src = path.join(skillsSourceDir, `whyspec-${cmd}`, "SKILL.md");
+    if (!fs.existsSync(src)) {
+      continue;
+    }
+
+    const raw = fs.readFileSync(src, "utf-8");
+    const parts = raw.split("---");
+    const body = parts.length >= 3 ? parts.slice(2).join("---").trim() : raw.trim();
+    const frontmatter = [
+      "---",
+      `description: ${COMMAND_DESCRIPTIONS[cmd]}`,
+      `argument-hint: ${COMMAND_ARGUMENT_HINTS[cmd]}`,
+      "---",
+    ].join("\n");
+    const content = `${frontmatter}\n\n${body.replaceAll("/whyspec-", "/whyspec:")}\n`;
+    const dest = path.join(root, `whyspec:${cmd}.md`);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, content, "utf-8");
+    installed = true;
+  }
+  return installed;
+}
+
 function getSkillsSourceDir(): string {
   const currentDir = path.dirname(fileURLToPath(import.meta.url));
   return path.join(path.dirname(path.dirname(currentDir)), "skills");
@@ -243,9 +290,13 @@ export function installSkillFiles(root: string, tools: string[]): void {
   if (tools.includes("claude-code")) {
     // Try authored skill files first (production-quality from skills/ directory)
     const authoredInstalled = installAuthoredSkills(path.join(root, ".claude", "skills"), skillsDir);
+    const commandsInstalled = installClaudeCommandsFromSkills(path.join(root, ".claude", "commands"), skillsDir);
     if (!authoredInstalled) {
       // Fall back to adapter-generated placeholders
       writeGeneratedFiles(root, generateClaudeCodeSkills());
+    }
+    if (!commandsInstalled) {
+      writeGeneratedFiles(root, generateClaudeCodeCommands());
     }
   }
 
@@ -321,7 +372,8 @@ export async function runInit(): Promise<void> {
     // Check if skills need to be installed (e.g. prior crash before skill step)
     if (tools.includes("claude-code")) {
       const skillCheck = path.join(root, ".claude", "skills", "whyspec-plan", "SKILL.md");
-      if (!fs.existsSync(skillCheck)) {
+      const commandCheck = path.join(root, ".claude", "commands", "whyspec:plan.md");
+      if (!fs.existsSync(skillCheck) || !fs.existsSync(commandCheck)) {
         console.log(chalk.yellow("\n  Repairing missing skill files...\n"));
         installSkillFiles(root, tools);
         generateAgentsMd(root, tools);
@@ -362,9 +414,19 @@ export async function runInit(): Promise<void> {
       // Leave malformed user settings untouched and continue with existing repair work.
     }
 
+    if (tools.includes("codex")) {
+      const hadAlias = fs.existsSync(path.join(root, "gitwhy"));
+      ensureVisibleGitwhyAlias(root, tools);
+      if (!hadAlias && fs.existsSync(path.join(root, "gitwhy"))) {
+        repaired = true;
+      }
+    }
+
     if (repaired) {
       const exampleCommand = tools.includes("claude-code") || tools.includes("cursor")
-        ? "/whyspec-plan"
+        ? tools.includes("claude-code")
+          ? "/whyspec:plan"
+          : "/whyspec-plan"
         : tools.includes("codex")
           ? "$whyspec-plan"
           : "whyspec plan";
@@ -407,6 +469,7 @@ export async function runInit(): Promise<void> {
   // 6. Ignore .gitwhy for Git without hiding it from agent file trees
   addToGitignore(root);
   ensureVsCodeShowsGitwhy(root);
+  ensureVisibleGitwhyAlias(root, selectedTools);
 
   // 7. Install skill files
   installSkillFiles(root, selectedTools);

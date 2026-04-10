@@ -7,6 +7,7 @@ import {
   writeConfigYaml,
   addToGitignore,
   ensureVsCodeShowsGitwhy,
+  ensureVisibleGitwhyAlias,
   installSkillFiles,
   generateAgentsMd,
   detectProjectName,
@@ -42,6 +43,26 @@ describe("createGitwhyDir", () => {
   it("is idempotent — calling twice does not throw", () => {
     createGitwhyDir(tmpDir);
     expect(() => createGitwhyDir(tmpDir)).not.toThrow();
+  });
+});
+
+describe("ensureVisibleGitwhyAlias", () => {
+  it("creates a visible gitwhy alias for Codex users", () => {
+    createGitwhyDir(tmpDir);
+
+    ensureVisibleGitwhyAlias(tmpDir, ["codex"]);
+
+    const aliasPath = path.join(tmpDir, "gitwhy");
+    expect(fs.existsSync(aliasPath)).toBe(true);
+    expect(fs.realpathSync(aliasPath)).toBe(fs.realpathSync(path.join(tmpDir, ".gitwhy")));
+  });
+
+  it("does not create the alias when Codex is not configured", () => {
+    createGitwhyDir(tmpDir);
+
+    ensureVisibleGitwhyAlias(tmpDir, ["claude-code"]);
+
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
   });
 });
 
@@ -246,17 +267,23 @@ describe("ensureVsCodeShowsGitwhy", () => {
 // ── installSkillFiles ────────────────────────────────────────────────
 
 describe("installSkillFiles", () => {
-  it("creates 6 SKILL.md files for claude-code", () => {
+  it("creates 6 SKILL.md files and 6 command files for claude-code", () => {
     installSkillFiles(tmpDir, ["claude-code"]);
 
     const commands = ["plan", "execute", "capture", "show", "search", "debug"];
     for (const cmd of commands) {
       const skillPath = path.join(tmpDir, ".claude", "skills", `whyspec-${cmd}`, "SKILL.md");
+      const commandPath = path.join(tmpDir, ".claude", "commands", `whyspec:${cmd}.md`);
       expect(fs.existsSync(skillPath)).toBe(true);
+      expect(fs.existsSync(commandPath)).toBe(true);
 
       const content = fs.readFileSync(skillPath, "utf-8");
       expect(content).toContain(`name: whyspec-${cmd}`);
       expect(content).toContain("---");
+
+      const commandContent = fs.readFileSync(commandPath, "utf-8");
+      expect(commandContent).toContain("argument-hint:");
+      expect(commandContent).toContain("/whyspec:");
     }
   });
 

@@ -9,9 +9,9 @@ WhySpec contexts (`ctx_<id>.md`) use the GitWhy format — zero conversion neede
 ## Deployment Modes
 
 ```
-Solo (default):     .gitwhy/ gitignored, private local reasoning
-Team (opt-in):      Remove from .gitignore, reasoning visible in PRs
-Enterprise:         Keep gitignored + push to GitWhy cloud
+Solo (default):     .gitwhy/ ignored locally, private reasoning
+Team (opt-in):      Remove the local ignore rule, reasoning visible in PRs
+Enterprise:         Keep it locally ignored + push to GitWhy cloud
 ```
 
 ## What GitWhy Adds

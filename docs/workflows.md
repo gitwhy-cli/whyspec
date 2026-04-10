@@ -39,12 +39,12 @@ Use search when you need to understand why a past decision was made — especial
 
 ### Solo (Default)
 
-`.gitwhy/` is gitignored. Reasoning stays local and private.
+`.gitwhy/` is ignored by Git by default. In normal git repos, WhySpec uses `.git/info/exclude` so the folder stays visible in more agent file trees while still remaining local and private.
 
 ### Team (Opt-in)
 
-Remove `.gitwhy/` from `.gitignore`. Reasoning becomes visible in PRs — reviewers can see not just what changed, but why.
+Remove the local ignore rule from `.git/info/exclude` or `.gitignore` (fallback for non-git projects). Reasoning becomes visible in PRs — reviewers can see not just what changed, but why.
 
 ### Enterprise
 
-Keep `.gitwhy/` gitignored but push to [GitWhy](https://gitwhy.dev) cloud. Reasoning is aggregated across repos and teams without cluttering your git history.
+Keep `.gitwhy/` locally ignored but push to [GitWhy](https://gitwhy.dev) cloud. Reasoning is aggregated across repos and teams without cluttering your git history.

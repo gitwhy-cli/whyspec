@@ -61,22 +61,47 @@ export function writeConfigYaml(root: string, opts: ConfigOptions): void {
 }
 
 export function addToGitignore(root: string): void {
-  const gitignorePath = path.join(root, ".gitignore");
   const entry = ".gitwhy/";
+  const gitDir = path.join(root, ".git");
+  const gitignorePath = path.join(root, ".gitignore");
+  const gitExcludePath = path.join(gitDir, "info", "exclude");
 
-  if (fs.existsSync(gitignorePath)) {
-    const content = fs.readFileSync(gitignorePath, "utf-8");
-    // Check if already present (exact line match)
-    const lines = content.split("\n");
-    if (lines.some((line) => line.trim() === entry)) {
-      return; // Already present
+  const ensureIgnoreEntry = (filePath: string): void => {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const lines = content.split("\n");
+      if (lines.some((line) => line.trim() === entry)) {
+        return;
+      }
+      const separator = content.endsWith("\n") ? "" : "\n";
+      fs.writeFileSync(filePath, content + separator + entry + "\n", "utf-8");
+      return;
     }
-    // Append with newline safety
-    const separator = content.endsWith("\n") ? "" : "\n";
-    fs.writeFileSync(gitignorePath, content + separator + entry + "\n", "utf-8");
-  } else {
-    fs.writeFileSync(gitignorePath, entry + "\n", "utf-8");
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, entry + "\n", "utf-8");
+  };
+
+  const removeIgnoreEntry = (filePath: string): void => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+
+    const content = fs.readFileSync(filePath, "utf-8");
+    const filtered = content
+      .split("\n")
+      .filter((line) => line.trim() !== entry && line.length > 0);
+
+    const nextContent = filtered.length > 0 ? `${filtered.join("\n")}\n` : "";
+    fs.writeFileSync(filePath, nextContent, "utf-8");
+  };
+
+  if (fs.existsSync(gitDir)) {
+    ensureIgnoreEntry(gitExcludePath);
+    removeIgnoreEntry(gitignorePath);
+    return;
   }
+
+  ensureIgnoreEntry(gitignorePath);
 }
 
 const WHYSPEC_COMMANDS = ["plan", "execute", "capture", "show", "search", "debug"] as const;
@@ -314,10 +339,13 @@ export async function runInit(): Promise<void> {
     }
 
     const gitignorePath = path.join(root, ".gitignore");
-    const hasGitwhyIgnore = fs.existsSync(gitignorePath) &&
-      fs.readFileSync(gitignorePath, "utf-8").split("\n").some((line) => line.trim() === ".gitwhy/");
-    if (!hasGitwhyIgnore) {
-      addToGitignore(root);
+    const gitExcludePath = path.join(root, ".git", "info", "exclude");
+    const beforeGitignore = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, "utf-8") : "";
+    const beforeGitExclude = fs.existsSync(gitExcludePath) ? fs.readFileSync(gitExcludePath, "utf-8") : "";
+    addToGitignore(root);
+    const afterGitignore = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, "utf-8") : "";
+    const afterGitExclude = fs.existsSync(gitExcludePath) ? fs.readFileSync(gitExcludePath, "utf-8") : "";
+    if (beforeGitignore !== afterGitignore || beforeGitExclude !== afterGitExclude) {
       repaired = true;
     }
 
@@ -376,7 +404,7 @@ export async function runInit(): Promise<void> {
     telemetry: process.env.WHYSPEC_TELEMETRY !== "0",
   });
 
-  // 6. Add to .gitignore
+  // 6. Ignore .gitwhy for Git without hiding it from agent file trees
   addToGitignore(root);
   ensureVsCodeShowsGitwhy(root);
 

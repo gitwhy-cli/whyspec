@@ -129,7 +129,7 @@ Display the full story of a change — from intent through design, tasks, and ca
    whyspec show --json "<change-name>"
    \`\`\`
 
-2. Parse the JSON response containing intent, design, tasks, context, and Decision Bridge delta.
+2. Parse the JSON response containing intent, design, tasks, context, surprises, and Decision Bridge delta.
 
 3. Display the change story in sections:
    - **Intent** — WHY (from intent.md)

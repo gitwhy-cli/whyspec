@@ -344,14 +344,14 @@ Investigation:
   Evidence entries: N
   Past contexts referenced: N
 
-View full investigation: /whyspec:show <bug-name>
+View full investigation: /whyspec-show <bug-name>
 ```
 
 ---
 
 ## Resuming an Investigation
 
-If the user invokes `/whyspec:debug` and a `debug.md` already exists for that change:
+If the user invokes `/whyspec-debug` and a `debug.md` already exists for that change:
 
 1. **Read debug.md** from the change folder
 2. **Check the Status field** and resume from the appropriate step:

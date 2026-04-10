@@ -57,8 +57,8 @@ Search reasoning — find past decisions, contexts, and intent across all change
 3. **Offer follow-up actions**
 
    After displaying results:
-   - "View full story: `/whyspec:show <change-name>`"
-   - "Narrow by domain: `/whyspec:search \"<query>\" --domain <domain>`"
+   - "View full story: `/whyspec-show <change-name>`"
+   - "Narrow by domain: `/whyspec-search \"<query>\" --domain <domain>`"
 
 **Guardrails**
 

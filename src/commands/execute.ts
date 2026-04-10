@@ -23,6 +23,9 @@ export interface TaskProgress {
 
 export interface ExecuteJsonOutput {
   change_name: string;
+  intent: string;
+  design: string;
+  tasks: string;
   intent_content: string;
   design_content: string;
   tasks_content: string;
@@ -111,6 +114,9 @@ export async function executeCommand(
   if (options.json) {
     const output: ExecuteJsonOutput = {
       change_name: change.name,
+      intent: intentContent,
+      design: designContent,
+      tasks: tasksContent,
       intent_content: intentContent,
       design_content: designContent,
       tasks_content: tasksContent,

@@ -9,6 +9,7 @@ import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
 import { generateClaudeCodeSkills } from "../adapters/claude-code.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
+import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
 import type { GeneratedFile } from "../adapters/types.js";
 
@@ -83,10 +84,89 @@ const WHYSPEC_COMMANDS = ["plan", "execute", "capture", "show", "search", "debug
 /** Write GeneratedFile[] to disk, creating directories as needed. */
 function writeGeneratedFiles(root: string, files: GeneratedFile[]): void {
   for (const file of files) {
-    const fullPath = path.join(root, file.path);
+    const fullPath = path.isAbsolute(file.path) ? file.path : path.join(root, file.path);
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, file.content, "utf-8");
   }
+}
+
+function stripJsonComments(content: string): string {
+  let output = "";
+  let inString = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let i = 0; i < content.length; i++) {
+    const current = content[i];
+    const next = content[i + 1];
+    const previous = content[i - 1];
+
+    if (inLineComment) {
+      if (current === "\n") {
+        inLineComment = false;
+        output += current;
+      }
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (current === "*" && next === "/") {
+        inBlockComment = false;
+        i++;
+      }
+      continue;
+    }
+
+    if (!inString && current === "/" && next === "/") {
+      inLineComment = true;
+      i++;
+      continue;
+    }
+
+    if (!inString && current === "/" && next === "*") {
+      inBlockComment = true;
+      i++;
+      continue;
+    }
+
+    if (current === "\"" && previous !== "\\") {
+      inString = !inString;
+    }
+
+    output += current;
+  }
+
+  return output.replace(/,\s*([}\]])/g, "$1");
+}
+
+function parseJsoncObject(content: string): Record<string, unknown> {
+  const parsed = JSON.parse(stripJsonComments(content));
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Expected a JSON object");
+  }
+  return parsed as Record<string, unknown>;
+}
+
+export function ensureVsCodeShowsGitwhy(root: string): void {
+  const settingsPath = path.join(root, ".vscode", "settings.json");
+  let settings: Record<string, unknown> = {};
+
+  if (fs.existsSync(settingsPath)) {
+    settings = parseJsoncObject(fs.readFileSync(settingsPath, "utf-8"));
+  }
+
+  const existingExcludes = settings["files.exclude"];
+  const filesExclude = existingExcludes &&
+      typeof existingExcludes === "object" &&
+      !Array.isArray(existingExcludes)
+    ? { ...(existingExcludes as Record<string, unknown>) }
+    : {};
+
+  filesExclude[".gitwhy"] = false;
+  settings["files.exclude"] = filesExclude;
+
+  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
 }
 
 /**
@@ -99,7 +179,7 @@ function installAuthoredSkills(root: string, skillsSourceDir: string): boolean {
   for (const cmd of WHYSPEC_COMMANDS) {
     const src = path.join(skillsSourceDir, `whyspec-${cmd}`, "SKILL.md");
     if (fs.existsSync(src)) {
-      const dest = path.join(root, ".claude", "skills", `whyspec-${cmd}`);
+      const dest = path.join(root, `whyspec-${cmd}`);
       fs.mkdirSync(dest, { recursive: true });
       fs.copyFileSync(src, path.join(dest, "SKILL.md"));
       installed = true;
@@ -108,13 +188,36 @@ function installAuthoredSkills(root: string, skillsSourceDir: string): boolean {
   return installed;
 }
 
+function getSkillsSourceDir(): string {
+  const currentDir = path.dirname(fileURLToPath(import.meta.url));
+  return path.join(path.dirname(path.dirname(currentDir)), "skills");
+}
+
+function getCodexSkillsRoot(): string {
+  return path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "skills");
+}
+
+function installCodexSkills(root: string, skillsSourceDir: string): void {
+  const codexSkillsRoot = getCodexSkillsRoot();
+  const authoredInstalled = installAuthoredSkills(codexSkillsRoot, skillsSourceDir);
+
+  if (!authoredInstalled) {
+    writeGeneratedFiles(root, generateCodexSkills(codexSkillsRoot));
+    return;
+  }
+
+  const metadataFiles = generateCodexSkills(codexSkillsRoot)
+    .filter((file) => file.path.endsWith("/agents/openai.yaml"));
+  writeGeneratedFiles(root, metadataFiles);
+}
+
 export function installSkillFiles(root: string, tools: string[]): void {
+  const skillsDir = getSkillsSourceDir();
+
   // Claude Code skills
   if (tools.includes("claude-code")) {
     // Try authored skill files first (production-quality from skills/ directory)
-    const currentDir = path.dirname(fileURLToPath(import.meta.url));
-    const skillsDir = path.join(path.dirname(path.dirname(currentDir)), "skills");
-    const authoredInstalled = installAuthoredSkills(root, skillsDir);
+    const authoredInstalled = installAuthoredSkills(path.join(root, ".claude", "skills"), skillsDir);
     if (!authoredInstalled) {
       // Fall back to adapter-generated placeholders
       writeGeneratedFiles(root, generateClaudeCodeSkills());
@@ -124,6 +227,10 @@ export function installSkillFiles(root: string, tools: string[]): void {
   // Cursor commands
   if (tools.includes("cursor")) {
     writeGeneratedFiles(root, generateCursorCommands());
+  }
+
+  if (tools.includes("codex")) {
+    installCodexSkills(root, skillsDir);
   }
 }
 
@@ -197,9 +304,44 @@ export async function runInit(): Promise<void> {
       }
     }
 
+    if (tools.includes("codex")) {
+      const codexSkillCheck = path.join(getCodexSkillsRoot(), "whyspec-plan", "SKILL.md");
+      if (!fs.existsSync(codexSkillCheck)) {
+        console.log(chalk.yellow("\n  Repairing missing Codex skills...\n"));
+        installSkillFiles(root, tools);
+        repaired = true;
+      }
+    }
+
+    const gitignorePath = path.join(root, ".gitignore");
+    const hasGitwhyIgnore = fs.existsSync(gitignorePath) &&
+      fs.readFileSync(gitignorePath, "utf-8").split("\n").some((line) => line.trim() === ".gitwhy/");
+    if (!hasGitwhyIgnore) {
+      addToGitignore(root);
+      repaired = true;
+    }
+
+    try {
+      const beforeSettings = fs.existsSync(path.join(root, ".vscode", "settings.json"))
+        ? fs.readFileSync(path.join(root, ".vscode", "settings.json"), "utf-8")
+        : "";
+      ensureVsCodeShowsGitwhy(root);
+      const afterSettings = fs.readFileSync(path.join(root, ".vscode", "settings.json"), "utf-8");
+      if (beforeSettings !== afterSettings) {
+        repaired = true;
+      }
+    } catch {
+      // Leave malformed user settings untouched and continue with existing repair work.
+    }
+
     if (repaired) {
+      const exampleCommand = tools.includes("claude-code") || tools.includes("cursor")
+        ? "/whyspec-plan"
+        : tools.includes("codex")
+          ? "$whyspec-plan"
+          : "whyspec plan";
       console.log(chalk.green.bold("  \u2713 Skills installed successfully!"));
-      console.log(`\n  Try: ${chalk.cyan.bold("/whyspec:plan")}\n`);
+      console.log(`\n  Try: ${chalk.cyan.bold(exampleCommand)}\n`);
     } else {
       console.log(chalk.yellow("\n  WhySpec is already initialized in this directory."));
       console.log(chalk.dim("  .gitwhy/ already exists.\n"));
@@ -236,6 +378,7 @@ export async function runInit(): Promise<void> {
 
   // 6. Add to .gitignore
   addToGitignore(root);
+  ensureVsCodeShowsGitwhy(root);
 
   // 7. Install skill files
   installSkillFiles(root, selectedTools);

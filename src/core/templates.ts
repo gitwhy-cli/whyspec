@@ -48,7 +48,7 @@ export function designTemplate(changeName: string): string {
 <!-- ASCII diagram of the design -->
 
 ## Decisions to Make
-<!-- THE DECISION BRIDGE: These checkboxes become "Decisions Made" after /whyspec:capture -->
+<!-- THE DECISION BRIDGE: These checkboxes become "Decisions Made" after /whyspec-capture -->
 - [ ]
 
 ## Questions to Resolve

@@ -5,7 +5,7 @@ description: Plan a change by declaring intent, design, and tasks before coding.
 
 Plan a change — create intent.md, design.md, and tasks.md with the Decision Bridge.
 
-When ready to implement, run `/whyspec:execute`
+When ready to implement, run `/whyspec-execute`
 
 ---
 
@@ -64,7 +64,7 @@ When ready to implement, run `/whyspec:execute`
    - [ ] [Decision 3: ...]
 
    These checkboxes form the "before" side of the Decision Bridge.
-   They will be resolved during /whyspec:capture after implementation.
+   They will be resolved during /whyspec-capture after implementation.
 
    ## Constraints
 
@@ -156,13 +156,13 @@ When ready to implement, run `/whyspec:execute`
    Questions to resolve: N open
    Tasks: N defined
 
-   Ready to implement? Run /whyspec:execute
+   Ready to implement? Run /whyspec-execute
    ```
 
 **Guardrails**
 
 - **Ask forcing questions FIRST** — never create files before asking. The questions shape the plan quality.
-- **Don't implement code** — this skill creates plan files only. Implementation happens in `/whyspec:execute`.
+- **Don't implement code** — this skill creates plan files only. Implementation happens in `/whyspec-execute`.
 - **Don't skip "Decisions to Make"** — every unsettled design choice must be a checkbox. These are the Decision Bridge. If the user hasn't mentioned trade-offs, ask: "What decisions haven't been made yet?"
 - **Use CLI-as-oracle** — always call `whyspec plan --json` to create the folder. Don't create paths or generate IDs manually.
 - **Apply `context` and `rules` as constraints** — they guide your writing but must NOT appear in the output files.

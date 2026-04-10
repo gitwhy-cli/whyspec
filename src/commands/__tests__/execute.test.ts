@@ -130,6 +130,9 @@ describe("execute command", () => {
     const parsed: ExecuteJsonOutput = JSON.parse(output);
 
     expect(parsed.change_name).toBe("exec-test");
+    expect(parsed.intent).toContain("# Intent");
+    expect(parsed.design).toContain("# Design");
+    expect(parsed.tasks).toContain("# Tasks");
     expect(parsed.intent_content).toContain("# Intent");
     expect(parsed.design_content).toContain("# Design");
     expect(parsed.tasks_content).toContain("# Tasks");
@@ -153,7 +156,10 @@ describe("execute command", () => {
     );
     const parsed: ExecuteJsonOutput = JSON.parse(output);
 
+    expect(parsed.intent).toContain("# Intent");
+    expect(parsed.design).toContain("# Design");
     expect(parsed.tasks_content).toBe("");
+    expect(parsed.tasks).toBe("");
     expect(parsed.progress.total).toBe(0);
     expect(parsed.progress.completed).toBe(0);
     expect(parsed.pending_tasks).toEqual([]);
@@ -168,6 +174,9 @@ describe("execute command", () => {
     );
     const parsed: ExecuteJsonOutput = JSON.parse(output);
 
+    expect(parsed.intent).toBe("");
+    expect(parsed.design).toBe("");
+    expect(parsed.tasks).toBe("");
     expect(parsed.intent_content).toBe("");
     expect(parsed.design_content).toBe("");
     expect(parsed.tasks_content).toBe("");

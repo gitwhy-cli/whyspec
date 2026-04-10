@@ -38,7 +38,7 @@ Use this skill when the developer wants to plan a change before coding.
    - **tasks.md** — Verification criteria (defined FIRST), then implementation checklist
 
 5. The "Decisions to Make" section in design.md is the BEFORE side of the Decision Bridge.
-   These will be resolved by /whyspec:capture after implementation.
+   These will be resolved by /whyspec-capture after implementation.
 
 ## Important
 - Always call the CLI first — it handles path creation and validation.
@@ -67,7 +67,7 @@ Use this skill when the developer wants to implement a planned change.
    - Mark each task complete: \`- [ ]\` → \`- [x]\` in tasks.md
    - Commit atomically (one commit per task or logical unit)
 
-5. On completion, prompt: "Ready to capture reasoning? Run /whyspec:capture"
+5. On completion, prompt: "Ready to capture reasoning? Run /whyspec-capture"
 
 ## Important
 - Use intent.md as context while implementing — it contains the WHY.
@@ -115,7 +115,7 @@ Use this skill when the developer wants to view the full story of a change.
    whyspec show --json "<change-name>"
    \`\`\`
 
-2. Parse the JSON response containing intent, design, tasks, context, and Decision Bridge delta.
+2. Parse the JSON response containing intent, design, tasks, context, surprises, and Decision Bridge delta.
 
 3. Display the change story in sections:
    - **Intent** — WHY (from intent.md)
@@ -126,7 +126,7 @@ Use this skill when the developer wants to view the full story of a change.
 
 ## Important
 - The Decision Bridge delta is the unique value — always show it.
-- If context hasn't been captured yet, show intent + design + tasks and suggest running /whyspec:capture.`;
+- If context hasn't been captured yet, show intent + design + tasks and suggest running /whyspec-capture.`;
 
     case "search":
       return `# WhySpec Search
@@ -179,7 +179,7 @@ Use this skill when the developer is investigating a bug.
 
 4. Create debug.md with the full investigation trail.
 
-5. Auto-prompt: "Ready to capture debug reasoning? Run /whyspec:capture"
+5. Auto-prompt: "Ready to capture debug reasoning? Run /whyspec-capture"
 
 ## Important
 - No fix without root cause — this is the Iron Law.

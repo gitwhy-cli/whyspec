@@ -49,7 +49,8 @@ Example JSON response:
     "design": "## Approach\\n...",
     "tasks": "## Verification\\n..."
   },
-  "context": { "project": "my-app", "branch": "feat/auth" }
+  "context": "Project context from config.yaml",
+  "rules": "Project-specific rules from config.yaml"
 }
 \`\`\`
 

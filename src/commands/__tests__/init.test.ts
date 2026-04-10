@@ -6,6 +6,7 @@ import {
   createGitwhyDir,
   writeConfigYaml,
   addToGitignore,
+  ensureVsCodeShowsGitwhy,
   installSkillFiles,
   generateAgentsMd,
   detectProjectName,
@@ -149,6 +150,75 @@ describe("addToGitignore", () => {
   });
 });
 
+// ── ensureVsCodeShowsGitwhy ─────────────────────────────────────────
+
+describe("ensureVsCodeShowsGitwhy", () => {
+  it("creates .vscode/settings.json when missing", () => {
+    ensureVsCodeShowsGitwhy(tmpDir);
+
+    const settingsPath = path.join(tmpDir, ".vscode", "settings.json");
+    expect(fs.existsSync(settingsPath)).toBe(true);
+
+    const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+    expect(settings).toEqual({
+      "files.exclude": {
+        ".gitwhy": false,
+      },
+    });
+  });
+
+  it("merges with existing settings without overwriting unrelated keys", () => {
+    const vscodeDir = path.join(tmpDir, ".vscode");
+    fs.mkdirSync(vscodeDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(vscodeDir, "settings.json"),
+      JSON.stringify({
+        "editor.formatOnSave": true,
+        "files.exclude": {
+          dist: true,
+        },
+      }, null, 2),
+      "utf-8",
+    );
+
+    ensureVsCodeShowsGitwhy(tmpDir);
+
+    const settings = JSON.parse(
+      fs.readFileSync(path.join(vscodeDir, "settings.json"), "utf-8"),
+    );
+    expect(settings["editor.formatOnSave"]).toBe(true);
+    expect(settings["files.exclude"]).toEqual({
+      dist: true,
+      ".gitwhy": false,
+    });
+  });
+
+  it("forces .gitwhy visible even if it was previously excluded", () => {
+    const vscodeDir = path.join(tmpDir, ".vscode");
+    fs.mkdirSync(vscodeDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(vscodeDir, "settings.json"),
+      JSON.stringify({
+        "files.exclude": {
+          ".gitwhy": true,
+          dist: true,
+        },
+      }, null, 2),
+      "utf-8",
+    );
+
+    ensureVsCodeShowsGitwhy(tmpDir);
+
+    const settings = JSON.parse(
+      fs.readFileSync(path.join(vscodeDir, "settings.json"), "utf-8"),
+    );
+    expect(settings["files.exclude"]).toEqual({
+      ".gitwhy": false,
+      dist: true,
+    });
+  });
+});
+
 // ── installSkillFiles ────────────────────────────────────────────────
 
 describe("installSkillFiles", () => {
@@ -170,6 +240,32 @@ describe("installSkillFiles", () => {
     installSkillFiles(tmpDir, ["cursor", "copilot"]);
 
     expect(fs.existsSync(path.join(tmpDir, ".claude"))).toBe(false);
+  });
+
+  it("installs Codex skills into CODEX_HOME/skills when codex is selected", () => {
+    const codexHome = path.join(tmpDir, ".codex-home");
+    process.env.CODEX_HOME = codexHome;
+
+    installSkillFiles(tmpDir, ["codex"]);
+
+    const commands = ["plan", "execute", "capture", "show", "search", "debug"];
+    for (const cmd of commands) {
+      const skillDir = path.join(codexHome, "skills", `whyspec-${cmd}`);
+      const skillPath = path.join(skillDir, "SKILL.md");
+      const metadataPath = path.join(skillDir, "agents", "openai.yaml");
+
+      expect(fs.existsSync(skillPath)).toBe(true);
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const skillContent = fs.readFileSync(skillPath, "utf-8");
+      const metadataContent = fs.readFileSync(metadataPath, "utf-8");
+
+      expect(skillContent).toContain(`name: whyspec-${cmd}`);
+      expect(metadataContent).toContain("display_name:");
+      expect(metadataContent).toContain("default_prompt:");
+    }
+
+    delete process.env.CODEX_HOME;
   });
 });
 

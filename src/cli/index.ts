@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { runInit } from "../commands/init.js";
 import { planCommand } from "../commands/plan.js";
@@ -12,6 +14,16 @@ import { listCommand } from "../commands/list.js";
 import { statusCommand } from "../commands/status.js";
 import { templateCommand } from "../commands/template.js";
 
+function getCliVersion(): string {
+  try {
+    const packageJsonPath = fileURLToPath(new URL("../../package.json", import.meta.url));
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+    return typeof packageJson.version === "string" ? packageJson.version : "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
+}
+
 const program = new Command();
 
 program
@@ -19,7 +31,7 @@ program
   .description(
     "The reasoning layer for AI-assisted development — capture WHY code was built the way it was"
   )
-  .version("0.1.0")
+  .version(getCliVersion())
   .option("--json", "Output structured JSON for agent consumption");
 
 // ── init ────────────────────────────────────────────────────────────────────

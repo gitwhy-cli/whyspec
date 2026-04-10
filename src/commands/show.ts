@@ -17,7 +17,9 @@ export interface ShowJsonOutput {
   intent: string;
   design: string;
   tasks: string;
+  context: string;
   contexts: Array<{ id: string; content: string }>;
+  surprises: string[];
   decision_bridge_delta: {
     planned: string[];
     decided: string[];
@@ -109,7 +111,9 @@ export async function showCommand(
       intent,
       design,
       tasks,
+      context: contexts[0]?.content ?? "",
       contexts,
+      surprises,
       decision_bridge_delta: {
         planned: allPlanned,
         decided: allDecided,

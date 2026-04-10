@@ -56,7 +56,7 @@ Show the full story — from intent through design, tasks, and reasoning — wit
    ```
    ## Reasoning (AFTER)
 
-   Not yet captured. Run /whyspec:capture to complete the story.
+   Not yet captured. Run /whyspec-capture to complete the story.
    ```
 
 3. **Highlight the Decision Bridge Delta**
@@ -79,7 +79,7 @@ Show the full story — from intent through design, tasks, and reasoning — wit
    - Added rate limiting on login — discovered during load testing
    ```
 
-   The delta is the most valuable output of `/whyspec:show` — it reveals how thinking evolved from plan to reality.
+   The delta is the most valuable output of `/whyspec-show` — it reveals how thinking evolved from plan to reality.
 
 **Guardrails**
 

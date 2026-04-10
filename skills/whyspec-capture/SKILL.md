@@ -5,7 +5,7 @@ description: Capture reasoning after implementation — resolve the Decision Bri
 
 Capture reasoning — create a context file that resolves the Decision Bridge and preserves the full story.
 
-View the complete story with `/whyspec:show`
+View the complete story with `/whyspec-show`
 
 ---
 
@@ -139,7 +139,7 @@ View the complete story with `/whyspec:show`
    Files documented: N
    Commits linked: N
 
-   View the full story: /whyspec:show <name>
+   View the full story: /whyspec-show <name>
    ```
 
 **Guardrails**
@@ -151,4 +151,4 @@ View the complete story with `/whyspec:show`
 - **Use SaaS XML format exactly** — the `<context>` tags must match the GitWhy format so `git why log` and `git why push` work without conversion.
 - **Include verification results** — what tests pass, what was manually verified. This grounds the context in evidence.
 - **Don't fabricate rationale** — if you don't know why a decision was made, ask the user. Invented reasoning is worse than no reasoning.
-- **One context per capture** — each `/whyspec:capture` invocation creates exactly one `ctx_<id>.md` file.
+- **One context per capture** — each `/whyspec-capture` invocation creates exactly one `ctx_<id>.md` file.

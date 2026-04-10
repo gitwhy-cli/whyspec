@@ -32,7 +32,7 @@ export const AVAILABLE_TOOLS: ToolChoice[] = [
   {
     name: "Codex CLI",
     value: "codex",
-    skillSupport: false,
+    skillSupport: true,
     usesAgentsMd: true,
   },
   {

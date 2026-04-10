@@ -48,6 +48,7 @@ describe("showCommand", () => {
     expect(output.intent).toContain("Intent: add-auth");
     expect(output.design).toContain("Design: add-auth");
     expect(output.tasks).toContain("Tasks: add-auth");
+    expect(output.context).toContain("Used JWT");
     expect(output.contexts).toHaveLength(1);
     expect(output.contexts[0].id).toBe("ctx_abc123");
   });
@@ -65,6 +66,7 @@ describe("showCommand", () => {
     const output = JSON.parse(logSpy.mock.calls[0][0]);
     expect(output.decision_bridge_delta.planned).toHaveLength(2);
     expect(output.decision_bridge_delta.decided).toHaveLength(2);
+    expect(output.surprises).toEqual([]);
   });
 
   it("detects surprises — decisions not in plan", async () => {
@@ -78,6 +80,7 @@ describe("showCommand", () => {
     await showCommand("surprise-test", { json: true });
 
     const output = JSON.parse(logSpy.mock.calls[0][0]);
+    expect(output.surprises.length).toBeGreaterThanOrEqual(1);
     expect(output.decision_bridge_delta.surprises.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -94,6 +97,7 @@ describe("showCommand", () => {
     expect(output.change_name).toBe("partial");
     expect(output.design).toBe("");
     expect(output.tasks).toBe("");
+    expect(output.context).toBe("");
     expect(output.contexts).toHaveLength(0);
   });
 

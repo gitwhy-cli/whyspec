@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { generateClaudeCodeSkills } from "./claude-code.js";
 import { generateCursorCommands } from "./cursor.js";
+import { generateCodexSkills } from "./codex.js";
 import { generateAgentsMd } from "./agents-md.js";
 import { WHYSPEC_COMMANDS, COMMAND_DESCRIPTIONS } from "./types.js";
 
@@ -70,6 +71,12 @@ describe("claude-code adapter", () => {
     for (const file of files) {
       expect(file.content).toContain("whyspec");
       expect(file.content).toContain("--json");
+    }
+  });
+
+  it("does not reference colon-style slash commands", () => {
+    for (const file of files) {
+      expect(file.content).not.toContain("/whyspec:");
     }
   });
 
@@ -150,6 +157,58 @@ describe("cursor adapter", () => {
     const prefixed = generateCursorCommands("/my/project");
     for (const file of prefixed) {
       expect(file.path).toMatch(/^\/my\/project\//);
+    }
+  });
+});
+
+// ─── Codex Adapter ───────────────────────────────────────────────────────────
+
+describe("codex adapter", () => {
+  const files = generateCodexSkills();
+
+  it("generates 12 files: 6 skills and 6 openai metadata files", () => {
+    expect(files).toHaveLength(12);
+  });
+
+  it("generates one SKILL.md and one openai.yaml per command", () => {
+    const paths = files.map((f) => f.path);
+    for (const command of WHYSPEC_COMMANDS) {
+      expect(paths).toContain(`whyspec-${command}/SKILL.md`);
+      expect(paths).toContain(`whyspec-${command}/agents/openai.yaml`);
+    }
+  });
+
+  it("skill files have matching names and descriptions", () => {
+    const skillFiles = files.filter((file) => file.path.endsWith("/SKILL.md"));
+    for (const file of skillFiles) {
+      const commandMatch = file.path.match(
+        /whyspec-(plan|execute|capture|show|search|debug)\//,
+      );
+      expect(commandMatch).not.toBeNull();
+      const command = commandMatch![1] as keyof typeof COMMAND_DESCRIPTIONS;
+      expect(file.content).toContain(`name: whyspec-${command}`);
+      expect(file.content).toContain(
+        `description: ${COMMAND_DESCRIPTIONS[command]}`,
+      );
+      expect(file.content).not.toContain("/whyspec:");
+    }
+  });
+
+  it("openai.yaml files contain UI metadata for command discovery", () => {
+    const metadataFiles = files.filter((file) =>
+      file.path.endsWith("/agents/openai.yaml")
+    );
+    for (const file of metadataFiles) {
+      expect(file.content).toContain("display_name:");
+      expect(file.content).toContain("short_description:");
+      expect(file.content).toContain("default_prompt:");
+    }
+  });
+
+  it("respects projectRoot prefix", () => {
+    const prefixed = generateCodexSkills("/my/codex/skills");
+    for (const file of prefixed) {
+      expect(file.path).toMatch(/^\/my\/codex\/skills\//);
     }
   });
 });

@@ -8,8 +8,8 @@ WhySpec works with any AI coding agent. Run `whyspec init` and select your agent
 |---------|------------|-----|
 | **Claude Code** | Native skills | `.claude/skills/whyspec-*/SKILL.md` |
 | **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
+| **Codex CLI** | Native skills + project instructions | `~/.codex/skills/whyspec-*` + `AGENTS.md` |
 | **GitHub Copilot** | Project instructions | `AGENTS.md` |
-| **Codex CLI** | Project instructions | `AGENTS.md` |
 | **Windsurf** | Project instructions | `AGENTS.md` |
 | **Cline** | Project instructions | `AGENTS.md` |
 | **Amazon Q** | Project instructions | `AGENTS.md` |
@@ -31,7 +31,7 @@ WhySpec generates skill files that Claude Code loads automatically:
 └── whyspec-debug/SKILL.md
 ```
 
-Use `/whyspec:plan`, `/whyspec:execute`, etc. directly in Claude Code.
+Use `/whyspec-plan`, `/whyspec-execute`, etc. directly in Claude Code.
 
 ### Cursor (Slash Commands)
 
@@ -46,6 +46,22 @@ WhySpec generates Cursor command files:
 
 Use `/whyspec-plan`, `/whyspec-execute`, etc. in Cursor.
 
-### AGENTS.md (Copilot, Codex, Windsurf, Cline, etc.)
+### Codex CLI (Native Skills)
+
+WhySpec installs native Codex skills into the global Codex skills directory:
+
+```
+~/.codex/skills/
+├── whyspec-plan/
+├── whyspec-execute/
+├── whyspec-capture/
+├── whyspec-show/
+├── whyspec-search/
+└── whyspec-debug/
+```
+
+Use `$whyspec-plan`, `$whyspec-execute`, etc. in Codex after restarting it.
+
+### AGENTS.md (Copilot, Windsurf, Cline, etc.)
 
 For tools that read project instructions from `AGENTS.md`, WhySpec appends instructions that teach the agent to use WhySpec commands via the CLI.

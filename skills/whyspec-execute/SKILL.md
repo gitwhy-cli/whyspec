@@ -5,7 +5,7 @@ description: Implement a planned change using intent and design as context. Use 
 
 Implement a change — read the plan, work through tasks, commit atomically.
 
-When all tasks are done, run `/whyspec:capture` to save your reasoning.
+When all tasks are done, run `/whyspec-capture` to save your reasoning.
 
 ---
 
@@ -89,7 +89,7 @@ When all tasks are done, run `/whyspec:capture` to save your reasoning.
    - [x] Task 2: description
    ...
 
-   Ready to capture reasoning? Run /whyspec:capture
+   Ready to capture reasoning? Run /whyspec-capture
    ```
 
    If paused before completion:
@@ -102,7 +102,7 @@ When all tasks are done, run `/whyspec:capture` to save your reasoning.
 
    Issue: <what caused the pause>
 
-   Resume with: /whyspec:execute <name>
+   Resume with: /whyspec-execute <name>
    ```
 
    **Always end with the capture prompt** — the reasoning is freshest right after implementation.
@@ -115,4 +115,4 @@ When all tasks are done, run `/whyspec:capture` to save your reasoning.
 - **Pause on unclear tasks** — don't guess at ambiguous requirements. Ask for clarification.
 - **Pause on design issues** — if reality doesn't match the plan, stop and suggest design.md updates before continuing.
 - **Mark checkboxes immediately** — update tasks.md after each task completion, not at the end.
-- **Always prompt capture** — end every execution session (complete or paused) with the `/whyspec:capture` suggestion.
+- **Always prompt capture** — end every execution session (complete or paused) with the `/whyspec-capture` suggestion.

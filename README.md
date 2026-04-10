@@ -29,21 +29,21 @@ In an era where AI writes most of the code, the human contribution isn't the syn
 ## See it in action
 
 ```
-You: /whyspec:plan add-jwt-auth
+You: /whyspec-plan add-jwt-auth
 AI:  Created .gitwhy/changes/add-jwt-auth/
      ✓ intent.md  — why this change exists
      ✓ design.md  — approach + 3 decisions to make
      ✓ tasks.md   — verification-first checklist
      Decision Bridge: 3 open questions to resolve.
 
-You: /whyspec:execute add-jwt-auth
+You: /whyspec-execute add-jwt-auth
 AI:  Implementing with full context...
      ✓ 1. Add token verification middleware
      ✓ 2. Create login endpoint with bcrypt
      ✓ 3. Wire up protected routes
      All tasks complete! 3 decisions resolved.
 
-You: /whyspec:capture add-jwt-auth
+You: /whyspec-capture add-jwt-auth
 AI:  Decision Bridge resolved:
      ✓ Token storage: httpOnly cookie (XSS > CSRF)
      ✓ Hashing: bcrypt (Node.js ecosystem)
@@ -62,7 +62,7 @@ npm install -g @gitwhy-cli/whyspec
 ```bash
 cd your-project
 whyspec init                        # Set up WhySpec
-# Then use /whyspec:plan in Claude Code, or /whyspec-plan in Cursor
+# Then use /whyspec-plan in Claude Code or Cursor, or $whyspec-plan in Codex
 ```
 
 That's it. WhySpec teaches your AI agent to plan before coding and capture reasoning after.
@@ -83,8 +83,8 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 |---------|------------|-----|
 | **Claude Code** | Native skills | `.claude/skills/whyspec-*/SKILL.md` |
 | **Cursor** | Slash commands | `.cursor/commands/whyspec-*.md` |
+| **Codex CLI** | Native skills + project instructions | `~/.codex/skills/whyspec-*` + `AGENTS.md` |
 | **GitHub Copilot** | Project instructions | `AGENTS.md` |
-| **Codex CLI** | Project instructions | `AGENTS.md` |
 | **Windsurf** | Project instructions | `AGENTS.md` |
 | **Cline** | Project instructions | `AGENTS.md` |
 | **Amazon Q** | Project instructions | `AGENTS.md` |

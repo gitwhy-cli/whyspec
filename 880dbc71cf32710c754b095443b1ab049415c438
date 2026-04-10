@@ -1,0 +1,40 @@
+src/commands/__tests__/init.test.ts
+  e3eb23a63a57f87f 310-320
+package.json
+  e3eb23a63a57f87f 3
+src/commands/init.ts
+  e3eb23a63a57f87f 307-325,354,433-436
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "880dbc71cf32710c754b095443b1ab049415c438",
+  "prompts": {
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    },
+    "e3eb23a63a57f87f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d74d6-1cc2-7d60-a9ee-835db673f782",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 36,
+      "total_deletions": 1,
+      "accepted_lines": 36,
+      "overriden_lines": 0
+    }
+  }
+}

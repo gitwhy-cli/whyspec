@@ -50,9 +50,8 @@ describe("debugCommand", () => {
     expect(existsSync(join(tmp, ".gitwhy", "debug"))).toBe(true);
   });
 
-  it("outputs valid JSON in --json mode without creating files", async () => {
+  it("outputs valid JSON in --json mode and creates debug artifacts", async () => {
     const tmp = makeTmp();
-    mkdirSync(join(tmp, ".gitwhy", "changes"), { recursive: true });
     process.cwd = () => tmp;
 
     await debugCommand("api timeout", { json: true });
@@ -63,6 +62,12 @@ describe("debugCommand", () => {
     expect(output).toHaveProperty("related_contexts");
     expect(output.path).toBe(".gitwhy/changes/api-timeout");
     expect(output.template).toContain("# Debug: api timeout");
+
+    const debugDir = join(tmp, ".gitwhy", "changes", "api-timeout");
+    expect(existsSync(debugDir)).toBe(true);
+    expect(existsSync(join(debugDir, ".started"))).toBe(true);
+    expect(existsSync(join(debugDir, "debug.md"))).toBe(true);
+    expect(readFileSync(join(debugDir, "debug.md"), "utf-8")).toBe(output.template);
   });
 
   it("includes related contexts from search", async () => {

@@ -32,9 +32,7 @@ export async function debugCommand(
   const gitwhyDir = join(repoRoot, ".gitwhy");
   const changePath = join(gitwhyDir, "changes", slug);
 
-  if (!options.json) {
-    ensureGitwhyDir(repoRoot);
-  }
+  ensureGitwhyDir(repoRoot);
 
   // Quick search for related contexts using first few words of the bug name.
   const searchQuery = name.split(/\s+/).slice(0, 3).join(" ");
@@ -60,6 +58,10 @@ export async function debugCommand(
   }
 
   if (options.json) {
+    mkdirSync(changePath, { recursive: true });
+    writeFileSync(join(changePath, ".started"), new Date().toISOString());
+    writeFileSync(join(changePath, "debug.md"), fullTemplate);
+
     const output: DebugJsonOutput = {
       path: `.gitwhy/changes/${slug}`,
       template: fullTemplate,

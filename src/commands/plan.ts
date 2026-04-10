@@ -1,7 +1,8 @@
 /**
  * whyspec plan — Create a change plan with intent, design, and tasks.
  *
- * --json mode: returns templates + context/rules for agent consumption (no files created).
+ * --json mode: returns templates + context/rules for agent consumption and
+ * creates the change directory anchor for agent workflows.
  * Non-JSON mode: creates .gitwhy/changes/<name>/ with 3 template files.
  */
 
@@ -37,9 +38,7 @@ export async function planCommand(
   const gitwhyDir = join(repoRoot, ".gitwhy");
   const changePath = join(gitwhyDir, "changes", slug);
 
-  if (!options.json) {
-    ensureGitwhyDir(repoRoot);
-  }
+  ensureGitwhyDir(repoRoot);
 
   // Duplicate detection
   if (existsSync(changePath)) {
@@ -51,7 +50,9 @@ export async function planCommand(
   const config = readConfig(repoRoot);
 
   if (options.json) {
-    // JSON mode: return structured data, don't create files
+    mkdirSync(changePath, { recursive: true });
+    writeFileSync(join(changePath, ".started"), new Date().toISOString());
+
     const output: PlanJsonOutput = {
       path: `.gitwhy/changes/${slug}`,
       templates: {

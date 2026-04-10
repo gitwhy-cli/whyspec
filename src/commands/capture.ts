@@ -1,7 +1,8 @@
 /**
  * whyspec capture — Capture reasoning context for a change.
  *
- * --json mode: returns XML template + commits + files + Decision Bridge data.
+ * --json mode: returns XML template + commits + files + Decision Bridge data
+ * and still writes ctx_<id>.md for agent workflows.
  * Non-JSON mode: writes ctx_<id>.md with metadata header + XML template.
  */
 
@@ -25,11 +26,42 @@ export interface CaptureJsonOutput {
   decisions_to_make: string[];
   change_name: string;
   change_path: string;
+  context_id: string;
+  file_path: string;
 }
 
 function readFileOrEmpty(filePath: string): string {
   if (!existsSync(filePath)) return "";
   return readFileSync(filePath, "utf-8");
+}
+
+function buildContextFile(
+  changeName: string,
+  contextId: string,
+  template: string,
+  commits: string[],
+): string {
+  const branch = getCurrentBranch();
+  const repository = getRemoteUrl();
+  const commitList = commits.length > 0 ? commits.map((c) => c.slice(0, 7)).join(", ") : "none";
+
+  const metadataHeader = [
+    `# ${changeName}`,
+    "",
+    `**Context ID:** ${contextId}`,
+    `**Agent:** whyspec`,
+    ...(repository ? [`**Repository:** ${repository}`] : []),
+    `**Branch:** ${branch}`,
+    `**Date:** ${new Date().toISOString()}`,
+    `**Change:** ${changeName}`,
+    `**Intent:** .gitwhy/changes/${changeName}/intent.md`,
+    `**Commits:** ${commitList}`,
+    "",
+    "---",
+    "",
+  ].join("\n");
+
+  return metadataHeader + template + "\n";
 }
 
 export async function captureCommand(
@@ -39,9 +71,7 @@ export async function captureCommand(
   const repoRoot = process.cwd();
   const gitwhyDir = join(repoRoot, ".gitwhy");
 
-  if (!options.json) {
-    ensureGitwhyDir(repoRoot);
-  }
+  ensureGitwhyDir(repoRoot);
 
   const change = resolveChange(gitwhyDir, name);
 
@@ -67,45 +97,31 @@ export async function captureCommand(
     // Gracefully handle if git operations fail
   }
 
+  const template = renderContextXml();
+  const contextId = generateContextId();
+  const fileName = `${contextId}.md`;
+  const filePath = join(change.path, fileName);
+  const content = buildContextFile(change.name, contextId, template, commits);
+  writeFileSync(filePath, content);
+
   if (options.json) {
     const output: CaptureJsonOutput = {
-      template: renderContextXml(),
+      template,
       commits,
       files_changed: filesChanged,
       decisions_to_make: allDecisions,
       change_name: change.name,
       change_path: `.gitwhy/changes/${change.name}`,
+      context_id: contextId,
+      file_path: `.gitwhy/changes/${change.name}/${fileName}`,
     };
     console.log(JSON.stringify(output, null, 2));
     return;
   }
 
-  // Non-JSON mode: write ctx_<id>.md with GitWhy-compatible metadata header
-  const contextId = generateContextId();
+  // Non-JSON mode: ctx_<id>.md has already been written above.
   const branch = getCurrentBranch();
-  const repository = getRemoteUrl();
   const commitList = commits.length > 0 ? commits.map((c) => c.slice(0, 7)).join(", ") : "none";
-
-  const metadataHeader = [
-    `# ${change.name}`,
-    "",
-    `**Context ID:** ${contextId}`,
-    `**Agent:** whyspec`,
-    ...(repository ? [`**Repository:** ${repository}`] : []),
-    `**Branch:** ${branch}`,
-    `**Date:** ${new Date().toISOString()}`,
-    `**Change:** ${change.name}`,
-    `**Intent:** .gitwhy/changes/${change.name}/intent.md`,
-    `**Commits:** ${commitList}`,
-    "",
-    "---",
-    "",
-  ].join("\n");
-
-  const content = metadataHeader + renderContextXml() + "\n";
-  const fileName = `${contextId}.md`;
-  const filePath = join(change.path, fileName);
-  writeFileSync(filePath, content);
 
   if (allDecisions.length > 0) {
     console.log(chalk.green("\n  Decision Bridge resolved:"));

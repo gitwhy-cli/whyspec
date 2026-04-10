@@ -141,6 +141,10 @@ describe("capture command", () => {
 
     expect(parsed.change_name).toBe("test-change");
     expect(parsed.change_path).toBe(".gitwhy/changes/test-change");
+    expect(parsed.context_id).toMatch(/^ctx_[a-z0-9]{8}$/);
+    expect(parsed.file_path).toBe(
+      `.gitwhy/changes/test-change/${parsed.context_id}.md`,
+    );
     expect(parsed.template).toContain("<context>");
     expect(parsed.template).toContain("</context>");
     expect(parsed.decisions_to_make).toContain(
@@ -154,6 +158,13 @@ describe("capture command", () => {
     );
     expect(Array.isArray(parsed.commits)).toBe(true);
     expect(Array.isArray(parsed.files_changed)).toBe(true);
+
+    const writtenPath = join(GITWHY_DIR, "changes", "test-change", `${parsed.context_id}.md`);
+    expect(existsSync(writtenPath)).toBe(true);
+
+    const writtenContent = readFileSync(writtenPath, "utf-8");
+    expect(writtenContent).toContain(`**Context ID:** ${parsed.context_id}`);
+    expect(writtenContent).toContain(parsed.template.trim());
   });
 
   it("XML template includes all required tags", async () => {
@@ -218,6 +229,8 @@ describe("capture command", () => {
 
     expect(parsed.decisions_to_make).toEqual([]);
     expect(parsed.change_name).toBe("no-design");
+    expect(parsed.context_id).toMatch(/^ctx_[a-z0-9]{8}$/);
+    expect(existsSync(join(changePath, `${parsed.context_id}.md`))).toBe(true);
   });
 
   it("auto-detects single change when name not provided", async () => {

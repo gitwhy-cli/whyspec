@@ -83,7 +83,7 @@ describe("plan command", () => {
     expect(tasks).toContain("## Verification");
   });
 
-  it("--json returns structured output without creating files", async () => {
+  it("--json returns structured output and creates the change directory anchor", async () => {
     const output = await captureOutput(() =>
       planCommand("json-test", { json: true }),
     );
@@ -96,9 +96,13 @@ describe("plan command", () => {
     expect(typeof parsed.context).toBe("string");
     expect(typeof parsed.rules).toBe("string");
 
-    // Files should NOT be created in JSON mode
+    // JSON mode should still create the change directory and start anchor
     const changePath = join(GITWHY_DIR, "changes", "json-test");
-    expect(existsSync(changePath)).toBe(false);
+    expect(existsSync(changePath)).toBe(true);
+    expect(existsSync(join(changePath, ".started"))).toBe(true);
+    expect(existsSync(join(changePath, "intent.md"))).toBe(false);
+    expect(existsSync(join(changePath, "design.md"))).toBe(false);
+    expect(existsSync(join(changePath, "tasks.md"))).toBe(false);
   });
 
   it("--json includes context and rules from config", async () => {

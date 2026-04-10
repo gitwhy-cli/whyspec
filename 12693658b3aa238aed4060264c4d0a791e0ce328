@@ -1,0 +1,75 @@
+skills/whyspec-execute/SKILL.md
+  9549c41e1d425d7e 3-4,9,15,17-27,31,33,35,53,82-123,127,129-134,137,143-144,146,149,151-158,160,162-164,166-183,185-190,192,194-200,202,210
+skills/whyspec-search/SKILL.md
+  9549c41e1d425d7e 3-4,13-22,30,45,47-49,51,53,55-60,64-65,69-87,89-111,113,115-118,120,122-126,128,130,132,134,136
+skills/whyspec-show/SKILL.md
+  9549c41e1d425d7e 3-4,13-24,42,63,66,73-74,77-81,84-99,101-129,131,133,135-137,139-140
+src/adapters/types.ts
+  9549c41e1d425d7e 24-26,28-33,38-43
+src/commands/__tests__/e2e.test.ts
+  9549c41e1d425d7e 88,102
+.gitignore
+  9549c41e1d425d7e 12
+skills/whyspec-debug/SKILL.md
+  9549c41e1d425d7e 3-4,15,17,19,21,23-27,29,31-40,42-62,73-74,78,89,91,93,104-105,107-110,112-114,116-131,133,137,139-143,145,147-149,151,153-155,157-172,176,178-182,184-188,190-192,194,196,198,200,204-209,214-216,220,222-241,243-245,247-249,251-254,256-257,261-264,268-275,277,281-288
+src/adapters/codex.ts
+  9549c41e1d425d7e 7,48-58,60-61,70
+src/adapters/adapters.test.ts
+  9549c41e1d425d7e 2,13-14,17-18,20,24-25,27-28,32-34,38-39,46-47,54,60-64
+src/adapters/claude-code.ts
+  9549c41e1d425d7e 10-12,14,17,19,23-25,32,39,42-45,48,50,59,61,65,68,71-73,76,78,82,87,89-92,95-96,100,104,109,111,114-115,118,122,127,130-131,134,143,146-150,153-155
+src/commands/init.ts
+  9549c41e1d425d7e 130,133-139,141,143-145,147-155
+skills/whyspec-capture/SKILL.md
+  9549c41e1d425d7e 3-4,9,15,17-26,30,32,62,67,71,78-133,171-173,203,206-233,239,241
+src/commands/__tests__/init.test.ts
+  9549c41e1d425d7e 197,202-203,206,209-212,215,221-225
+skills/whyspec-plan/SKILL.md
+  9549c41e1d425d7e 3-4,9,13,15,17,19,21-25,27,29,31,33-34,36-37,39-53,55-59,61-67,69,81-83,85-88,90-113,118-119,123,127-129,132,136-138,142-144,148-149,152,154-170,172,174,179,202,205,207,214-215,225,227,240,243-298,300,302-305,308-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "12693658b3aa238aed4060264c4d0a791e0ce328",
+  "prompts": {
+    "9549c41e1d425d7e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1a77635-5c57-422b-addf-13311edab73b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 4428,
+      "total_deletions": 2642,
+      "accepted_lines": 2272,
+      "overriden_lines": 10
+    },
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    },
+    "e3eb23a63a57f87f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d74d6-1cc2-7d60-a9ee-835db673f782",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 391,
+      "total_deletions": 510,
+      "accepted_lines": 15,
+      "overriden_lines": 15
+    }
+  }
+}

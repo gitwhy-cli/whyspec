@@ -1,0 +1,34 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "04591b562f07b0bead905146f201d3da85d639ac",
+  "prompts": {
+    "2c9c7ded12ca727b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d74b8-3b48-7950-b117-d2e1ffb7ddec",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}

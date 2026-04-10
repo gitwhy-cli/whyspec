@@ -33,10 +33,9 @@ export function renderSuccessMessage(tools: string[]): string {
   const lines: string[] = [];
   const usesClaudeCommands = tools.includes("claude-code");
   const usesCursorCommands = tools.includes("cursor");
-  const usesCodex = tools.includes("codex");
   const exampleCommand = usesClaudeCommands || usesCursorCommands
     ? "/whyspec-plan"
-    : usesCodex
+    : tools.includes("codex")
       ? "$whyspec-plan"
       : "whyspec plan";
 
@@ -46,16 +45,9 @@ export function renderSuccessMessage(tools: string[]): string {
   lines.push(chalk.dim("  Created:"));
   lines.push(chalk.white("    .gitwhy/config.yaml"));
   lines.push(chalk.white("    .gitwhy/changes/"));
-  if (usesCodex) {
-    lines.push(chalk.white("    gitwhy/  (Codex-visible mirror of .gitwhy/)"));
-  }
   if (tools.length > 0) {
     lines.push("");
     lines.push(chalk.dim(`  Tools configured: ${tools.join(", ")}`));
-  }
-  if (usesCodex) {
-    lines.push("");
-    lines.push(chalk.dim("  In Codex, open gitwhy/ if .gitwhy/ is hidden after reload."));
   }
   lines.push("");
   lines.push(`  Ready! Try: ${chalk.cyan.bold(exampleCommand)}`);

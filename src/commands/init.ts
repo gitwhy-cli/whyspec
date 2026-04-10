@@ -33,68 +33,32 @@ export function createGitwhyDir(root: string): void {
   fs.mkdirSync(debugDir, { recursive: true });
 }
 
-export function ensureVisibleGitwhyAlias(root: string, tools: string[]): void {
-  if (!tools.includes("codex")) {
-    return;
-  }
-
+export function removeLegacyGitwhyAlias(root: string): boolean {
   const helperPath = path.join(root, "gitwhy");
-  const targetPath = path.join(root, ".gitwhy");
-
-  if (!fs.existsSync(targetPath)) {
-    return;
+  if (!fs.lstatSync(helperPath, { throwIfNoEntry: false })) {
+    return false;
   }
 
-  if (fs.existsSync(helperPath) && fs.lstatSync(helperPath).isSymbolicLink()) {
+  const helperStat = fs.lstatSync(helperPath);
+  if (helperStat.isSymbolicLink()) {
     fs.unlinkSync(helperPath);
+    return true;
   }
 
-  fs.mkdirSync(helperPath, { recursive: true });
+  if (!helperStat.isDirectory()) {
+    return false;
+  }
 
   const readmePath = path.join(helperPath, "README.md");
-  if (!fs.existsSync(readmePath)) {
-    fs.writeFileSync(
-      readmePath,
-      [
-        "# WhySpec workspace",
-        "",
-        "This visible folder mirrors `.gitwhy/` for Codex file trees.",
-        "Edit files through `gitwhy/` or `.gitwhy/` interchangeably.",
-        "",
-      ].join("\n"),
-      "utf-8",
-    );
+  const readmeContent = fs.existsSync(readmePath) ? fs.readFileSync(readmePath, "utf-8") : "";
+  const isKnownLegacyHelper = readmeContent.includes("This visible folder mirrors `.gitwhy/` for Codex file trees.");
+
+  if (!isKnownLegacyHelper) {
+    return false;
   }
 
-  const entries = [
-    ["config.yaml", path.join(targetPath, "config.yaml"), "file"],
-    ["changes", path.join(targetPath, "changes"), "dir"],
-    ["archive", path.join(targetPath, "archive"), "dir"],
-    ["debug", path.join(targetPath, "debug"), "dir"],
-  ] as const;
-
-  for (const [name, sourcePath, linkType] of entries) {
-    const entryPath = path.join(helperPath, name);
-    if (fs.existsSync(entryPath)) {
-      if (fs.lstatSync(entryPath).isSymbolicLink()) {
-        const currentTarget = fs.realpathSync(entryPath);
-        const expectedTarget = fs.realpathSync(sourcePath);
-        if (currentTarget === expectedTarget) {
-          continue;
-        }
-        fs.unlinkSync(entryPath);
-      } else {
-        continue;
-      }
-    }
-
-    const relativeTarget = path.relative(path.dirname(entryPath), sourcePath);
-    fs.symlinkSync(
-      relativeTarget,
-      entryPath,
-      process.platform === "win32" ? "junction" : linkType,
-    );
-  }
+  fs.rmSync(helperPath, { recursive: true, force: true });
+  return true;
 }
 
 export function writeConfigYaml(root: string, opts: ConfigOptions): void {
@@ -462,12 +426,8 @@ export async function runInit(): Promise<void> {
       // Leave malformed user settings untouched and continue with existing repair work.
     }
 
-    if (tools.includes("codex")) {
-      const hadAlias = fs.existsSync(path.join(root, "gitwhy"));
-      ensureVisibleGitwhyAlias(root, tools);
-      if (!hadAlias && fs.existsSync(path.join(root, "gitwhy"))) {
-        repaired = true;
-      }
+    if (removeLegacyGitwhyAlias(root)) {
+      repaired = true;
     }
 
     if (repaired) {
@@ -515,7 +475,7 @@ export async function runInit(): Promise<void> {
   // 6. Keep .gitwhy visible to tools and repair any legacy ignore entries
   addToGitignore(root);
   ensureVsCodeShowsGitwhy(root);
-  ensureVisibleGitwhyAlias(root, selectedTools);
+  removeLegacyGitwhyAlias(root);
 
   // 7. Install skill files
   installSkillFiles(root, selectedTools);

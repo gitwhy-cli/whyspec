@@ -7,7 +7,7 @@ import {
   writeConfigYaml,
   addToGitignore,
   ensureVsCodeShowsGitwhy,
-  ensureVisibleGitwhyAlias,
+  removeLegacyGitwhyAlias,
   installSkillFiles,
   generateAgentsMd,
   detectProjectName,
@@ -46,47 +46,41 @@ describe("createGitwhyDir", () => {
   });
 });
 
-describe("ensureVisibleGitwhyAlias", () => {
-  it("creates a visible gitwhy helper workspace for Codex users", () => {
-    createGitwhyDir(tmpDir);
-    writeConfigYaml(tmpDir, {
-      projectName: "test-project",
-      projectDescription: "",
-      tools: ["codex"],
-      telemetry: true,
-    });
-
-    ensureVisibleGitwhyAlias(tmpDir, ["codex"]);
-
-    const helperPath = path.join(tmpDir, "gitwhy");
-    expect(fs.existsSync(helperPath)).toBe(true);
-    expect(fs.statSync(helperPath).isDirectory()).toBe(true);
-    expect(fs.existsSync(path.join(helperPath, "README.md"))).toBe(true);
-    expect(fs.realpathSync(path.join(helperPath, "changes"))).toBe(
-      fs.realpathSync(path.join(tmpDir, ".gitwhy", "changes")),
-    );
-    expect(fs.realpathSync(path.join(helperPath, "config.yaml"))).toBe(
-      fs.realpathSync(path.join(tmpDir, ".gitwhy", "config.yaml")),
-    );
-  });
-
-  it("upgrades the legacy gitwhy symlink into a real helper directory", () => {
-    createGitwhyDir(tmpDir);
+describe("removeLegacyGitwhyAlias", () => {
+  it("removes the legacy gitwhy helper symlink", () => {
     fs.symlinkSync(".gitwhy", path.join(tmpDir, "gitwhy"), "dir");
 
-    ensureVisibleGitwhyAlias(tmpDir, ["codex"]);
-
-    const helperPath = path.join(tmpDir, "gitwhy");
-    expect(fs.lstatSync(helperPath).isDirectory()).toBe(true);
-    expect(fs.lstatSync(path.join(helperPath, "changes")).isSymbolicLink()).toBe(true);
+    expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
   });
 
-  it("does not create the alias when Codex is not configured", () => {
-    createGitwhyDir(tmpDir);
+  it("removes the legacy gitwhy helper directory created by older versions", () => {
+    const helperPath = path.join(tmpDir, "gitwhy");
+    fs.mkdirSync(helperPath, { recursive: true });
+    fs.writeFileSync(
+      path.join(helperPath, "README.md"),
+      [
+        "# WhySpec workspace",
+        "",
+        "This visible folder mirrors `.gitwhy/` for Codex file trees.",
+        "Edit files through `gitwhy/` or `.gitwhy/` interchangeably.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    fs.mkdirSync(path.join(helperPath, "archive"), { recursive: true });
 
-    ensureVisibleGitwhyAlias(tmpDir, ["claude-code"]);
+    expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
+    expect(fs.existsSync(helperPath)).toBe(false);
+  });
 
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
+  it("does not remove an unrelated user gitwhy directory", () => {
+    const helperPath = path.join(tmpDir, "gitwhy");
+    fs.mkdirSync(helperPath, { recursive: true });
+    fs.writeFileSync(path.join(helperPath, "README.md"), "# My notes\n", "utf-8");
+
+    expect(removeLegacyGitwhyAlias(tmpDir)).toBe(false);
+    expect(fs.existsSync(helperPath)).toBe(true);
   });
 });
 

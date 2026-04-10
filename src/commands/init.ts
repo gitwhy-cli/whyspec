@@ -304,6 +304,25 @@ function installClaudeCommandsFromSkills(root: string, skillsSourceDir: string):
   return installed;
 }
 
+function removeLegacyClaudeSkills(root: string): boolean {
+  const skillsRoot = path.join(root, ".claude", "skills");
+  let removed = false;
+
+  for (const cmd of WHYSPEC_COMMANDS) {
+    const legacyPath = path.join(skillsRoot, `whyspec-${cmd}`);
+    if (fs.existsSync(legacyPath)) {
+      fs.rmSync(legacyPath, { recursive: true, force: true });
+      removed = true;
+    }
+  }
+
+  if (removed && fs.existsSync(skillsRoot) && fs.readdirSync(skillsRoot).length === 0) {
+    fs.rmdirSync(skillsRoot);
+  }
+
+  return removed;
+}
+
 function getSkillsSourceDir(): string {
   const currentDir = path.dirname(fileURLToPath(import.meta.url));
   return path.join(path.dirname(path.dirname(currentDir)), "skills");
@@ -332,6 +351,7 @@ export function installSkillFiles(root: string, tools: string[]): void {
 
   // Claude Code skills
   if (tools.includes("claude-code")) {
+    removeLegacyClaudeSkills(root);
     const commandsInstalled = installClaudeCommandsFromSkills(path.join(root, ".claude", "commands"), skillsDir);
     if (!commandsInstalled) {
       writeGeneratedFiles(root, generateClaudeCodeCommands());
@@ -410,6 +430,10 @@ export async function runInit(): Promise<void> {
     // Check if skills need to be installed (e.g. prior crash before skill step)
     if (tools.includes("claude-code")) {
       const commandCheck = path.join(root, ".claude", "commands", "whyspec:plan.md");
+      const removedLegacySkills = removeLegacyClaudeSkills(root);
+      if (removedLegacySkills) {
+        repaired = true;
+      }
       if (!fs.existsSync(commandCheck)) {
         console.log(chalk.yellow("\n  Repairing missing Claude commands...\n"));
         installSkillFiles(root, tools);

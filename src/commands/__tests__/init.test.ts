@@ -307,6 +307,17 @@ describe("installSkillFiles", () => {
     expect(fs.existsSync(path.join(tmpDir, ".claude", "skills"))).toBe(false);
   });
 
+  it("removes legacy Claude skill folders when reinstalling commands", () => {
+    const legacyPath = path.join(tmpDir, ".claude", "skills", "whyspec-plan");
+    fs.mkdirSync(legacyPath, { recursive: true });
+    fs.writeFileSync(path.join(legacyPath, "SKILL.md"), "legacy", "utf-8");
+
+    installSkillFiles(tmpDir, ["claude-code"]);
+
+    expect(fs.existsSync(legacyPath)).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, ".claude", "commands", "whyspec:plan.md"))).toBe(true);
+  });
+
   it("does nothing if claude-code is not selected", () => {
     installSkillFiles(tmpDir, ["cursor", "copilot"]);
 

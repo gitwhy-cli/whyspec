@@ -8,6 +8,7 @@ import {
   addToGitignore,
   ensureVsCodeShowsGitwhy,
   removeLegacyGitwhyAlias,
+  migrateLegacyStorage,
   installSkillFiles,
   generateAgentsMd,
   detectProjectName,
@@ -27,17 +28,17 @@ afterEach(() => {
 // ── createGitwhyDir ──────────────────────────────────────────────────
 
 describe("createGitwhyDir", () => {
-  it("creates the full .gitwhy directory structure", () => {
+  it("creates the full gitwhy directory structure", () => {
     createGitwhyDir(tmpDir);
 
-    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "changes"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "archive"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, ".gitwhy", "debug"))).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, ".gitwhy")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, ".gitwhy", "changes")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, ".gitwhy", "archive")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, ".gitwhy", "debug")).isDirectory()).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "changes"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "archive"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "debug"))).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "gitwhy")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "gitwhy", "changes")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "gitwhy", "archive")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "gitwhy", "debug")).isDirectory()).toBe(true);
   });
 
   it("is idempotent — calling twice does not throw", () => {
@@ -84,6 +85,19 @@ describe("removeLegacyGitwhyAlias", () => {
   });
 });
 
+describe("migrateLegacyStorage", () => {
+  it("renames legacy .gitwhy storage to gitwhy when visible storage is absent", () => {
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
+    fs.writeFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "version: \"1.0\"\n", "utf-8");
+
+    expect(migrateLegacyStorage(tmpDir)).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "changes"))).toBe(true);
+    expect(fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8")).toContain("version:");
+  });
+});
+
 // ── writeConfigYaml ──────────────────────────────────────────────────
 
 describe("writeConfigYaml", () => {
@@ -99,7 +113,7 @@ describe("writeConfigYaml", () => {
       telemetry: true,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
     const config = YAML.parse(raw);
 
     expect(config.version).toBe("1.0");
@@ -117,7 +131,7 @@ describe("writeConfigYaml", () => {
       telemetry: true,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
     expect(raw).toContain("context:");
     expect(raw).toContain("rules:");
     expect(raw).toContain("# Describe your tech stack");
@@ -132,7 +146,7 @@ describe("writeConfigYaml", () => {
       telemetry: false,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
     expect(raw.startsWith("# WhySpec project configuration")).toBe(true);
   });
 
@@ -144,7 +158,7 @@ describe("writeConfigYaml", () => {
       telemetry: false,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
     const config = YAML.parse(raw);
     expect(config.telemetry).toBe(false);
   });
@@ -229,6 +243,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
     expect(settings).toEqual({
       "files.exclude": {
         ".gitwhy": false,
+        "gitwhy": false,
       },
     });
   });
@@ -256,6 +271,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
     expect(settings["files.exclude"]).toEqual({
       dist: true,
       ".gitwhy": false,
+      "gitwhy": false,
     });
   });
 
@@ -280,6 +296,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
     );
     expect(settings["files.exclude"]).toEqual({
       ".gitwhy": false,
+      "gitwhy": false,
       dist: true,
     });
   });

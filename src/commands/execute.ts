@@ -9,6 +9,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
+import { storageDirPath } from "../core/storage-root.js";
 
 export interface PendingTask {
   line: number;
@@ -100,7 +101,7 @@ export async function executeCommand(
   name: string | undefined,
   options: { json?: boolean },
 ): Promise<void> {
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const gitwhyDir = storageDirPath(process.cwd());
   const change = resolveChange(gitwhyDir, name);
 
   // Read all three planning artifacts

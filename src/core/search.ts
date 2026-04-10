@@ -5,7 +5,7 @@
  *   - computeSearchScore (tree.go:736-781)
  *   - SearchContexts (tree.go:648-732)
  *
- * Searches all .md files in .gitwhy/changes/ (ctx_*.md, intent.md, design.md)
+ * Searches all .md files in the active changes directory (ctx_*.md, intent.md, design.md)
  * using weighted section scoring.
  */
 
@@ -204,7 +204,7 @@ function extractFilePaths(content: string): string[] {
 }
 
 /**
- * Search all .md files in .gitwhy/changes/ for a query string.
+ * Search all .md files in the active changes directory for a query string.
  * Returns scored results sorted by score descending, then date descending.
  *
  * Searches ctx_*.md, intent.md, and design.md (FR-25).

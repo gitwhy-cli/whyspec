@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { planCommand, type PlanJsonOutput } from "../plan.js";
 
 const TEST_DIR = join(process.cwd(), ".test-plan-tmp");
-const GITWHY_DIR = join(TEST_DIR, ".gitwhy");
+const GITWHY_DIR = join(TEST_DIR, "gitwhy");
 
 // Capture console.log output
 function captureOutput(fn: () => Promise<void>): Promise<string> {
@@ -50,7 +50,7 @@ describe("plan command", () => {
     expect(existsSync(join(changePath, "tasks.md"))).toBe(true);
   });
 
-  it("auto-initializes .gitwhy before creating plan files", async () => {
+  it("auto-initializes gitwhy before creating plan files", async () => {
     await planCommand("Auto Init Plan", {});
 
     expect(existsSync(join(GITWHY_DIR, "config.yaml"))).toBe(true);
@@ -89,7 +89,7 @@ describe("plan command", () => {
     );
     const parsed: PlanJsonOutput = JSON.parse(output);
 
-    expect(parsed.path).toBe(".gitwhy/changes/json-test");
+    expect(parsed.path).toBe("gitwhy/changes/json-test");
     expect(parsed.templates.intent).toContain("# Intent: json-test");
     expect(parsed.templates.design).toContain("# Design: json-test");
     expect(parsed.templates.tasks).toContain("# Tasks: json-test");

@@ -3,7 +3,7 @@
  *
  * --json mode: returns templates + context/rules for agent consumption and
  * creates the change directory anchor for agent workflows.
- * Non-JSON mode: creates .gitwhy/changes/<name>/ with 3 template files.
+ * Non-JSON mode: creates changes/<name>/ with 3 template files.
  */
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -12,6 +12,7 @@ import chalk from "chalk";
 import { slugify } from "../utils/slugify.js";
 import { readConfig } from "../core/config.js";
 import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
+import { relativeStoragePath, storageDirPath } from "../core/storage-root.js";
 import {
   intentTemplate,
   designTemplate,
@@ -35,7 +36,7 @@ export async function planCommand(
 ): Promise<void> {
   const repoRoot = process.cwd();
   const slug = slugify(name);
-  const gitwhyDir = join(repoRoot, ".gitwhy");
+  const gitwhyDir = storageDirPath(repoRoot);
   const changePath = join(gitwhyDir, "changes", slug);
 
   ensureGitwhyDir(repoRoot);
@@ -54,7 +55,7 @@ export async function planCommand(
     writeFileSync(join(changePath, ".started"), new Date().toISOString());
 
     const output: PlanJsonOutput = {
-      path: `.gitwhy/changes/${slug}`,
+      path: relativeStoragePath(repoRoot, "changes", slug),
       templates: {
         intent: intentTemplate(slug),
         design: designTemplate(slug),
@@ -81,7 +82,7 @@ export async function planCommand(
   const decisionCount = (intentContent.match(/^- \[ \]/gm) || []).length +
     (designContent.match(/^- \[ \]/gm) || []).length;
 
-  console.log(chalk.green(`\n  Created`) + ` .gitwhy/changes/${slug}/`);
+  console.log(chalk.green(`\n  Created`) + ` ${relativeStoragePath(repoRoot, "changes", slug)}/`);
   console.log(`     ${chalk.green("✓")} intent.md  — why this change exists`);
   console.log(`     ${chalk.green("✓")} design.md  — approach + decisions to make`);
   console.log(`     ${chalk.green("✓")} tasks.md   — verification-first checklist`);

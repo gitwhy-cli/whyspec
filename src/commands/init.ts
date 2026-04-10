@@ -7,6 +7,7 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
+import { LEGACY_STORAGE_DIR, PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../core/storage-root.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
@@ -24,7 +25,7 @@ export interface ConfigOptions {
 // ── Filesystem helpers (testable, accept root) ───────────────────────
 
 export function createGitwhyDir(root: string): void {
-  const gitwhyDir = path.join(root, ".gitwhy");
+  const gitwhyDir = storageDirPath(root);
   const changesDir = path.join(gitwhyDir, "changes");
   const archiveDir = path.join(gitwhyDir, "archive");
   const debugDir = path.join(gitwhyDir, "debug");
@@ -61,6 +62,18 @@ export function removeLegacyGitwhyAlias(root: string): boolean {
   return true;
 }
 
+export function migrateLegacyStorage(root: string): boolean {
+  const legacyPath = path.join(root, LEGACY_STORAGE_DIR);
+  const primaryPath = path.join(root, PRIMARY_STORAGE_DIR);
+
+  if (!fs.existsSync(legacyPath) || fs.existsSync(primaryPath)) {
+    return false;
+  }
+
+  fs.renameSync(legacyPath, primaryPath);
+  return true;
+}
+
 export function writeConfigYaml(root: string, opts: ConfigOptions): void {
   const config = {
     version: "1.0",
@@ -84,11 +97,11 @@ export function writeConfigYaml(root: string, opts: ConfigOptions): void {
   });
 
   const header = "# WhySpec project configuration\n";
-  fs.writeFileSync(path.join(root, ".gitwhy", "config.yaml"), header + yamlStr, "utf-8");
+  fs.writeFileSync(path.join(storageDirPath(root), "config.yaml"), header + yamlStr, "utf-8");
 }
 
 export function addToGitignore(root: string): void {
-  const entry = ".gitwhy/";
+  const entries = [".gitwhy/", "gitwhy/"];
   const gitignorePath = path.join(root, ".gitignore");
   const gitDir = path.join(root, ".git");
   const gitExcludePath = path.join(gitDir, "info", "exclude");
@@ -100,7 +113,7 @@ export function addToGitignore(root: string): void {
 
     const content = fs.readFileSync(filePath, "utf-8");
     const lines = content.split("\n");
-    const filtered = lines.filter((line) => line.trim() !== entry);
+    const filtered = lines.filter((line) => !entries.includes(line.trim()));
 
     if (filtered.length !== lines.length) {
       fs.writeFileSync(filePath, filtered.join("\n"), "utf-8");
@@ -196,6 +209,7 @@ export function ensureVsCodeShowsGitwhy(root: string): void {
     : {};
 
   filesExclude[".gitwhy"] = false;
+  filesExclude["gitwhy"] = false;
   settings["files.exclude"] = filesExclude;
 
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
@@ -346,7 +360,6 @@ export function detectProjectName(root: string): string {
 
 export async function runInit(): Promise<void> {
   const root = process.cwd();
-  const gitwhyDir = path.join(root, ".gitwhy");
 
   // Guard: reject home directory — common accident, always wrong
   if (root === os.homedir()) {
@@ -370,6 +383,10 @@ export async function runInit(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+
+  // Upgrade legacy hidden storage before deciding whether initialization already exists.
+  migrateLegacyStorage(root);
+  const gitwhyDir = path.join(root, resolveStorageDirName(root));
 
   // Guard: already initialized — but repair missing skills from partial init
   if (fs.existsSync(gitwhyDir)) {
@@ -440,7 +457,7 @@ export async function runInit(): Promise<void> {
       console.log(`\n  Try: ${chalk.cyan.bold(exampleCommand)}\n`);
     } else {
       console.log(chalk.yellow("\n  WhySpec is already initialized in this directory."));
-      console.log(chalk.dim("  .gitwhy/ already exists.\n"));
+      console.log(chalk.dim(`  ${resolveStorageDirName(root)}/ already exists.\n`));
     }
     return;
   }
@@ -460,7 +477,7 @@ export async function runInit(): Promise<void> {
     selectedTools.push("claude-code");
   }
 
-  // 4. Create .gitwhy/ structure
+  // 4. Create storage structure
   createGitwhyDir(root);
 
   // 5. Write config.yaml
@@ -472,7 +489,7 @@ export async function runInit(): Promise<void> {
     telemetry: process.env.WHYSPEC_TELEMETRY !== "0",
   });
 
-  // 6. Keep .gitwhy visible to tools and repair any legacy ignore entries
+  // 6. Keep storage visible to tools and repair any legacy ignore entries
   addToGitignore(root);
   ensureVsCodeShowsGitwhy(root);
   removeLegacyGitwhyAlias(root);

@@ -31,30 +31,30 @@ describe("generateContextId", () => {
 });
 
 describe("path helpers", () => {
-  it("gitwhyDir returns .gitwhy path", () => {
-    expect(gitwhyDir("/repo")).toBe(join("/repo", ".gitwhy"));
+  it("gitwhyDir returns gitwhy path by default", () => {
+    expect(gitwhyDir("/repo")).toBe(join("/repo", "gitwhy"));
   });
 
-  it("changesDir returns .gitwhy/changes path", () => {
-    expect(changesDir("/repo")).toBe(join("/repo", ".gitwhy", "changes"));
+  it("changesDir returns gitwhy/changes path by default", () => {
+    expect(changesDir("/repo")).toBe(join("/repo", "gitwhy", "changes"));
   });
 });
 
 describe("ensureDirectoryStructure", () => {
-  it("creates .gitwhy/, changes/, archive/, debug/", () => {
+  it("creates gitwhy/, changes/, archive/, debug/", () => {
     const tmp = makeTmp();
     ensureDirectoryStructure(tmp);
-    expect(existsSync(join(tmp, ".gitwhy"))).toBe(true);
-    expect(existsSync(join(tmp, ".gitwhy", "changes"))).toBe(true);
-    expect(existsSync(join(tmp, ".gitwhy", "archive"))).toBe(true);
-    expect(existsSync(join(tmp, ".gitwhy", "debug"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "changes"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "archive"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "debug"))).toBe(true);
   });
 
   it("is idempotent", () => {
     const tmp = makeTmp();
     ensureDirectoryStructure(tmp);
     ensureDirectoryStructure(tmp);
-    expect(existsSync(join(tmp, ".gitwhy"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy"))).toBe(true);
   });
 });
 

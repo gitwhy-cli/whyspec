@@ -28,7 +28,7 @@ describe("debugCommand", () => {
 
     await debugCommand("login button broken", { json: false });
 
-    const debugDir = join(tmp, ".gitwhy", "changes", "login-button-broken");
+    const debugDir = join(tmp, "gitwhy", "changes", "login-button-broken");
     expect(existsSync(debugDir)).toBe(true);
     expect(existsSync(join(debugDir, "debug.md"))).toBe(true);
     expect(existsSync(join(debugDir, ".started"))).toBe(true);
@@ -39,15 +39,15 @@ describe("debugCommand", () => {
     expect(content).toContain("## Hypotheses");
   });
 
-  it("auto-initializes .gitwhy before creating debug files", async () => {
+  it("auto-initializes gitwhy before creating debug files", async () => {
     const tmp = makeTmp();
     process.cwd = () => tmp;
 
     await debugCommand("lazy init debug", { json: false });
 
-    expect(existsSync(join(tmp, ".gitwhy", "config.yaml"))).toBe(true);
-    expect(existsSync(join(tmp, ".gitwhy", "archive"))).toBe(true);
-    expect(existsSync(join(tmp, ".gitwhy", "debug"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "config.yaml"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "archive"))).toBe(true);
+    expect(existsSync(join(tmp, "gitwhy", "debug"))).toBe(true);
   });
 
   it("outputs valid JSON in --json mode and creates debug artifacts", async () => {
@@ -60,10 +60,10 @@ describe("debugCommand", () => {
     expect(output).toHaveProperty("path");
     expect(output).toHaveProperty("template");
     expect(output).toHaveProperty("related_contexts");
-    expect(output.path).toBe(".gitwhy/changes/api-timeout");
+    expect(output.path).toBe("gitwhy/changes/api-timeout");
     expect(output.template).toContain("# Debug: api timeout");
 
-    const debugDir = join(tmp, ".gitwhy", "changes", "api-timeout");
+    const debugDir = join(tmp, "gitwhy", "changes", "api-timeout");
     expect(existsSync(debugDir)).toBe(true);
     expect(existsSync(join(debugDir, ".started"))).toBe(true);
     expect(existsSync(join(debugDir, "debug.md"))).toBe(true);

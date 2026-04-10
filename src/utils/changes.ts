@@ -1,5 +1,5 @@
 /**
- * Change folder operations for .gitwhy/changes/ directories.
+ * Change folder operations for WhySpec change directories.
  */
 
 import { existsSync, readdirSync, statSync } from "node:fs";
@@ -32,7 +32,7 @@ function normalizeChangeName(name: string): string {
 }
 
 /**
- * List all change folder names in .gitwhy/changes/.
+ * List all change folder names in the active storage root.
  */
 export function listChanges(gitwhyDir: string): string[] {
   const changesDir = join(gitwhyDir, "changes");

@@ -10,6 +10,7 @@ import { join } from "node:path";
 import chalk from "chalk";
 import { listChanges } from "../utils/changes.js";
 import { readMarkdown } from "../core/storage.js";
+import { storageDirPath } from "../core/storage-root.js";
 import { parseTasks } from "./execute.js";
 
 export interface ChangeListItem {
@@ -47,7 +48,7 @@ function getLastModified(dirPath: string): Date {
 export async function listCommand(
   options: { json?: boolean },
 ): Promise<void> {
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const gitwhyDir = storageDirPath(process.cwd());
   const changes = listChanges(gitwhyDir);
 
   if (changes.length === 0) {

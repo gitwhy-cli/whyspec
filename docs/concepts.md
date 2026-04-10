@@ -20,7 +20,7 @@ The plan **predicts** decisions. The capture **records** decisions. The delta sh
 ## What Gets Created
 
 ```
-.gitwhy/
+gitwhy/
 ├── changes/
 │   ├── add-jwt-auth/
 │   │   ├── intent.md          # why
@@ -35,8 +35,6 @@ The plan **predicts** decisions. The capture **records** decisions. The delta sh
 │   └── add-rate-limiting/
 │       ├── intent.md
 │       └── design.md          # planning phase
-└── templates/
-    └── ...
 ```
 
 ### File Types

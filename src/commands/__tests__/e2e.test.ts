@@ -59,13 +59,13 @@ afterEach(() => {
 // ── Init Lifecycle ─────────────────────────────────────────────────
 
 describe("E2E: init lifecycle", () => {
-  it("creates the full .gitwhy/ directory structure", () => {
+  it("creates the full gitwhy/ directory structure", () => {
     createGitwhyDir(tmpDir);
 
-    expect(existsSync(join(tmpDir, ".gitwhy"))).toBe(true);
-    expect(existsSync(join(tmpDir, ".gitwhy", "changes"))).toBe(true);
-    expect(existsSync(join(tmpDir, ".gitwhy", "archive"))).toBe(true);
-    expect(existsSync(join(tmpDir, ".gitwhy", "debug"))).toBe(true);
+    expect(existsSync(join(tmpDir, "gitwhy"))).toBe(true);
+    expect(existsSync(join(tmpDir, "gitwhy", "changes"))).toBe(true);
+    expect(existsSync(join(tmpDir, "gitwhy", "archive"))).toBe(true);
+    expect(existsSync(join(tmpDir, "gitwhy", "debug"))).toBe(true);
   });
 
   it("writes config.yaml with valid structure", () => {
@@ -77,7 +77,7 @@ describe("E2E: init lifecycle", () => {
       telemetry: false,
     });
 
-    const configPath = join(tmpDir, ".gitwhy", "config.yaml");
+    const configPath = join(tmpDir, "gitwhy", "config.yaml");
     expect(existsSync(configPath)).toBe(true);
 
     const content = readFileSync(configPath, "utf-8");
@@ -121,7 +121,7 @@ describe("E2E: plan lifecycle", () => {
 
     await captureOutput(() => planCommand("add-auth", {}));
 
-    const changePath = join(tmpDir, ".gitwhy", "changes", "add-auth");
+    const changePath = join(tmpDir, "gitwhy", "changes", "add-auth");
     expect(existsSync(changePath)).toBe(true);
     expect(existsSync(join(changePath, "intent.md"))).toBe(true);
     expect(existsSync(join(changePath, "design.md"))).toBe(true);
@@ -133,7 +133,7 @@ describe("E2E: plan lifecycle", () => {
 
     await captureOutput(() => planCommand("timing-test", {}));
 
-    const startedPath = join(tmpDir, ".gitwhy", "changes", "timing-test", ".started");
+    const startedPath = join(tmpDir, "gitwhy", "changes", "timing-test", ".started");
     expect(existsSync(startedPath)).toBe(true);
 
     const content = readFileSync(startedPath, "utf-8").trim();
@@ -175,7 +175,7 @@ describe("E2E: capture lifecycle", () => {
 
     await captureOutput(() => captureCommand("capture-test", {}));
 
-    const changePath = join(tmpDir, ".gitwhy", "changes", "capture-test");
+    const changePath = join(tmpDir, "gitwhy", "changes", "capture-test");
     const ctxFiles = readdirSync(changePath).filter((f) =>
       f.startsWith("ctx_"),
     );
@@ -203,7 +203,7 @@ describe("E2E: capture lifecycle", () => {
 
     // Write decisions into design.md
     const designPath = join(
-      tmpDir, ".gitwhy", "changes", "json-capture", "design.md",
+      tmpDir, "gitwhy", "changes", "json-capture", "design.md",
     );
     writeFileSync(
       designPath,
@@ -240,7 +240,7 @@ describe("E2E: execute lifecycle", () => {
 
     // Add tasks to tasks.md
     const tasksPath = join(
-      tmpDir, ".gitwhy", "changes", "exec-test", "tasks.md",
+      tmpDir, "gitwhy", "changes", "exec-test", "tasks.md",
     );
     writeFileSync(
       tasksPath,
@@ -284,13 +284,13 @@ describe("E2E: full init → plan → capture → execute → show → search li
     });
     addToGitignore(tmpDir);
 
-    expect(existsSync(join(tmpDir, ".gitwhy", "config.yaml"))).toBe(true);
+    expect(existsSync(join(tmpDir, "gitwhy", "config.yaml"))).toBe(true);
     expect(existsSync(join(tmpDir, ".gitignore"))).toBe(false);
 
     // 2. Plan
     await captureOutput(() => planCommand("auth-feature", {}));
 
-    const changePath = join(tmpDir, ".gitwhy", "changes", "auth-feature");
+    const changePath = join(tmpDir, "gitwhy", "changes", "auth-feature");
     expect(existsSync(join(changePath, "intent.md"))).toBe(true);
     expect(existsSync(join(changePath, "design.md"))).toBe(true);
     expect(existsSync(join(changePath, "tasks.md"))).toBe(true);
@@ -340,7 +340,7 @@ describe("E2E: full init → plan → capture → execute → show → search li
 
     await captureOutput(() => planCommand("auth-search", {}));
 
-    const changePath = join(tmpDir, ".gitwhy", "changes", "auth-search");
+    const changePath = join(tmpDir, "gitwhy", "changes", "auth-search");
     writeFileSync(
       join(changePath, "intent.md"),
       `# Intent: auth-search

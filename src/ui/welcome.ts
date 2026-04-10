@@ -10,7 +10,7 @@ export function renderWelcomeScreen(): string {
   lines.push(chalk.bold("  The reasoning layer for AI coding"));
   lines.push("");
   lines.push(chalk.dim("  This will create:"));
-  lines.push(chalk.white("    .gitwhy/"));
+  lines.push(chalk.white("    gitwhy/"));
   lines.push(chalk.white("    \u251C\u2500\u2500 config.yaml"));
   lines.push(chalk.white("    \u2514\u2500\u2500 changes/"));
   lines.push("");
@@ -43,8 +43,8 @@ export function renderSuccessMessage(tools: string[]): string {
   lines.push(chalk.green.bold("  \u2713 WhySpec initialized!"));
   lines.push("");
   lines.push(chalk.dim("  Created:"));
-  lines.push(chalk.white("    .gitwhy/config.yaml"));
-  lines.push(chalk.white("    .gitwhy/changes/"));
+  lines.push(chalk.white("    gitwhy/config.yaml"));
+  lines.push(chalk.white("    gitwhy/changes/"));
   if (tools.length > 0) {
     lines.push("");
     lines.push(chalk.dim(`  Tools configured: ${tools.join(", ")}`));

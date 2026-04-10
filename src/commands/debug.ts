@@ -12,6 +12,7 @@ import { slugify } from "../utils/slugify.js";
 import { debugTemplate } from "../core/templates.js";
 import { searchChanges, type SearchResult } from "../core/search.js";
 import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
+import { relativeStoragePath, storageDirPath } from "../core/storage-root.js";
 
 export interface DebugJsonOutput {
   path: string;
@@ -29,7 +30,7 @@ export async function debugCommand(
 
   const repoRoot = process.cwd();
   const slug = slugify(name);
-  const gitwhyDir = join(repoRoot, ".gitwhy");
+  const gitwhyDir = storageDirPath(repoRoot);
   const changePath = join(gitwhyDir, "changes", slug);
 
   ensureGitwhyDir(repoRoot);
@@ -63,7 +64,7 @@ export async function debugCommand(
     writeFileSync(join(changePath, "debug.md"), fullTemplate);
 
     const output: DebugJsonOutput = {
-      path: `.gitwhy/changes/${slug}`,
+      path: relativeStoragePath(repoRoot, "changes", slug),
       template: fullTemplate,
       related_contexts: relatedContexts,
     };
@@ -76,7 +77,7 @@ export async function debugCommand(
   writeFileSync(join(changePath, ".started"), new Date().toISOString());
   writeFileSync(join(changePath, "debug.md"), fullTemplate);
 
-  console.log(chalk.green(`\n  Created`) + ` .gitwhy/changes/${slug}/`);
+  console.log(chalk.green(`\n  Created`) + ` ${relativeStoragePath(repoRoot, "changes", slug)}/`);
   console.log(`     ${chalk.green("✓")} debug.md — scientific investigation template`);
 
   if (relatedContexts.length > 0) {

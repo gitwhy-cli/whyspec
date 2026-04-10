@@ -43,7 +43,7 @@ Example JSON response:
 
 \`\`\`json
 {
-  "path": ".gitwhy/changes/add-jwt-auth",
+  "path": "gitwhy/changes/add-jwt-auth",
   "templates": {
     "intent": "## Why This Change Exists\\n...",
     "design": "## Approach\\n...",

@@ -10,6 +10,7 @@ import { join } from "node:path";
 import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
 import { extractDecisions } from "../core/context.js";
+import { storageDirPath } from "../core/storage-root.js";
 import { parseTasks } from "./execute.js";
 
 export interface ShowJsonOutput {
@@ -70,7 +71,7 @@ export async function showCommand(
   name: string,
   options: { json?: boolean },
 ): Promise<void> {
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const gitwhyDir = storageDirPath(process.cwd());
   const change = resolveChange(gitwhyDir, name);
 
   // Read all files.

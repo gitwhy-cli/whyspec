@@ -12,7 +12,7 @@ import { captureCommand, type CaptureJsonOutput } from "../capture.js";
 import { generateContextId, extractDecisions } from "../../core/context.js";
 
 const TEST_DIR = join(process.cwd(), ".test-capture-tmp");
-const GITWHY_DIR = join(TEST_DIR, ".gitwhy");
+const GITWHY_DIR = join(TEST_DIR, "gitwhy");
 
 function captureOutput(fn: () => Promise<void>): Promise<string> {
   let output = "";
@@ -140,10 +140,10 @@ describe("capture command", () => {
     const parsed: CaptureJsonOutput = JSON.parse(output);
 
     expect(parsed.change_name).toBe("test-change");
-    expect(parsed.change_path).toBe(".gitwhy/changes/test-change");
+    expect(parsed.change_path).toBe("gitwhy/changes/test-change");
     expect(parsed.context_id).toMatch(/^ctx_[a-z0-9]{8}$/);
     expect(parsed.file_path).toBe(
-      `.gitwhy/changes/test-change/${parsed.context_id}.md`,
+      `gitwhy/changes/test-change/${parsed.context_id}.md`,
     );
     expect(parsed.template).toContain("<context>");
     expect(parsed.template).toContain("</context>");
@@ -212,7 +212,7 @@ describe("capture command", () => {
     expect(content).toContain("**Date:**");
     // WhySpec supplementary fields
     expect(content).toContain("**Change:** ctx-test");
-    expect(content).toContain("**Intent:** .gitwhy/changes/ctx-test/intent.md");
+    expect(content).toContain("**Intent:** gitwhy/changes/ctx-test/intent.md");
     expect(content).toContain("**Commits:**");
     expect(content).toContain("<context>");
   });
@@ -243,7 +243,7 @@ describe("capture command", () => {
     expect(parsed.change_name).toBe("only-change");
   });
 
-  it("auto-initializes .gitwhy before resolving the change", async () => {
+  it("auto-initializes gitwhy before resolving the change", async () => {
     await expect(captureCommand("missing-change", {})).rejects.toThrow(
       'Change "missing-change" not found.',
     );

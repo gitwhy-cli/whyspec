@@ -12,6 +12,7 @@ import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
 import { getCurrentBranch, getCommitsSince, getFilesChanged, getRemoteUrl } from "../utils/git.js";
 import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
+import { relativeStoragePath, storageDirPath } from "../core/storage-root.js";
 import {
   generateContextId,
   renderContextXml,
@@ -36,6 +37,7 @@ function readFileOrEmpty(filePath: string): string {
 }
 
 function buildContextFile(
+  repoRoot: string,
   changeName: string,
   contextId: string,
   template: string,
@@ -54,7 +56,7 @@ function buildContextFile(
     `**Branch:** ${branch}`,
     `**Date:** ${new Date().toISOString()}`,
     `**Change:** ${changeName}`,
-    `**Intent:** .gitwhy/changes/${changeName}/intent.md`,
+    `**Intent:** ${relativeStoragePath(repoRoot, "changes", changeName, "intent.md")}`,
     `**Commits:** ${commitList}`,
     "",
     "---",
@@ -69,7 +71,7 @@ export async function captureCommand(
   options: { json?: boolean },
 ): Promise<void> {
   const repoRoot = process.cwd();
-  const gitwhyDir = join(repoRoot, ".gitwhy");
+  const gitwhyDir = storageDirPath(repoRoot);
 
   ensureGitwhyDir(repoRoot);
 
@@ -101,7 +103,7 @@ export async function captureCommand(
   const contextId = generateContextId();
   const fileName = `${contextId}.md`;
   const filePath = join(change.path, fileName);
-  const content = buildContextFile(change.name, contextId, template, commits);
+  const content = buildContextFile(repoRoot, change.name, contextId, template, commits);
   writeFileSync(filePath, content);
 
   if (options.json) {
@@ -111,9 +113,9 @@ export async function captureCommand(
       files_changed: filesChanged,
       decisions_to_make: allDecisions,
       change_name: change.name,
-      change_path: `.gitwhy/changes/${change.name}`,
+      change_path: relativeStoragePath(repoRoot, "changes", change.name),
       context_id: contextId,
-      file_path: `.gitwhy/changes/${change.name}/${fileName}`,
+      file_path: relativeStoragePath(repoRoot, "changes", change.name, fileName),
     };
     console.log(JSON.stringify(output, null, 2));
     return;

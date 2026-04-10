@@ -11,6 +11,7 @@ import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
 import { readMarkdown } from "../core/storage.js";
 import { extractDecisions, getChangeFolderCreatedAt } from "../core/context.js";
+import { storageDirPath } from "../core/storage-root.js";
 import { getCommitsSince } from "../utils/git.js";
 import { parseTasks } from "./execute.js";
 
@@ -44,7 +45,7 @@ export async function statusCommand(
   name: string,
   options: { json?: boolean },
 ): Promise<void> {
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const gitwhyDir = storageDirPath(process.cwd());
   const change = resolveChange(gitwhyDir, name);
 
   // Check file presence.

@@ -1,14 +1,14 @@
 /**
  * Storage module for WhySpec.
- * Manages .gitwhy/ directory structure, reads/writes markdown files,
+ * Manages WhySpec storage directory structure, reads/writes markdown files,
  * generates context IDs.
  */
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
+import { storageDirPath } from "./storage-root.js";
 
-const GITWHY_DIR = ".gitwhy";
 const CHANGES_DIR = "changes";
 const ARCHIVE_DIR = "archive";
 const DEBUG_DIR = "debug";
@@ -22,29 +22,30 @@ export function generateContextId(): string {
   return `ctx_${bytes.toString("hex")}`;
 }
 
-/** Returns the .gitwhy directory path for a repo root. */
+/** Returns the active WhySpec storage directory path for a repo root. */
 export function gitwhyDir(repoRoot: string): string {
-  return join(repoRoot, GITWHY_DIR);
+  return storageDirPath(repoRoot);
 }
 
 /** Returns the changes directory path. */
 export function changesDir(repoRoot: string): string {
-  return join(repoRoot, GITWHY_DIR, CHANGES_DIR);
+  return join(gitwhyDir(repoRoot), CHANGES_DIR);
 }
 
 /**
- * Ensures the .gitwhy/ directory structure exists:
- *   .gitwhy/
+ * Ensures the WhySpec directory structure exists:
+ *   gitwhy/ or .gitwhy/
  *   ├── changes/
  *   ├── archive/
  *   └── debug/
  */
 export function ensureDirectoryStructure(repoRoot: string): void {
+  const rootDir = gitwhyDir(repoRoot);
   const dirs = [
-    join(repoRoot, GITWHY_DIR),
-    join(repoRoot, GITWHY_DIR, CHANGES_DIR),
-    join(repoRoot, GITWHY_DIR, ARCHIVE_DIR),
-    join(repoRoot, GITWHY_DIR, DEBUG_DIR),
+    rootDir,
+    join(rootDir, CHANGES_DIR),
+    join(rootDir, ARCHIVE_DIR),
+    join(rootDir, DEBUG_DIR),
   ];
   for (const dir of dirs) {
     mkdirSync(dir, { recursive: true });
@@ -52,11 +53,11 @@ export function ensureDirectoryStructure(repoRoot: string): void {
 }
 
 /**
- * Creates a change directory under .gitwhy/changes/<name>/.
+ * Creates a change directory under changes/<name>/.
  * Returns the created path.
  */
 export function createChangeDir(repoRoot: string, changeName: string): string {
-  const dir = join(repoRoot, GITWHY_DIR, CHANGES_DIR, changeName);
+  const dir = join(changesDir(repoRoot), changeName);
   mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -73,7 +74,7 @@ export function writeMarkdown(changeDir: string, filename: string, content: stri
   writeFileSync(join(changeDir, filename), content, "utf-8");
 }
 
-/** Lists all change names in .gitwhy/changes/. */
+/** Lists all change names in changes/. */
 export function listChanges(repoRoot: string): string[] {
   const dir = changesDir(repoRoot);
   if (!existsSync(dir)) return [];
@@ -84,5 +85,5 @@ export function listChanges(repoRoot: string): string[] {
 
 /** Checks if a specific change directory exists. */
 export function changeExists(repoRoot: string, changeName: string): boolean {
-  return existsSync(join(repoRoot, GITWHY_DIR, CHANGES_DIR, changeName));
+  return existsSync(join(changesDir(repoRoot), changeName));
 }

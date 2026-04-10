@@ -1,0 +1,46 @@
+README.md
+  e3eb23a63a57f87f 84
+package.json
+  e3eb23a63a57f87f 3
+src/commands/__tests__/init.test.ts
+  e3eb23a63a57f87f 50,52-57,61-76,79-81,294,306-307
+src/commands/init.ts
+  e3eb23a63a57f87f 10,42,45,49-98,413-414
+docs/supported-tools.md
+  e3eb23a63a57f87f 9,20,22,34,65
+src/ui/welcome.ts
+  e3eb23a63a57f87f 52,58-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "49753de3570a302597cbc63cb08707de1d766d04",
+  "prompts": {
+    "baebccfadf9a3553": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7445-a1ec-7a20-a74a-56408b2db0e2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    },
+    "e3eb23a63a57f87f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d74d6-1cc2-7d60-a9ee-835db673f782",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 98,
+      "total_deletions": 42,
+      "accepted_lines": 98,
+      "overriden_lines": 0
+    }
+  }
+}

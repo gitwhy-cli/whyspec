@@ -10,6 +10,7 @@ import { join } from "node:path";
 import chalk from "chalk";
 import { slugify } from "../utils/slugify.js";
 import { readConfig } from "../core/config.js";
+import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
 import {
   intentTemplate,
   designTemplate,
@@ -31,9 +32,14 @@ export async function planCommand(
   name: string,
   options: { json?: boolean },
 ): Promise<void> {
+  const repoRoot = process.cwd();
   const slug = slugify(name);
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const gitwhyDir = join(repoRoot, ".gitwhy");
   const changePath = join(gitwhyDir, "changes", slug);
+
+  if (!options.json) {
+    ensureGitwhyDir(repoRoot);
+  }
 
   // Duplicate detection
   if (existsSync(changePath)) {
@@ -42,7 +48,7 @@ export async function planCommand(
     );
   }
 
-  const config = readConfig(process.cwd());
+  const config = readConfig(repoRoot);
 
   if (options.json) {
     // JSON mode: return structured data, don't create files

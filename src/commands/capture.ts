@@ -10,6 +10,7 @@ import { join } from "node:path";
 import chalk from "chalk";
 import { resolveChange } from "../utils/changes.js";
 import { getCurrentBranch, getCommitsSince, getFilesChanged, getRemoteUrl } from "../utils/git.js";
+import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
 import {
   generateContextId,
   renderContextXml,
@@ -35,7 +36,13 @@ export async function captureCommand(
   name: string | undefined,
   options: { json?: boolean },
 ): Promise<void> {
-  const gitwhyDir = join(process.cwd(), ".gitwhy");
+  const repoRoot = process.cwd();
+  const gitwhyDir = join(repoRoot, ".gitwhy");
+
+  if (!options.json) {
+    ensureGitwhyDir(repoRoot);
+  }
+
   const change = resolveChange(gitwhyDir, name);
 
   // Read planning artifacts

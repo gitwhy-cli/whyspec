@@ -24,7 +24,6 @@ describe("debugCommand", () => {
 
   it("creates change directory and debug.md in non-JSON mode", async () => {
     const tmp = makeTmp();
-    mkdirSync(join(tmp, ".gitwhy", "changes"), { recursive: true });
     process.cwd = () => tmp;
 
     await debugCommand("login button broken", { json: false });
@@ -38,6 +37,17 @@ describe("debugCommand", () => {
     expect(content).toContain("# Debug: login button broken");
     expect(content).toContain("## Symptoms");
     expect(content).toContain("## Hypotheses");
+  });
+
+  it("auto-initializes .gitwhy before creating debug files", async () => {
+    const tmp = makeTmp();
+    process.cwd = () => tmp;
+
+    await debugCommand("lazy init debug", { json: false });
+
+    expect(existsSync(join(tmp, ".gitwhy", "config.yaml"))).toBe(true);
+    expect(existsSync(join(tmp, ".gitwhy", "archive"))).toBe(true);
+    expect(existsSync(join(tmp, ".gitwhy", "debug"))).toBe(true);
   });
 
   it("outputs valid JSON in --json mode without creating files", async () => {

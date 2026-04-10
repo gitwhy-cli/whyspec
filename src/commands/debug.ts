@@ -11,6 +11,7 @@ import chalk from "chalk";
 import { slugify } from "../utils/slugify.js";
 import { debugTemplate } from "../core/templates.js";
 import { searchChanges, type SearchResult } from "../core/search.js";
+import { ensureGitwhyDir } from "../core/ensure-gitwhy-dir.js";
 
 export interface DebugJsonOutput {
   path: string;
@@ -30,6 +31,10 @@ export async function debugCommand(
   const slug = slugify(name);
   const gitwhyDir = join(repoRoot, ".gitwhy");
   const changePath = join(gitwhyDir, "changes", slug);
+
+  if (!options.json) {
+    ensureGitwhyDir(repoRoot);
+  }
 
   // Quick search for related contexts using first few words of the bug name.
   const searchQuery = name.split(/\s+/).slice(0, 3).join(" ");

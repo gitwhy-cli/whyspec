@@ -50,6 +50,14 @@ describe("plan command", () => {
     expect(existsSync(join(changePath, "tasks.md"))).toBe(true);
   });
 
+  it("auto-initializes .gitwhy before creating plan files", async () => {
+    await planCommand("Auto Init Plan", {});
+
+    expect(existsSync(join(GITWHY_DIR, "config.yaml"))).toBe(true);
+    expect(existsSync(join(GITWHY_DIR, "archive"))).toBe(true);
+    expect(existsSync(join(GITWHY_DIR, "debug"))).toBe(true);
+  });
+
   it("slugifies the change name correctly", async () => {
     await planCommand("My Cool Feature!!!", {});
     const changePath = join(GITWHY_DIR, "changes", "my-cool-feature");

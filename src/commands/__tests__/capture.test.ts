@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
+  existsSync,
   readFileSync,
   mkdirSync,
   rmSync,
@@ -227,5 +228,15 @@ describe("capture command", () => {
     );
     const parsed: CaptureJsonOutput = JSON.parse(output);
     expect(parsed.change_name).toBe("only-change");
+  });
+
+  it("auto-initializes .gitwhy before resolving the change", async () => {
+    await expect(captureCommand("missing-change", {})).rejects.toThrow(
+      'Change "missing-change" not found.',
+    );
+
+    expect(existsSync(join(GITWHY_DIR, "config.yaml"))).toBe(true);
+    expect(existsSync(join(GITWHY_DIR, "archive"))).toBe(true);
+    expect(existsSync(join(GITWHY_DIR, "debug"))).toBe(true);
   });
 });

@@ -234,8 +234,7 @@ export async function runInit(): Promise<void> {
     telemetry: process.env.WHYSPEC_TELEMETRY !== "0",
   });
 
-  // 6. Add to .gitignore
-  addToGitignore(root);
+  // 6. Skip gitignore — let users decide whether to share .gitwhy/ with the team
 
   // 7. Install skill files
   installSkillFiles(root, selectedTools);

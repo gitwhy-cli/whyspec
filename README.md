@@ -14,7 +14,7 @@
 
 **Spec-driven development with "reasoning" layer.**
 
-A spec-driven context engineering framework that also capture reasoning for AI coding agents like Claude Code, Cursor, Copilot, and more.
+A spec-driven context engineering framework that also capture reasoning for AI coding agents like Claude Code, Cursor, Copilot, and more. Plan before coding, capture what actually happened after coding, and preserve the why behind each change for future chats, debugging, and reviews.
 
 ## Our Vision
 

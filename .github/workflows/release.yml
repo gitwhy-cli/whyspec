@@ -37,7 +37,23 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Resolve package version
+        id: package
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Check npm for existing version
+        id: npm_version
+        run: |
+          published="$(npm view @gitwhy-cli/whyspec@${{ steps.package.outputs.version }} version 2>/dev/null || true)"
+          if [ "$published" = "${{ steps.package.outputs.version }}" ]; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+            echo "Version $published is already on npm; skipping duplicate publish."
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
+        if: steps.npm_version.outputs.already_published != 'true'
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -38,8 +38,6 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 ```
 /whyspec-capture add-jwt-auth  ->   whyspec/changes/add-jwt-auth/ctx_a1b2c3d4.md
                                       Decisions Made + Surprises + Trade-offs
-
-`whyspec/` is the canonical visible workspace. Existing `gitwhy/` and `.gitwhy/` folders are still read as legacy fallbacks.
 ```
 
 ## What's Next

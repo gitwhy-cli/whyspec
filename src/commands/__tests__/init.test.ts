@@ -48,15 +48,19 @@ describe("createGitwhyDir", () => {
 });
 
 describe("removeLegacyGitwhyAlias", () => {
-  it("removes the legacy gitwhy helper symlink", () => {
+  it("removes the legacy gitwhy helper symlink and promotes .gitwhy to whyspec", () => {
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
     fs.symlinkSync(".gitwhy", path.join(tmpDir, "gitwhy"), "dir");
 
     expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
   });
 
-  it("removes the legacy gitwhy helper directory created by older versions", () => {
+  it("removes the legacy gitwhy helper directory and promotes .gitwhy to whyspec", () => {
     const helperPath = path.join(tmpDir, "gitwhy");
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
     fs.mkdirSync(helperPath, { recursive: true });
     fs.writeFileSync(
       path.join(helperPath, "README.md"),
@@ -73,6 +77,8 @@ describe("removeLegacyGitwhyAlias", () => {
 
     expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
     expect(fs.existsSync(helperPath)).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
   });
 
   it("does not remove an unrelated user gitwhy directory", () => {

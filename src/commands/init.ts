@@ -36,12 +36,21 @@ export function createGitwhyDir(root: string): void {
 
 export function removeLegacyGitwhyAlias(root: string): boolean {
   const helperPath = path.join(root, "gitwhy");
+  const primaryPath = path.join(root, PRIMARY_STORAGE_DIR);
+  const oldestLegacyPath = path.join(root, ".gitwhy");
   if (!fs.lstatSync(helperPath, { throwIfNoEntry: false })) {
     return false;
   }
 
   const helperStat = fs.lstatSync(helperPath);
   if (helperStat.isSymbolicLink()) {
+    const helperTarget = fs.readlinkSync(helperPath);
+    const resolvedTarget = path.resolve(path.dirname(helperPath), helperTarget);
+    const resolvedOldestLegacy = path.resolve(oldestLegacyPath);
+
+    if (!fs.existsSync(primaryPath) && fs.existsSync(oldestLegacyPath) && resolvedTarget === resolvedOldestLegacy) {
+      fs.renameSync(oldestLegacyPath, primaryPath);
+    }
     fs.unlinkSync(helperPath);
     return true;
   }
@@ -56,6 +65,10 @@ export function removeLegacyGitwhyAlias(root: string): boolean {
 
   if (!isKnownLegacyHelper) {
     return false;
+  }
+
+  if (!fs.existsSync(primaryPath) && fs.existsSync(oldestLegacyPath)) {
+    fs.renameSync(oldestLegacyPath, primaryPath);
   }
 
   fs.rmSync(helperPath, { recursive: true, force: true });
@@ -393,6 +406,7 @@ export async function runInit(): Promise<void> {
 
   // Upgrade legacy hidden storage before deciding whether initialization already exists.
   migrateLegacyStorage(root);
+  removeLegacyGitwhyAlias(root);
   const gitwhyDir = path.join(root, resolveStorageDirName(root));
 
   // Guard: already initialized — but repair missing skills from partial init
@@ -448,10 +462,6 @@ export async function runInit(): Promise<void> {
       }
     } catch {
       // Leave malformed user settings untouched and continue with existing repair work.
-    }
-
-    if (removeLegacyGitwhyAlias(root)) {
-      repaired = true;
     }
 
     if (repaired) {

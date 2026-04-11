@@ -22,19 +22,19 @@ The plan **predicts** decisions. The capture **records** decisions. The delta sh
 ```
 whyspec/
 ├── changes/
-│   ├── add-jwt-auth/
-│   │   ├── intent.md          # why
-│   │   ├── design.md          # approach + decisions
-│   │   ├── tasks.md           # verification checklist
-│   │   └── ctx_a1b2c3d4.md    # captured reasoning
-│   ├── migrate-to-postgres/
-│   │   ├── intent.md
-│   │   ├── design.md
-│   │   ├── tasks.md
-│   │   └── ctx_f3e4d5c6.md
-│   └── add-rate-limiting/
-│       ├── intent.md
-│       └── design.md          # planning phase
+    ├── add-jwt-auth/
+    │   ├── intent.md          # why
+    │   ├── design.md          # approach + decisions
+    │   ├── tasks.md           # verification checklist
+    │   └── ctx_a1b2c3d4.md    # captured reasoning
+    ├── migrate-to-postgres/
+    │   ├── intent.md
+    │   ├── design.md
+    │   ├── tasks.md
+    │   └── ctx_f3e4d5c6.md
+    └── add-rate-limiting/
+        ├── intent.md
+        └── design.md          # planning phase
 ```
 
 ### File Types

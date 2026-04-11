@@ -37,8 +37,6 @@ whyspec/
 │       └── design.md          # planning phase
 ```
 
-Legacy `gitwhy/` and `.gitwhy/` roots are still supported for repositories created before the rename.
-
 ### File Types
 
 | File | Created by | Purpose |

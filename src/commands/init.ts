@@ -7,7 +7,7 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
-import { LEGACY_STORAGE_DIR, PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../core/storage-root.js";
+import { PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../core/storage-root.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
@@ -63,14 +63,20 @@ export function removeLegacyGitwhyAlias(root: string): boolean {
 }
 
 export function migrateLegacyStorage(root: string): boolean {
-  const legacyPath = path.join(root, LEGACY_STORAGE_DIR);
   const primaryPath = path.join(root, PRIMARY_STORAGE_DIR);
+  const activeDirName = resolveStorageDirName(root);
+  const activePath = path.join(root, activeDirName);
 
-  if (!fs.existsSync(legacyPath) || fs.existsSync(primaryPath)) {
+  if (activeDirName === PRIMARY_STORAGE_DIR || fs.existsSync(primaryPath)) {
     return false;
   }
 
-  fs.renameSync(legacyPath, primaryPath);
+  const activeStat = fs.lstatSync(activePath, { throwIfNoEntry: false });
+  if (!activeStat || !activeStat.isDirectory() || activeStat.isSymbolicLink()) {
+    return false;
+  }
+
+  fs.renameSync(activePath, primaryPath);
   return true;
 }
 
@@ -101,7 +107,7 @@ export function writeConfigYaml(root: string, opts: ConfigOptions): void {
 }
 
 export function addToGitignore(root: string): void {
-  const entries = [".gitwhy/", "gitwhy/"];
+  const entries = [".gitwhy/", "gitwhy/", "whyspec/"];
   const gitignorePath = path.join(root, ".gitignore");
   const gitDir = path.join(root, ".git");
   const gitExcludePath = path.join(gitDir, "info", "exclude");
@@ -120,7 +126,7 @@ export function addToGitignore(root: string): void {
     }
   };
 
-  // Migration-only cleanup: keep .gitwhy visible and unmanaged by ignore files.
+  // Keep visible WhySpec roots unmanaged by ignore files during migration.
   removeEntry(gitignorePath);
   removeEntry(gitExcludePath);
 }
@@ -210,6 +216,7 @@ export function ensureVsCodeShowsGitwhy(root: string): void {
 
   filesExclude[".gitwhy"] = false;
   filesExclude["gitwhy"] = false;
+  filesExclude["whyspec"] = false;
   settings["files.exclude"] = filesExclude;
 
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });

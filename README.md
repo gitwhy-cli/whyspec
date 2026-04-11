@@ -30,7 +30,7 @@ In an era where AI writes most of the code, the human contribution isn't the syn
 
 ```
 You: /whyspec-plan add-jwt-auth
-AI:  Created gitwhy/changes/add-jwt-auth/
+AI:  Created whyspec/changes/add-jwt-auth/
      ✓ intent.md  — why this change exists
      ✓ design.md  — approach + 3 decisions to make
      ✓ tasks.md   — verification-first checklist
@@ -66,6 +66,8 @@ whyspec init                        # Set up WhySpec
 ```
 
 That's it. WhySpec teaches your AI agent to plan before coding and capture reasoning after.
+
+WhySpec writes visible planning files to `whyspec/`. GitWhy-native internal data stays in `.git/gitwhy/`. Older `gitwhy/` and `.gitwhy/` workspaces are still readable for compatibility.
 
 ## Docs
 

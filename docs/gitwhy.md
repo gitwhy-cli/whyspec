@@ -9,9 +9,9 @@ WhySpec contexts (`ctx_<id>.md`) use the GitWhy format — zero conversion neede
 ## Deployment Modes
 
 ```
-Solo (default):     gitwhy/ kept local, visible reasoning
-Team (opt-in):      Commit gitwhy/ so reasoning is visible in PRs
-Enterprise:         Keep gitwhy/ local or sync to GitWhy cloud
+Solo (default):     whyspec/ kept local, visible reasoning
+Team (opt-in):      Commit whyspec/ so reasoning is visible in PRs
+Enterprise:         Keep whyspec/ local or sync to GitWhy cloud
 ```
 
 ## What GitWhy Adds

@@ -33,7 +33,7 @@ Tools that read `AGENTS.md` will automatically use WhySpec commands via the CLI.
 
 ```
 You: /whyspec-plan add-jwt-auth
-AI:  Created gitwhy/changes/add-jwt-auth/
+AI:  Created whyspec/changes/add-jwt-auth/
      ✓ intent.md  — why this change exists
      ✓ design.md  — approach + 3 decisions to make
      ✓ tasks.md   — verification-first checklist

@@ -20,7 +20,7 @@ The plan **predicts** decisions. The capture **records** decisions. The delta sh
 ## What Gets Created
 
 ```
-gitwhy/
+whyspec/
 ├── changes/
 │   ├── add-jwt-auth/
 │   │   ├── intent.md          # why
@@ -36,6 +36,8 @@ gitwhy/
 │       ├── intent.md
 │       └── design.md          # planning phase
 ```
+
+Legacy `gitwhy/` and `.gitwhy/` roots are still supported for repositories created before the rename.
 
 ### File Types
 

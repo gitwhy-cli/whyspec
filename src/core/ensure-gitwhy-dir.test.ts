@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 describe("ensureGitwhyDir", () => {
-  it("creates gitwhy structure and default config when missing", () => {
+  it("creates canonical whyspec structure and default config when missing", () => {
     fs.writeFileSync(
       path.join(tmpDir, "package.json"),
       JSON.stringify({ name: "@gitwhy-cli/whyspec" }),
@@ -26,27 +26,27 @@ describe("ensureGitwhyDir", () => {
 
     ensureGitwhyDir(tmpDir);
 
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "changes"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "archive"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "debug"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "archive"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "debug"))).toBe(true);
 
-    const rawConfig = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
+    const rawConfig = fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8");
     const config = YAML.parse(rawConfig);
     expect(config.project.name).toBe("whyspec");
     expect(config.tools).toEqual(["claude-code"]);
     expect(stderrSpy).toHaveBeenCalledTimes(1);
-    expect(stderrSpy).toHaveBeenCalledWith("Auto-initialized gitwhy/\n");
+    expect(stderrSpy).toHaveBeenCalledWith("Auto-initialized whyspec/\n");
 
     stderrSpy.mockRestore();
   });
 
-  it("is a no-op when gitwhy already exists", () => {
-    fs.mkdirSync(path.join(tmpDir, "gitwhy"), { recursive: true });
+  it("is a no-op when whyspec already exists", () => {
+    fs.mkdirSync(path.join(tmpDir, "whyspec"), { recursive: true });
     const stderrSpy = vi.spyOn(process.stderr, "write").mockReturnValue(true);
 
     expect(() => ensureGitwhyDir(tmpDir)).not.toThrow();
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "config.yaml"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "config.yaml"))).toBe(false);
     expect(stderrSpy).not.toHaveBeenCalled();
 
     stderrSpy.mockRestore();

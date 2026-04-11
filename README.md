@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/gitwhy-cli/whyspec/actions/workflows/ci.yml"><img src="https://github.com/gitwhy-cli/whyspec/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://www.npmjs.com/package/@gitwhy-cli/whyspec"><img src="https://img.shields.io/npm/v/%40gitwhy-cli%2Fwhyspec" alt="npm version"></a>
   <a href="https://github.com/gitwhy-cli/whyspec/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
   <a href="https://discord.gg/2X5X5XeFyT"><img src="https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>

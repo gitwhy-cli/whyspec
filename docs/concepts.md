@@ -20,7 +20,7 @@ The plan **predicts** decisions. The capture **records** decisions. The delta sh
 ## What Gets Created
 
 ```
-gitwhy/
+whyspec/
 ├── changes/
 │   ├── add-jwt-auth/
 │   │   ├── intent.md          # why

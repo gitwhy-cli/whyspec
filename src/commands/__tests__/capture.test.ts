@@ -12,7 +12,7 @@ import { captureCommand, type CaptureJsonOutput } from "../capture.js";
 import { generateContextId, extractDecisions } from "../../core/context.js";
 
 const TEST_DIR = join(process.cwd(), ".test-capture-tmp");
-const GITWHY_DIR = join(TEST_DIR, "gitwhy");
+const WHYSPEC_DIR = join(TEST_DIR, "whyspec");
 
 function captureOutput(fn: () => Promise<void>): Promise<string> {
   let output = "";
@@ -35,7 +35,7 @@ function createChangeFolderWithFiles(
   name: string,
   designContent?: string,
 ): string {
-  const changePath = join(GITWHY_DIR, "changes", name);
+  const changePath = join(WHYSPEC_DIR, "changes", name);
   mkdirSync(changePath, { recursive: true });
   writeFileSync(
     join(changePath, "intent.md"),
@@ -140,10 +140,10 @@ describe("capture command", () => {
     const parsed: CaptureJsonOutput = JSON.parse(output);
 
     expect(parsed.change_name).toBe("test-change");
-    expect(parsed.change_path).toBe("gitwhy/changes/test-change");
+    expect(parsed.change_path).toBe("whyspec/changes/test-change");
     expect(parsed.context_id).toMatch(/^ctx_[a-z0-9]{8}$/);
     expect(parsed.file_path).toBe(
-      `gitwhy/changes/test-change/${parsed.context_id}.md`,
+      `whyspec/changes/test-change/${parsed.context_id}.md`,
     );
     expect(parsed.template).toContain("<context>");
     expect(parsed.template).toContain("</context>");
@@ -159,7 +159,7 @@ describe("capture command", () => {
     expect(Array.isArray(parsed.commits)).toBe(true);
     expect(Array.isArray(parsed.files_changed)).toBe(true);
 
-    const writtenPath = join(GITWHY_DIR, "changes", "test-change", `${parsed.context_id}.md`);
+    const writtenPath = join(WHYSPEC_DIR, "changes", "test-change", `${parsed.context_id}.md`);
     expect(existsSync(writtenPath)).toBe(true);
 
     const writtenContent = readFileSync(writtenPath, "utf-8");
@@ -196,7 +196,7 @@ describe("capture command", () => {
 
     await captureOutput(() => captureCommand("ctx-test", {}));
 
-    const changePath = join(GITWHY_DIR, "changes", "ctx-test");
+    const changePath = join(WHYSPEC_DIR, "changes", "ctx-test");
     const files = readdirSync(changePath).filter((f) =>
       f.startsWith("ctx_"),
     );
@@ -212,13 +212,13 @@ describe("capture command", () => {
     expect(content).toContain("**Date:**");
     // WhySpec supplementary fields
     expect(content).toContain("**Change:** ctx-test");
-    expect(content).toContain("**Intent:** gitwhy/changes/ctx-test/intent.md");
+    expect(content).toContain("**Intent:** whyspec/changes/ctx-test/intent.md");
     expect(content).toContain("**Commits:**");
     expect(content).toContain("<context>");
   });
 
   it("handles missing design.md gracefully", async () => {
-    const changePath = join(GITWHY_DIR, "changes", "no-design");
+    const changePath = join(WHYSPEC_DIR, "changes", "no-design");
     mkdirSync(changePath, { recursive: true });
     writeFileSync(join(changePath, "intent.md"), "# Intent\n");
 
@@ -243,13 +243,13 @@ describe("capture command", () => {
     expect(parsed.change_name).toBe("only-change");
   });
 
-  it("auto-initializes gitwhy before resolving the change", async () => {
+  it("auto-initializes whyspec before resolving the change", async () => {
     await expect(captureCommand("missing-change", {})).rejects.toThrow(
       'Change "missing-change" not found.',
     );
 
-    expect(existsSync(join(GITWHY_DIR, "config.yaml"))).toBe(true);
-    expect(existsSync(join(GITWHY_DIR, "archive"))).toBe(true);
-    expect(existsSync(join(GITWHY_DIR, "debug"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "config.yaml"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "archive"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "debug"))).toBe(true);
   });
 });

@@ -28,17 +28,17 @@ afterEach(() => {
 // ── createGitwhyDir ──────────────────────────────────────────────────
 
 describe("createGitwhyDir", () => {
-  it("creates the full gitwhy directory structure", () => {
+  it("creates the full whyspec directory structure", () => {
     createGitwhyDir(tmpDir);
 
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "changes"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "archive"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "debug"))).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, "gitwhy")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, "gitwhy", "changes")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, "gitwhy", "archive")).isDirectory()).toBe(true);
-    expect(fs.statSync(path.join(tmpDir, "gitwhy", "debug")).isDirectory()).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "archive"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "debug"))).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "whyspec")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "whyspec", "changes")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "whyspec", "archive")).isDirectory()).toBe(true);
+    expect(fs.statSync(path.join(tmpDir, "whyspec", "debug")).isDirectory()).toBe(true);
   });
 
   it("is idempotent — calling twice does not throw", () => {
@@ -48,15 +48,19 @@ describe("createGitwhyDir", () => {
 });
 
 describe("removeLegacyGitwhyAlias", () => {
-  it("removes the legacy gitwhy helper symlink", () => {
+  it("removes the legacy gitwhy helper symlink and promotes .gitwhy to whyspec", () => {
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
     fs.symlinkSync(".gitwhy", path.join(tmpDir, "gitwhy"), "dir");
 
     expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
   });
 
-  it("removes the legacy gitwhy helper directory created by older versions", () => {
+  it("removes the legacy gitwhy helper directory and promotes .gitwhy to whyspec", () => {
     const helperPath = path.join(tmpDir, "gitwhy");
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
     fs.mkdirSync(helperPath, { recursive: true });
     fs.writeFileSync(
       path.join(helperPath, "README.md"),
@@ -73,6 +77,8 @@ describe("removeLegacyGitwhyAlias", () => {
 
     expect(removeLegacyGitwhyAlias(tmpDir)).toBe(true);
     expect(fs.existsSync(helperPath)).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
   });
 
   it("does not remove an unrelated user gitwhy directory", () => {
@@ -86,15 +92,35 @@ describe("removeLegacyGitwhyAlias", () => {
 });
 
 describe("migrateLegacyStorage", () => {
-  it("renames legacy .gitwhy storage to gitwhy when visible storage is absent", () => {
+  it("renames legacy gitwhy storage to whyspec when the canonical root is absent", () => {
+    fs.mkdirSync(path.join(tmpDir, "gitwhy", "changes"), { recursive: true });
+    fs.writeFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "version: \"1.0\"\n", "utf-8");
+
+    expect(migrateLegacyStorage(tmpDir)).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
+    expect(fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8")).toContain("version:");
+  });
+
+  it("renames legacy .gitwhy storage to whyspec when newer visible roots are absent", () => {
     fs.mkdirSync(path.join(tmpDir, ".gitwhy", "changes"), { recursive: true });
     fs.writeFileSync(path.join(tmpDir, ".gitwhy", "config.yaml"), "version: \"1.0\"\n", "utf-8");
 
     expect(migrateLegacyStorage(tmpDir)).toBe(true);
     expect(fs.existsSync(path.join(tmpDir, ".gitwhy"))).toBe(false);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy"))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, "gitwhy", "changes"))).toBe(true);
-    expect(fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8")).toContain("version:");
+    expect(fs.existsSync(path.join(tmpDir, "whyspec"))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec", "changes"))).toBe(true);
+    expect(fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8")).toContain("version:");
+  });
+
+  it("does not rename a legacy symlink helper during storage migration", () => {
+    fs.mkdirSync(path.join(tmpDir, ".gitwhy"), { recursive: true });
+    fs.symlinkSync(".gitwhy", path.join(tmpDir, "gitwhy"), "dir");
+
+    expect(migrateLegacyStorage(tmpDir)).toBe(false);
+    expect(fs.lstatSync(path.join(tmpDir, "gitwhy")).isSymbolicLink()).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, "whyspec"))).toBe(false);
   });
 });
 
@@ -113,7 +139,7 @@ describe("writeConfigYaml", () => {
       telemetry: true,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8");
     const config = YAML.parse(raw);
 
     expect(config.version).toBe("1.0");
@@ -131,7 +157,7 @@ describe("writeConfigYaml", () => {
       telemetry: true,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8");
     expect(raw).toContain("context:");
     expect(raw).toContain("rules:");
     expect(raw).toContain("# Describe your tech stack");
@@ -146,7 +172,7 @@ describe("writeConfigYaml", () => {
       telemetry: false,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8");
     expect(raw.startsWith("# WhySpec project configuration")).toBe(true);
   });
 
@@ -158,7 +184,7 @@ describe("writeConfigYaml", () => {
       telemetry: false,
     });
 
-    const raw = fs.readFileSync(path.join(tmpDir, "gitwhy", "config.yaml"), "utf-8");
+    const raw = fs.readFileSync(path.join(tmpDir, "whyspec", "config.yaml"), "utf-8");
     const config = YAML.parse(raw);
     expect(config.telemetry).toBe(false);
   });
@@ -182,8 +208,8 @@ describe("addToGitignore", () => {
     expect(content).toBe("node_modules/\n");
   });
 
-  it("removes .gitwhy/ from .gitignore", () => {
-    fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/\n.gitwhy/\n", "utf-8");
+  it("removes visible WhySpec roots from .gitignore", () => {
+    fs.writeFileSync(path.join(tmpDir, ".gitignore"), "node_modules/\n.gitwhy/\ngitwhy/\nwhyspec/\n", "utf-8");
 
     addToGitignore(tmpDir);
 
@@ -208,11 +234,11 @@ describe("addToGitignore", () => {
     expect(fs.existsSync(path.join(tmpDir, ".gitignore"))).toBe(false);
   });
 
-  it("removes .gitwhy/ from both .gitignore and .git/info/exclude", () => {
+  it("removes visible WhySpec roots from both .gitignore and .git/info/exclude", () => {
     fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
     fs.writeFileSync(
       path.join(tmpDir, ".git", "info", "exclude"),
-      "# comments\n.gitwhy/\n",
+      "# comments\n.gitwhy/\ngitwhy/\nwhyspec/\n",
       "utf-8",
     );
     fs.writeFileSync(
@@ -226,6 +252,8 @@ describe("addToGitignore", () => {
     expect(fs.readFileSync(path.join(tmpDir, ".gitignore"), "utf-8")).toBe("node_modules/\n");
     const excludeContent = fs.readFileSync(path.join(tmpDir, ".git", "info", "exclude"), "utf-8");
     expect(excludeContent).not.toContain(".gitwhy/");
+    expect(excludeContent).not.toContain("gitwhy/");
+    expect(excludeContent).not.toContain("whyspec/");
     expect(excludeContent).toBe("# comments\n");
   });
 });
@@ -244,6 +272,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
       "files.exclude": {
         ".gitwhy": false,
         "gitwhy": false,
+        "whyspec": false,
       },
     });
   });
@@ -272,6 +301,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
       dist: true,
       ".gitwhy": false,
       "gitwhy": false,
+      "whyspec": false,
     });
   });
 
@@ -297,6 +327,7 @@ describe("ensureVsCodeShowsGitwhy", () => {
     expect(settings["files.exclude"]).toEqual({
       ".gitwhy": false,
       "gitwhy": false,
+      "whyspec": false,
       dist: true,
     });
   });

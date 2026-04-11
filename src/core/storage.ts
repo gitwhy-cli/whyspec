@@ -34,7 +34,7 @@ export function changesDir(repoRoot: string): string {
 
 /**
  * Ensures the WhySpec directory structure exists:
- *   gitwhy/ or .gitwhy/
+ *   whyspec/ 
  *   ├── changes/
  *   ├── archive/
  *   └── debug/

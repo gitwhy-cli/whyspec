@@ -1,15 +1,20 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-export const PRIMARY_STORAGE_DIR = "gitwhy";
-export const LEGACY_STORAGE_DIR = ".gitwhy";
+export const PRIMARY_STORAGE_DIR = "whyspec";
+export const LEGACY_STORAGE_DIR = "gitwhy";
+export const OLDEST_LEGACY_STORAGE_DIR = ".gitwhy";
+export const STORAGE_DIR_CANDIDATES = [
+  PRIMARY_STORAGE_DIR,
+  LEGACY_STORAGE_DIR,
+  OLDEST_LEGACY_STORAGE_DIR,
+] as const;
 
 export function resolveStorageDirName(repoRoot: string): string {
-  if (existsSync(join(repoRoot, PRIMARY_STORAGE_DIR))) {
-    return PRIMARY_STORAGE_DIR;
-  }
-  if (existsSync(join(repoRoot, LEGACY_STORAGE_DIR))) {
-    return LEGACY_STORAGE_DIR;
+  for (const candidate of STORAGE_DIR_CANDIDATES) {
+    if (existsSync(join(repoRoot, candidate))) {
+      return candidate;
+    }
   }
   return PRIMARY_STORAGE_DIR;
 }

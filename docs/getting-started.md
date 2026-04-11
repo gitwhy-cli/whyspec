@@ -21,7 +21,7 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 **1. Plan** — Before coding, declare intent and surface decisions that need to be made.
 
 ```
-/whyspec-plan add-jwt-auth     ->   gitwhy/changes/add-jwt-auth/
+/whyspec-plan add-jwt-auth     ->   whyspec/changes/add-jwt-auth/
                                       intent.md   (why this change exists)
                                       design.md   (approach + decisions to make)
                                       tasks.md    (verification-first checklist)
@@ -36,7 +36,7 @@ That's it. WhySpec teaches your AI agent to plan before coding and capture reaso
 **3. Capture** — After coding, record the reasoning. Resolve the Decision Bridge.
 
 ```
-/whyspec-capture add-jwt-auth  ->   gitwhy/changes/add-jwt-auth/ctx_a1b2c3d4.md
+/whyspec-capture add-jwt-auth  ->   whyspec/changes/add-jwt-auth/ctx_a1b2c3d4.md
                                       Decisions Made + Surprises + Trade-offs
 ```
 

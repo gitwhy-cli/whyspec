@@ -7,7 +7,7 @@ import YAML from "yaml";
 import { renderWelcomeScreen, renderTelemetryNotice, renderSuccessMessage } from "../ui/welcome.js";
 import { promptToolPicker, needsAgentsMd } from "../ui/tool-picker.js";
 import { readConfig } from "../core/config.js";
-import { LEGACY_STORAGE_DIR, PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../core/storage-root.js";
+import { PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../core/storage-root.js";
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
@@ -36,12 +36,21 @@ export function createGitwhyDir(root: string): void {
 
 export function removeLegacyGitwhyAlias(root: string): boolean {
   const helperPath = path.join(root, "gitwhy");
+  const primaryPath = path.join(root, PRIMARY_STORAGE_DIR);
+  const oldestLegacyPath = path.join(root, ".gitwhy");
   if (!fs.lstatSync(helperPath, { throwIfNoEntry: false })) {
     return false;
   }
 
   const helperStat = fs.lstatSync(helperPath);
   if (helperStat.isSymbolicLink()) {
+    const helperTarget = fs.readlinkSync(helperPath);
+    const resolvedTarget = path.resolve(path.dirname(helperPath), helperTarget);
+    const resolvedOldestLegacy = path.resolve(oldestLegacyPath);
+
+    if (!fs.existsSync(primaryPath) && fs.existsSync(oldestLegacyPath) && resolvedTarget === resolvedOldestLegacy) {
+      fs.renameSync(oldestLegacyPath, primaryPath);
+    }
     fs.unlinkSync(helperPath);
     return true;
   }
@@ -58,19 +67,29 @@ export function removeLegacyGitwhyAlias(root: string): boolean {
     return false;
   }
 
+  if (!fs.existsSync(primaryPath) && fs.existsSync(oldestLegacyPath)) {
+    fs.renameSync(oldestLegacyPath, primaryPath);
+  }
+
   fs.rmSync(helperPath, { recursive: true, force: true });
   return true;
 }
 
 export function migrateLegacyStorage(root: string): boolean {
-  const legacyPath = path.join(root, LEGACY_STORAGE_DIR);
   const primaryPath = path.join(root, PRIMARY_STORAGE_DIR);
+  const activeDirName = resolveStorageDirName(root);
+  const activePath = path.join(root, activeDirName);
 
-  if (!fs.existsSync(legacyPath) || fs.existsSync(primaryPath)) {
+  if (activeDirName === PRIMARY_STORAGE_DIR || fs.existsSync(primaryPath)) {
     return false;
   }
 
-  fs.renameSync(legacyPath, primaryPath);
+  const activeStat = fs.lstatSync(activePath, { throwIfNoEntry: false });
+  if (!activeStat || !activeStat.isDirectory() || activeStat.isSymbolicLink()) {
+    return false;
+  }
+
+  fs.renameSync(activePath, primaryPath);
   return true;
 }
 
@@ -101,7 +120,7 @@ export function writeConfigYaml(root: string, opts: ConfigOptions): void {
 }
 
 export function addToGitignore(root: string): void {
-  const entries = [".gitwhy/", "gitwhy/"];
+  const entries = [".gitwhy/", "gitwhy/", "whyspec/"];
   const gitignorePath = path.join(root, ".gitignore");
   const gitDir = path.join(root, ".git");
   const gitExcludePath = path.join(gitDir, "info", "exclude");
@@ -120,7 +139,7 @@ export function addToGitignore(root: string): void {
     }
   };
 
-  // Migration-only cleanup: keep .gitwhy visible and unmanaged by ignore files.
+  // Keep visible WhySpec roots unmanaged by ignore files during migration.
   removeEntry(gitignorePath);
   removeEntry(gitExcludePath);
 }
@@ -210,6 +229,7 @@ export function ensureVsCodeShowsGitwhy(root: string): void {
 
   filesExclude[".gitwhy"] = false;
   filesExclude["gitwhy"] = false;
+  filesExclude["whyspec"] = false;
   settings["files.exclude"] = filesExclude;
 
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
@@ -386,6 +406,7 @@ export async function runInit(): Promise<void> {
 
   // Upgrade legacy hidden storage before deciding whether initialization already exists.
   migrateLegacyStorage(root);
+  removeLegacyGitwhyAlias(root);
   const gitwhyDir = path.join(root, resolveStorageDirName(root));
 
   // Guard: already initialized — but repair missing skills from partial init
@@ -441,10 +462,6 @@ export async function runInit(): Promise<void> {
       }
     } catch {
       // Leave malformed user settings untouched and continue with existing repair work.
-    }
-
-    if (removeLegacyGitwhyAlias(root)) {
-      repaired = true;
     }
 
     if (repaired) {

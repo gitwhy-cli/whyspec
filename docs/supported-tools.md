@@ -62,7 +62,7 @@ WhySpec installs native Codex skills into the global Codex skills directory:
 
 Use `$whyspec-plan`, `$whyspec-execute`, etc. in Codex after restarting it.
 
-WhySpec stores reasoning in a visible `gitwhy/` folder so Codex and other agents can reliably keep access to the files after reloads.
+WhySpec stores reasoning in a visible `whyspec/` folder so Codex and other agents can reliably keep access to the files after reloads.
 
 ### AGENTS.md (Copilot, Windsurf, Cline, etc.)
 

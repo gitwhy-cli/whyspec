@@ -39,12 +39,12 @@ Use search when you need to understand why a past decision was made — especial
 
 ### Solo (Default)
 
-`gitwhy/` is the default local storage root. It is left visible and unignored so agent file trees do not lose access to reasoning data.
+`whyspec/` is the default local storage root. It is left visible and unignored so agent file trees do not lose access to reasoning data.
 
 ### Team (Opt-in)
 
-Commit `gitwhy/` if you want reasoning visible in PRs. Reviewers can then see not just what changed, but why.
+Commit `whyspec/` if you want reasoning visible in PRs. Reviewers can then see not just what changed, but why.
 
 ### Enterprise
 
-Keep `gitwhy/` local-only or sync it to [GitWhy](https://gitwhy.dev) cloud. Reasoning is aggregated across repos and teams without requiring hidden storage.
+Keep `whyspec/` local-only or sync it to [GitWhy](https://gitwhy.dev) cloud. Reasoning is aggregated across repos and teams without requiring hidden storage.

@@ -73,7 +73,7 @@ When ready to implement, run `/whyspec-execute`
    ```
 
    Parse the JSON response:
-   - `path`: The change directory (e.g., `.gitwhy/changes/add-auth/`)
+   - `path`: The change directory (e.g., `whyspec/changes/add-auth/`)
    - `templates`: Template content for intent.md, design.md, tasks.md
    - `context`: Project context from config.yaml (constraints for you — do NOT copy into files)
    - `rules`: Project-specific rules (constraints for you — do NOT copy into files)

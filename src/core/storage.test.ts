@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { mkdtempSync, existsSync } from "node:fs";
+import { mkdtempSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -13,6 +13,7 @@ import {
   listChanges,
   changeExists,
 } from "./storage.js";
+import { resolveStorageDirName } from "./storage-root.js";
 
 function makeTmp(): string {
   return mkdtempSync(join(tmpdir(), "whyspec-storage-test-"));
@@ -31,30 +32,54 @@ describe("generateContextId", () => {
 });
 
 describe("path helpers", () => {
-  it("gitwhyDir returns gitwhy path by default", () => {
-    expect(gitwhyDir("/repo")).toBe(join("/repo", "gitwhy"));
+  it("gitwhyDir returns whyspec path by default", () => {
+    expect(gitwhyDir("/repo")).toBe(join("/repo", "whyspec"));
   });
 
-  it("changesDir returns gitwhy/changes path by default", () => {
-    expect(changesDir("/repo")).toBe(join("/repo", "gitwhy", "changes"));
+  it("changesDir returns whyspec/changes path by default", () => {
+    expect(changesDir("/repo")).toBe(join("/repo", "whyspec", "changes"));
+  });
+
+  it("prefers whyspec over legacy visible roots when multiple exist", () => {
+    const tmp = makeTmp();
+    mkdirSync(join(tmp, "whyspec"), { recursive: true });
+    mkdirSync(join(tmp, "gitwhy"), { recursive: true });
+    mkdirSync(join(tmp, ".gitwhy"), { recursive: true });
+
+    expect(resolveStorageDirName(tmp)).toBe("whyspec");
+  });
+
+  it("falls back to gitwhy before .gitwhy", () => {
+    const tmp = makeTmp();
+    mkdirSync(join(tmp, "gitwhy"), { recursive: true });
+    mkdirSync(join(tmp, ".gitwhy"), { recursive: true });
+
+    expect(resolveStorageDirName(tmp)).toBe("gitwhy");
+  });
+
+  it("falls back to .gitwhy when newer visible roots are absent", () => {
+    const tmp = makeTmp();
+    mkdirSync(join(tmp, ".gitwhy"), { recursive: true });
+
+    expect(resolveStorageDirName(tmp)).toBe(".gitwhy");
   });
 });
 
 describe("ensureDirectoryStructure", () => {
-  it("creates gitwhy/, changes/, archive/, debug/", () => {
+  it("creates whyspec/, changes/, archive/, debug/", () => {
     const tmp = makeTmp();
     ensureDirectoryStructure(tmp);
-    expect(existsSync(join(tmp, "gitwhy"))).toBe(true);
-    expect(existsSync(join(tmp, "gitwhy", "changes"))).toBe(true);
-    expect(existsSync(join(tmp, "gitwhy", "archive"))).toBe(true);
-    expect(existsSync(join(tmp, "gitwhy", "debug"))).toBe(true);
+    expect(existsSync(join(tmp, "whyspec"))).toBe(true);
+    expect(existsSync(join(tmp, "whyspec", "changes"))).toBe(true);
+    expect(existsSync(join(tmp, "whyspec", "archive"))).toBe(true);
+    expect(existsSync(join(tmp, "whyspec", "debug"))).toBe(true);
   });
 
   it("is idempotent", () => {
     const tmp = makeTmp();
     ensureDirectoryStructure(tmp);
     ensureDirectoryStructure(tmp);
-    expect(existsSync(join(tmp, "gitwhy"))).toBe(true);
+    expect(existsSync(join(tmp, "whyspec"))).toBe(true);
   });
 });
 

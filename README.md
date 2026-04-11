@@ -12,9 +12,9 @@
   <a href="https://discord.gg/2X5X5XeFyT"><img src="https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-**Spec-driven development that captures reasoning.**
+**Spec-driven development with "reasoning" layer.**
 
-A spec-driven context engineering framework for AI coding agents like Claude Code, Cursor, Copilot, and more.
+A spec-driven context engineering framework that also capture reasoning for AI coding agents like Claude Code, Cursor, Copilot, and more.
 
 ## Our Vision
 

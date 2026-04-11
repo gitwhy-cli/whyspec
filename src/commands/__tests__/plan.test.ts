@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { planCommand, type PlanJsonOutput } from "../plan.js";
 
 const TEST_DIR = join(process.cwd(), ".test-plan-tmp");
-const GITWHY_DIR = join(TEST_DIR, "gitwhy");
+const WHYSPEC_DIR = join(TEST_DIR, "whyspec");
 
 // Capture console.log output
 function captureOutput(fn: () => Promise<void>): Promise<string> {
@@ -42,7 +42,7 @@ describe("plan command", () => {
 
   it("creates change folder with 3 template files", async () => {
     await planCommand("Add JWT Auth", {});
-    const changePath = join(GITWHY_DIR, "changes", "add-jwt-auth");
+    const changePath = join(WHYSPEC_DIR, "changes", "add-jwt-auth");
 
     expect(existsSync(changePath)).toBe(true);
     expect(existsSync(join(changePath, "intent.md"))).toBe(true);
@@ -50,23 +50,23 @@ describe("plan command", () => {
     expect(existsSync(join(changePath, "tasks.md"))).toBe(true);
   });
 
-  it("auto-initializes gitwhy before creating plan files", async () => {
+  it("auto-initializes whyspec before creating plan files", async () => {
     await planCommand("Auto Init Plan", {});
 
-    expect(existsSync(join(GITWHY_DIR, "config.yaml"))).toBe(true);
-    expect(existsSync(join(GITWHY_DIR, "archive"))).toBe(true);
-    expect(existsSync(join(GITWHY_DIR, "debug"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "config.yaml"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "archive"))).toBe(true);
+    expect(existsSync(join(WHYSPEC_DIR, "debug"))).toBe(true);
   });
 
   it("slugifies the change name correctly", async () => {
     await planCommand("My Cool Feature!!!", {});
-    const changePath = join(GITWHY_DIR, "changes", "my-cool-feature");
+    const changePath = join(WHYSPEC_DIR, "changes", "my-cool-feature");
     expect(existsSync(changePath)).toBe(true);
   });
 
   it("template files contain correct headings", async () => {
     await planCommand("test-feature", {});
-    const changePath = join(GITWHY_DIR, "changes", "test-feature");
+    const changePath = join(WHYSPEC_DIR, "changes", "test-feature");
 
     const intent = readFileSync(join(changePath, "intent.md"), "utf-8");
     expect(intent).toContain("# Intent: test-feature");
@@ -89,7 +89,7 @@ describe("plan command", () => {
     );
     const parsed: PlanJsonOutput = JSON.parse(output);
 
-    expect(parsed.path).toBe("gitwhy/changes/json-test");
+    expect(parsed.path).toBe("whyspec/changes/json-test");
     expect(parsed.templates.intent).toContain("# Intent: json-test");
     expect(parsed.templates.design).toContain("# Design: json-test");
     expect(parsed.templates.tasks).toContain("# Tasks: json-test");
@@ -97,7 +97,7 @@ describe("plan command", () => {
     expect(typeof parsed.rules).toBe("string");
 
     // JSON mode should still create the change directory and start anchor
-    const changePath = join(GITWHY_DIR, "changes", "json-test");
+    const changePath = join(WHYSPEC_DIR, "changes", "json-test");
     expect(existsSync(changePath)).toBe(true);
     expect(existsSync(join(changePath, ".started"))).toBe(true);
     expect(existsSync(join(changePath, "intent.md"))).toBe(false);
@@ -107,9 +107,9 @@ describe("plan command", () => {
 
   it("--json includes context and rules from config", async () => {
     // Create config.yaml with custom context and rules
-    mkdirSync(GITWHY_DIR, { recursive: true });
+    mkdirSync(WHYSPEC_DIR, { recursive: true });
     writeFileSync(
-      join(GITWHY_DIR, "config.yaml"),
+      join(WHYSPEC_DIR, "config.yaml"),
       'version: "1.0"\ncontext: "We use React + TypeScript"\nrules: "Always write tests first"',
     );
 

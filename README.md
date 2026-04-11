@@ -67,8 +67,6 @@ whyspec init                        # Set up WhySpec
 
 That's it. WhySpec teaches your AI agent to plan before coding and capture reasoning after.
 
-WhySpec writes visible planning files to `whyspec/`. GitWhy-native internal data stays in `.git/gitwhy/`. Older `gitwhy/` and `.gitwhy/` workspaces are still readable for compatibility.
-
 ## Docs
 
 → [Getting Started](docs/getting-started.md): first steps<br>

@@ -1,0 +1,44 @@
+src/commands/init.ts
+  3564ae4910b20c42 14,354-358,449-457
+src/adapters/agents-md.ts
+  3564ae4910b20c42 152
+src/ui/tool-picker.ts
+  3564ae4910b20c42 62-67
+src/adapters/antigravity.ts
+  3564ae4910b20c42 1-142
+src/adapters/__tests__/antigravity.test.ts
+  3564ae4910b20c42 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "9d444938b558e2bd513e5297307928e414f466e2",
+  "prompts": {
+    "3564ae4910b20c42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0296486-3dae-4f29-a3bb-164c557c40df",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 388,
+      "total_deletions": 12,
+      "accepted_lines": 379,
+      "overriden_lines": 4
+    },
+    "57b97c8e7dee1c02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7db3-883a-7963-a797-7832c7f86cf2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 445,
+      "total_deletions": 0,
+      "accepted_lines": 445,
+      "overriden_lines": 0
+    }
+  }
+}

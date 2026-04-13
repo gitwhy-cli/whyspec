@@ -65,6 +65,12 @@ export const AVAILABLE_TOOLS: ToolChoice[] = [
     skillSupport: true,
     usesAgentsMd: true,
   },
+  {
+    name: "OpenCode",
+    value: "opencode",
+    skillSupport: true,
+    usesAgentsMd: true,
+  },
 ];
 
 export async function promptToolPicker(): Promise<string[]> {

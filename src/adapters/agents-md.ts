@@ -8,7 +8,7 @@ import {
  * Generate the AGENTS.md content.
  *
  * This single file is read by GitHub Copilot, Windsurf, Cline, Amazon Q,
- * RooCode, Codex CLI, and other AI coding agents that look for project-root
+ * RooCode, Codex CLI, OpenCode, and other AI coding agents that look for project-root
  * instruction files.
  */
 function getAgentsMdContent(): string {
@@ -149,14 +149,14 @@ WhySpec debug sessions follow the scientific method:
 
 ---
 
-*This file is read by GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI, Google Antigravity, and other AI coding agents that support project-level instruction files.*
+*This file is read by GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI, Google Antigravity, OpenCode, and other AI coding agents that support project-level instruction files.*
 `;
 }
 
 /**
  * Generate AGENTS.md for AI tools that read project-root instruction files.
  *
- * Targets: GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI.
+ * Targets: GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI, OpenCode.
  * Single comprehensive file with CLI-as-oracle pattern, example workflow,
  * and Decision Bridge explanation.
  *

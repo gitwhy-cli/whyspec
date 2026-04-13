@@ -1,0 +1,36 @@
+package.json
+  3564ae4910b20c42 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "1ce588e88689e33d844a7dc3ae4753063d31a7f9",
+  "prompts": {
+    "3564ae4910b20c42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0296486-3dae-4f29-a3bb-164c557c40df",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 7,
+      "accepted_lines": 609,
+      "overriden_lines": 0
+    },
+    "57b97c8e7dee1c02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7db3-883a-7963-a797-7832c7f86cf2",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Quan Nguyen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 445,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -59,6 +59,12 @@ export const AVAILABLE_TOOLS: ToolChoice[] = [
     skillSupport: false,
     usesAgentsMd: true,
   },
+  {
+    name: "Google Antigravity",
+    value: "antigravity",
+    skillSupport: true,
+    usesAgentsMd: true,
+  },
 ];
 
 export async function promptToolPicker(): Promise<string[]> {

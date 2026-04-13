@@ -149,7 +149,7 @@ WhySpec debug sessions follow the scientific method:
 
 ---
 
-*This file is read by GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI, and other AI coding agents that support project-level instruction files.*
+*This file is read by GitHub Copilot, Windsurf, Cline, Amazon Q, RooCode, Codex CLI, Google Antigravity, and other AI coding agents that support project-level instruction files.*
 `;
 }
 

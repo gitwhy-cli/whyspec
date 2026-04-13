@@ -11,6 +11,7 @@ import { PRIMARY_STORAGE_DIR, resolveStorageDirName, storageDirPath } from "../c
 import { generateCursorCommands } from "../adapters/cursor.js";
 import { generateCodexSkills } from "../adapters/codex.js";
 import { generateAgentsMd as generateAgentsMdAdapter } from "../adapters/agents-md.js";
+import { generateAntigravitySkills } from "../adapters/antigravity.js";
 import { type GeneratedFile } from "../adapters/types.js";
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -350,6 +351,11 @@ export function installSkillFiles(root: string, tools: string[]): void {
   if (tools.includes("codex")) {
     installCodexSkills(root, skillsDir);
   }
+
+  // Antigravity skills
+  if (tools.includes("antigravity")) {
+    writeGeneratedFiles(root, generateAntigravitySkills());
+  }
 }
 
 export function generateAgentsMd(root: string, tools: string[]): void {
@@ -435,6 +441,15 @@ export async function runInit(): Promise<void> {
       const codexSkillCheck = path.join(getCodexSkillsRoot(), "whyspec-plan", "SKILL.md");
       if (!fs.existsSync(codexSkillCheck)) {
         console.log(chalk.yellow("\n  Repairing missing Codex skills...\n"));
+        installSkillFiles(root, tools);
+        repaired = true;
+      }
+    }
+
+    if (tools.includes("antigravity")) {
+      const antigravitySkillCheck = path.join(root, ".agent", "skills", "whyspec-plan", "SKILL.md");
+      if (!fs.existsSync(antigravitySkillCheck)) {
+        console.log(chalk.yellow("\n  Repairing missing Antigravity skills...\n"));
         installSkillFiles(root, tools);
         repaired = true;
       }

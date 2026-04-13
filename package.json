@@ -1,6 +1,6 @@
 {
   "name": "@gitwhy-cli/whyspec",
-  "version": "1.2.23",
+  "version": "1.2.24",
   "description": "The reasoning layer for AI-assisted development — capture WHY code was built the way it was",
   "type": "module",
   "main": "dist/cli/index.js",
